@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model UsersData {
+  UserID                      String  @id
+  UserVoiceRankCardColor      String?
+  UserTextRankCardColor       String?
+  UserVoiceRankCardBackground String?
+  UserTextRankCardBackground  String?
+
+  @@index([UserID])
+}
+
+model GuildsData {
+  GuildID           String @id
+  Prefix            String @default("!")
+  VoiceSpeedDefault Int    @default(60)
+  TextExperienceMin Int    @default(5)
+  TextExperienceMax Int    @default(20)
+  VoiceExperienceMin Int   @default(5)
+  VoiceExperienceMax Int   @default(20)
+  TextExpEnabled   Boolean @default(true)
+  VoiceExpEnabled  Boolean @default(true)
+  TextDefaultMessage String?
+  VoiceDefaultMessage String?
+
+  @@index([GuildID])
+}
+
+model UsersVoiceExperienceData {
+  UserID          String
+  GuildID         String
+  VoiceExperience Int    @default(0)
+  Nivel           Int    @default(0)
+  TotalExperience Int    @default(0)
+
+  @@id([UserID, GuildID])
+  @@index([UserID])
+  @@index([GuildID])
+}
+
+model VoiceRoleRewards {
+  GuildID String
+  Nivel   Int
+  RoleID  String
+
+  @@id([GuildID, RoleID])
+  @@index([GuildID])
+  @@index([RoleID])
+}
+
+model UsersTextExperienceData {
+  UserID          String
+  GuildID         String
+  TextExperience  Int    @default(0)
+  Nivel           Int    @default(0)
+  TotalExperience Int    @default(0)
+
+  @@id([UserID, GuildID])
+  @@index([UserID])
+  @@index([GuildID])
+}
+
+model TextRoleRewards {
+  GuildID String
+  Nivel   Int
+  RoleID  String
+
+  @@id([GuildID, RoleID])
+  @@index([GuildID])
+  @@index([RoleID])
+}
+
+model UsersEconomyVoiceRewards {
+  UserID  String
+  GuildID String
+  Coins   Int    @default(0)
+
+  @@id([UserID, GuildID])
+}
+
+model ActiveTempVoices {
+  GuildID         String
+  ChannelID       String
+  ChannelOwner    String
+  ChannelCategory String?
+
+  @@id([GuildID, ChannelID])
+  @@index([GuildID])
+  @@index([ChannelID])
+}
+
+model ConfigChannels {
+  GuildID            String  @id
+  NotesLogs          String?
+  ModLog             String?
+  TextXPNotification String?
+  VcXPNotification   String?
+  VoiceLogs          String?
+
+  @@index([GuildID])
+}
+
+model Moderation {
+  GuildID     String
+  UserID      String
+  ModeratorID String
+  CaseID      Int
+  Type        String
+  Reason      String?
+  Date        DateTime
+
+  @@id([GuildID, CaseID])
+  @@index([GuildID])
+  @@index([CaseID])
+}

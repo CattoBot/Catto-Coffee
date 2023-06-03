@@ -1,0 +1,41 @@
+{
+  "name": "coffee",
+  "version": "1.0.0",
+  "description": "Nueva versión de Catto con prisma.",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node .",
+    "dev": "nodemon --config nodemon.json src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1rainwall/Coffee.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/1rainwall/Coffee/issues"
+  },
+  "homepage": "https://github.com/1rainwall/Coffee#readme",
+  "devDependencies": {
+    "@prisma/client": "^4.15.0",
+    "@types/node": "^20.2.5",
+    "nodemon": "^2.0.22",
+    "prisma": "^4.15.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@sapphire/decorators": "^6.0.1",
+    "@sapphire/framework": "^4.4.4",
+    "@sapphire/plugin-subcommands": "^4.0.1",
+    "@sapphire/time-utilities": "^1.7.9",
+    "canvacord": "^5.4.9",
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.0.3",
+    "kleur": "^4.1.5",
+    "moment": "^2.29.4"
+  }
+}
