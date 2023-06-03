@@ -10,6 +10,7 @@ import {
   ActionRowBuilder,
   TextInputBuilder,
   TextInputStyle,
+  PermissionFlagsBits,
 } from "discord.js";
 
 export class AdminSubCommands extends Subcommand {
@@ -60,6 +61,16 @@ export class AdminSubCommands extends Subcommand {
           
           ],
         },
+        {
+          name: 'setup',
+          type: 'group',
+          entries: [
+            {
+              name: 'voices',
+              chatInputRun: 'chatInputSetupVoices'
+            }
+          ]
+        }
       ],
     });
   }
@@ -110,6 +121,16 @@ export class AdminSubCommands extends Subcommand {
                     value: "voice",
                   }
                 )
+            )
+        )
+        .addSubcommandGroup((group) =>
+          group
+            .setName("setup")
+            .setDescription("Configuración del sistema de canales temporales")
+            .addSubcommand((command) =>
+              command
+                .setName("voices")
+                .setDescription(`Creal el canal de voz para el sistema de canales temporales`)
             )
         )
 
@@ -316,6 +337,46 @@ export class AdminSubCommands extends Subcommand {
         )
     );
   }
+
+  public async chatInputSetupVoices(interaction: Subcommand.ChatInputCommandInteraction) {
+    const Guild = interaction.guild;
+    const CategoryName = `Crea tu canal`;
+  
+    const Category = await Guild?.channels.create({
+      name: CategoryName,
+      type: 4,
+    });
+  
+    const ChannelName = `Únete para Crear`;
+    const Channel = await Guild?.channels.create({
+      name: ChannelName,
+      parent: Category?.id,
+      type: 2,
+      permissionOverwrites: [
+        {
+          id: Guild.roles.everyone.id,
+          allow: PermissionFlagsBits.Connect,
+        },
+      ],
+    });
+  
+    const guildId = Guild?.id ?? '';
+    const channelId = Channel?.id ?? '';
+    const categoryId = Category?.id ?? '';
+  
+    await Prisma.configTempChannels.create({
+      data: {
+        GuildID: guildId,
+        TempVoiceChannelCreate: channelId,
+        TempVoiceCategory: categoryId,
+      },
+    });
+  
+    await interaction.reply({
+      content: `Se ha configurado el sistema de canales voz temporales éxitosamente ${config.emojis.success}. Puedes verificar en <#${Channel?.id}>.`,
+    });
+  }
+  
 
   public async chatInputResetExpUser(
     interaction: Subcommand.ChatInputCommandInteraction

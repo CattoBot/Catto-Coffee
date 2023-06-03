@@ -36,6 +36,16 @@ model GuildsData {
   @@index([GuildID])
 }
 
+model ConfigTempChannels {
+  GuildID String
+  TempVoiceChannelCreate String
+  TempVoiceCategory String
+
+  @@id([GuildID, TempVoiceChannelCreate])
+  @@index([GuildID])
+  @@index([TempVoiceChannelCreate])
+}
+
 model UsersVoiceExperienceData {
   UserID          String
   GuildID         String
