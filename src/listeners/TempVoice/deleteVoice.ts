@@ -36,7 +36,7 @@ export class DeleteVoiceListener extends Listener {
               }
             },
           })
-        ]);
+        ]).catch((err) => {});
       }
     }
   }

@@ -10,6 +10,9 @@ export class TempVoiceCommands extends Subcommand {
     super(context, {
       ...options,
       cooldownDelay: Time.Second * 5,
+      requiredClientPermissions: ['ManageChannels'],
+      requiredUserPermissions: ['SendMessages'],
+      preconditions: ["TempVoiceExists"],
       name: "tempvoice",
       description: "Comandos de voz temporales",
       subcommands: [

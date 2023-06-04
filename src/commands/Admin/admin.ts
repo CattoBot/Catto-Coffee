@@ -339,6 +339,20 @@ export class AdminSubCommands extends Subcommand {
   }
 
   public async chatInputSetupVoices(interaction: Subcommand.ChatInputCommandInteraction) {
+
+    const getCategories = await Prisma.configTempChannels.findMany({
+      where: {
+        GuildID: interaction.guild?.id,
+      }
+    });
+
+    if(getCategories.length >= 2) {
+      return interaction.reply({
+        content: `${config.emojis.error} Parece que ya tienes 2 categorias de canales temporales, si deseas crear más, considera adquirir mi versión premium.`,
+        ephemeral: true,
+      });
+    }
+
     const Guild = interaction.guild;
     const CategoryName = `Crea tu canal`;
   
@@ -347,7 +361,7 @@ export class AdminSubCommands extends Subcommand {
       type: 4,
     });
   
-    const ChannelName = `Únete para Crear`;
+    const ChannelName = `🔉・Únete para Crear`;
     const Channel = await Guild?.channels.create({
       name: ChannelName,
       parent: Category?.id,

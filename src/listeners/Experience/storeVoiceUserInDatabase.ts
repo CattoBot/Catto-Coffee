@@ -3,7 +3,7 @@ import { Prisma } from "../../../prisma/PrismaClient";
 import { GuildMember, VoiceState } from "discord.js";
 const addXpIntervals = new Map();
 
-export class VoiceStateUpdateListener extends Listener {
+export class storeVoiceUsersInDatabase extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,

@@ -1,6 +1,6 @@
 import { Listener, Events } from "@sapphire/framework";
 import { Prisma } from "../../../prisma/PrismaClient";
-import { VoiceState, CategoryChannel, ChannelType } from "discord.js";
+import { VoiceState, CategoryChannel, ChannelType, PermissionOverwrites } from "discord.js";
 
 const cooldown = new Map<string, number>();
 
@@ -48,6 +48,7 @@ export class CreateVoiceListener extends Listener {
         name: `Canal de ${newState.member?.displayName}`,
           type: ChannelType.GuildVoice,
           parent: categoryChannel,
+          permissionOverwrites: categoryChannel.permissionOverwrites.cache
         });
 
         await Prisma.activeTempVoices.create({

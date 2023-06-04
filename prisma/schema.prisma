@@ -41,7 +41,7 @@ model ConfigTempChannels {
   TempVoiceChannelCreate String
   TempVoiceCategory String
 
-  @@id([GuildID, TempVoiceChannelCreate])
+  @@id([GuildID, TempVoiceCategory])
   @@index([GuildID])
   @@index([TempVoiceChannelCreate])
 }
