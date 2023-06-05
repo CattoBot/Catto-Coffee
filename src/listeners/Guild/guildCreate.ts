@@ -1,7 +1,7 @@
 import { Listener, Events } from "@sapphire/framework";
 import  { EmbedBuilder, Guild, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import config from "../../config";
-import { Prisma } from "../../../prisma/PrismaClient";
+import { Prisma } from "../../client/PrismaClient";
 
 export class GuildCreateListener extends Listener {
     public constructor(context: Listener.Context, options: Listener.Options) {
@@ -13,6 +13,8 @@ export class GuildCreateListener extends Listener {
     }
 
     public async run(Guild: Guild) {
+
+        this.container.logger.info(`[GUILD JOIN] ${Guild.name} (${Guild.id}) added the bot.`);
 
         await Prisma.guildsData.create({
             data: {

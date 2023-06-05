@@ -1,5 +1,5 @@
 import { Listener, Events } from "@sapphire/framework";
-import { Prisma } from "../../../prisma/PrismaClient";
+import { Prisma } from "../../client/PrismaClient";
 import { VoiceChannel } from "discord.js";
 
 export class DeleteVoiceListener extends Listener {

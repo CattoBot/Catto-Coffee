@@ -1,5 +1,5 @@
 import { container } from "@sapphire/framework";
-import { Prisma } from "../../../../../prisma/PrismaClient";
+import { Prisma } from "../../../../client/PrismaClient";
 import Client from "../../../../index";
 import calculateLevelXP from "../../General/calculateLevelXP";
 import { getRandomXP } from "../../General/getRandomXP";
@@ -52,8 +52,6 @@ async function updateVoiceExperience(UserID: string, GuildID: string, Experience
     if (updatedUser.VoiceExperience >= xpHastaNivel) {
       updatedUser.VoiceExperience -= xpHastaNivel;
       updatedUser.Nivel++;
-
-      container.logger.info(`Usuario ${UserID} subió al nivel ${updatedUser.Nivel}`);
       levelUp = true;
     }
 
@@ -168,12 +166,6 @@ export async function addMembersVoiceExperience() {
 
           try {
             let updatedUser = await updateVoiceExperience(UserID, GuildID, Experience, min, max);
-            container.logger.info(`Sele ha dado ${Experience} de experiencia de voz al usuario ${UserID} en el servidor ${GuildID}`)
-            container.logger.info(`Usuario ${UserID} en el servidor ${GuildID} (${guild.name})`);
-            container.logger.info(`Experiencia de voz: ${updatedUser.VoiceExperience}`);
-            container.logger.info(`Experiencia total: ${updatedUser.TotalExperience}`);
-            container.logger.info(`Nivel actual: ${updatedUser.Nivel}`);
-
             if (updatedUser.levelUp) {
               await handleLevelUp(UserID, GuildID, updatedUser.Nivel);
             }

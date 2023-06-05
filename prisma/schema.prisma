@@ -20,6 +20,19 @@ model UsersData {
   @@index([UserID])
 }
 
+model UserNotes {
+  UserID String
+  GuildID String
+  Note String
+  NoteID Int
+  Perpetrator String
+  ReadRoleID String?
+  AttachmentURL String?
+  Unix String 
+
+  @@id([NoteID, GuildID])
+}
+
 model GuildsData {
   GuildID           String @id
   Prefix            String @default("!")

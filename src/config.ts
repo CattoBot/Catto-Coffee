@@ -3,7 +3,7 @@ import { Colors } from "discord.js"
 export default {
     BotSettings: {
         Token: process.env.BOT_TOKEN,
-        OwnerIDs: [''],
+        OwnerIDs: ['249600415040012309'],
         DefaultVoiceExperienceSpeed: 60, // segundos
         DefaultTextExperienceCooldown: 60, // segundos
         TopGGLink: process.env.TOPGG_LINK,

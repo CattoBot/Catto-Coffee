@@ -1,5 +1,5 @@
 import { Listener, Events } from "@sapphire/framework";
-import { Prisma } from "../../../prisma/PrismaClient";
+import { Prisma } from "../../client/PrismaClient";
 import { VoiceState, CategoryChannel, ChannelType, PermissionOverwrites } from "discord.js";
 
 const cooldown = new Map<string, number>();

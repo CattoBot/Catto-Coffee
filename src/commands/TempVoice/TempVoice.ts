@@ -1,7 +1,7 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { ChatInputCommand } from "@sapphire/framework";
 import { Time } from "@sapphire/time-utilities";
-import { Prisma } from "../../../prisma/PrismaClient";
+import { Prisma } from "../../client/PrismaClient";
 import config from "../../config";
 import { PermissionFlagsBits } from "discord.js";
 

@@ -1,6 +1,6 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from "@sapphire/framework";
   import type { ModalSubmitInteraction } from "discord.js";
-  import { Prisma } from "../../../prisma/PrismaClient";
+  import { Prisma } from "../../client/PrismaClient";
   import config from "../../config";
   
   export class TextMessageModal extends InteractionHandler {

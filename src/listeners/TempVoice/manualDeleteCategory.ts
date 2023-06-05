@@ -1,5 +1,5 @@
 import { Listener, Events } from "@sapphire/framework";
-import { Prisma } from "../../../prisma/PrismaClient";
+import { Prisma } from "../../client/PrismaClient";
 import { CategoryChannel } from "discord.js";
 
 export class DeleteCategoryListener extends Listener {

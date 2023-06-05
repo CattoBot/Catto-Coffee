@@ -2,7 +2,7 @@ import { Subcommand } from "@sapphire/plugin-subcommands";
 import { ChatInputCommand } from "@sapphire/framework";
 import { AttachmentBuilder } from "discord.js";
 import Canvacord from "canvacord";
-import { Prisma } from "../../../prisma/PrismaClient";
+import { Prisma } from "../../client/PrismaClient";
 import config from "../../config";
 import calculateLevelXP from "../../utils/functions/General/calculateLevelXP";
 import Client from "../..";
@@ -23,7 +23,7 @@ export class LevelingSubcommand extends Subcommand {
           chatInputRun: "chatInputRank",
         },
         {
-          name: "ladderboard",
+          name: "leaderboard",
           chatInputRun: "chatInputLadderboard",
         },
         {
@@ -77,7 +77,7 @@ export class LevelingSubcommand extends Subcommand {
         )
         .addSubcommand((subcommand) =>
           subcommand
-            .setName("ladderboard")
+            .setName("leaderboard")
             .setDescription("Muestra la tabla de usuarios con más experiencia")
             .addStringOption((option) =>
               option
@@ -366,6 +366,7 @@ export class LevelingSubcommand extends Subcommand {
             orderBy: {
               TextExperience: "desc",
             },
+            take: 10,
           });
 
           let sorted = rank.sort((a, b) => {
@@ -409,6 +410,7 @@ export class LevelingSubcommand extends Subcommand {
             orderBy: {
               VoiceExperience: "desc",
             },
+            take: 10,
           });
 
           let voiceSorted = rank.sort((a, b) => {

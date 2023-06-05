@@ -1,6 +1,6 @@
 import { container } from '@sapphire/framework'
 import  Client  from '../../../../index'
-import { Prisma } from '../../../../../prisma/PrismaClient'
+import { Prisma } from '../../../../client/PrismaClient'
 
 export async function getUsersInVoiceChannels() {
     try {

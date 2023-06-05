@@ -6,7 +6,7 @@ export class ResetCommandsCommand extends Command {
       ...options,
       description: "Resets the commands.",
       detailedDescription: "Resets the commands.",
-    //   preconditions: ["OwnerOnly"],
+       preconditions: ["OwnerOnly"],
     });
   }
 

@@ -1,5 +1,5 @@
 import { Precondition } from "@sapphire/framework";
-import { Prisma } from "../../../prisma/PrismaClient";
+import { Prisma } from "../../client/PrismaClient";
 import { CommandInteraction } from "discord.js";
 import config from "../../config";
 

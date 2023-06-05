@@ -14,6 +14,6 @@ export class ReadyListener extends Listener {
 
   public async run(client: Client) {
     await getUsersInVoiceChannels();
-    return this.container.logger.info(bold().bgWhite().strikethrough().underline(`Logged in as ${client.user?.tag}`));
+    return this.container.logger.info(`Logged in as ${client.user?.tag}`);
   }
 }

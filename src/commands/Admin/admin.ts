@@ -1,6 +1,6 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { ChatInputCommand } from "@sapphire/framework";
-import { Prisma } from "../../../prisma/PrismaClient";
+import { Prisma } from "../../client/PrismaClient";
 import config from "../../config";
 import Client from "../..";
 import {
@@ -600,7 +600,7 @@ export class AdminSubCommands extends Subcommand {
                 .setCustomId("voice-message")
                 .setLabel("Mensaje de felicitación para niveles en voz")
                 .setPlaceholder(
-                  "Mensaje de felicitación, usa {user} para mencioanr el usuario."
+                  "Mensaje de felicitación, usa {user} para mencionar el usuario."
                 )
                 .setRequired(true)
                 .setStyle(TextInputStyle.Paragraph)
@@ -620,7 +620,7 @@ export class AdminSubCommands extends Subcommand {
                 .setCustomId("text-message")
                 .setLabel("Mensaje de felicitación")
                 .setPlaceholder(
-                  "Mensaje de felicitación, usa {user} para mencioanr el usuario."
+                  "Mensaje de felicitación, usa {user} para mencionar el usuario."
                 )
                 .setRequired(true)
                 .setStyle(TextInputStyle.Paragraph)

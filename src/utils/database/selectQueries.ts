@@ -1,5 +1,5 @@
 import type {  GuildMember } from "discord.js";
-import { Prisma } from "../../../prisma/PrismaClient";
+import { Prisma } from "../../client/PrismaClient";
 
 // Verificar si el miembro existe en la base de datos de Voice
 export async function isMemberInVoiceExperienceDatabase(member: GuildMember): Promise<boolean> {

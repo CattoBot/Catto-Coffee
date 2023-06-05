@@ -3,4 +3,5 @@ node_modules
 .env
 package-lock.json
 src/commands/Owner/embed.ts
+dist
 ```
