@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE `guildsdata` ADD COLUMN `VoiceExperienceMax` INTEGER NOT NULL DEFAULT 20,
-    ADD COLUMN `VoiceExperienceMin` INTEGER NOT NULL DEFAULT 5,
-    MODIFY `TextExperienceMax` INTEGER NOT NULL DEFAULT 20;
