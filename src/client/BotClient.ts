@@ -34,12 +34,6 @@ export class BotClient extends SapphireClient {
       loadMessageCommandListeners: true,
       presence: {
         status: "dnd",
-        activities: [
-          {
-            name: "Catto Coffee",
-            type: ActivityType.Watching,
-          },
-        ],
       },
     });
   }
