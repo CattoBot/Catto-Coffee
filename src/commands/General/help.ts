@@ -37,7 +37,7 @@ export class HelpCommand extends Command {
         ]
     })
 
-    interaction.reply({
+    return interaction.reply({
         content: `**<a:cattobell:1114454366213115965> Para saber todos mis comandos haz click [aquí](https://cattobot.github.io/Catto-Documentation/)**`,
         components: [row]
     });

@@ -14,7 +14,7 @@ export class TempVoiceExists extends Precondition {
       return this.ok();
     } else {
       return this.error({
-        message: `${config.emojis.error} Parece que en este servidor no se han configurado correctamente los canales. Por favor ejecuta \`/admin setup voices\` para hacerlo.`,
+        message: `${config.emojis.error} Parece que en este servidor no se ha configurado el sistema de canales temporales.`,
       });
     }
   }

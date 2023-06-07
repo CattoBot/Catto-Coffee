@@ -69,6 +69,9 @@ model UsersVoiceExperienceData {
   @@id([UserID, GuildID])
   @@index([UserID])
   @@index([GuildID])
+  @@index([Nivel])
+  @@index([VoiceExperience])
+  @@index([TotalExperience])
 }
 
 model VoiceRoleRewards {

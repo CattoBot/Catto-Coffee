@@ -1,6 +1,6 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { ChatInputCommand } from "@sapphire/framework";
-import { AttachmentBuilder } from "discord.js";
+import { AttachmentBuilder, Guild } from "discord.js";
 import Canvacord from "canvacord";
 import { Prisma } from "../../client/PrismaClient";
 import config from "../../config";
@@ -11,7 +11,7 @@ export class LevelingSubcommand extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
     super(context, {
       ...options,
-      preconditions: ["GuildOnly", "CheckTextEnabled", "CheckVoiceEnabled"],
+      preconditions: ["GuildOnly"],
       fullCategory: ["Leveling"],
       name: "xp",
       description: "Comandos de experiencia",
@@ -166,9 +166,53 @@ export class LevelingSubcommand extends Subcommand {
     );
   }
 
+  private async verifyEnableVoice(Enabled: Guild, Interaction: Subcommand.ChatInputCommandInteraction){
+    const guild = await Prisma.guildsData.findUnique({
+      where: {
+        GuildID: Enabled.id,
+      },
+    });
 
+    if(guild?.VoiceExpEnabled === false){
+      if(Interaction.deferred){
+        return Interaction.editReply({
+          content: `La experiencia de voz está desactivada en este servidor. ❌`,
+        });
+      } else {
+        return Interaction.reply({
+          content: `La experiencia de voz está desactivada en este servidor. ${config.emojis.error}`,
+          ephemeral: true,
+        });
+      }
+    }
+
+    return true;
+  }
+
+  private async verifyEnableText(Enabled: Guild, Interaction: Subcommand.ChatInputCommandInteraction){
+    const guild = await Prisma.guildsData.findUnique({
+      where: {
+        GuildID: Enabled.id,
+      },
+    });
+
+    if(guild?.TextExpEnabled === false){
+      if(Interaction.deferred){
+        return Interaction.editReply({
+          content: `La experiencia por texto está desactivada en este servidor. ❌`,
+        });
+      }else {
+        return Interaction.reply({
+          content: `La experiencia por texto está desactivada en este servidor. ${config.emojis.error}`,
+          ephemeral: true,
+        });
+      }
+    }
+
+    return true;
+  }
+  
   public async chatInputSetLevelXP(interaction: Subcommand.ChatInputCommandInteraction) {
-
     if(!interaction.memberPermissions?.has('ManageRoles')){
       return interaction.reply({
         content: `No tienes permisos para usar este comando. ${config.emojis.error} permiso requerido: \`Manage Roles\``,
@@ -203,6 +247,7 @@ export class LevelingSubcommand extends Subcommand {
 
     switch (tipo) {
       case "text":
+        await this.verifyEnableText(interaction.guild as Guild, interaction);
         const textUser = await Prisma.usersTextExperienceData.findUnique({
           where: {
             UserID_GuildID: {
@@ -245,6 +290,7 @@ export class LevelingSubcommand extends Subcommand {
         );
 
       case "voice":
+        await this.verifyEnableVoice(interaction.guild!, interaction);
         const VoiceUser = await Prisma.usersVoiceExperienceData.findUnique({
           where: {
             UserID_GuildID: {
@@ -293,6 +339,7 @@ export class LevelingSubcommand extends Subcommand {
     const tipo = interaction.options.getString("tipo") ?? "text";
     switch (tipo) {
       case "text":
+        await this.verifyEnableText(interaction.guild as Guild, interaction);
         const TextRewards = await Prisma.textRoleRewards.findMany({
           where: {
             GuildID: interaction.guildId as string,
@@ -315,6 +362,7 @@ export class LevelingSubcommand extends Subcommand {
         }
 
       case "voice":
+        await this.verifyEnableVoice(interaction.guild!, interaction);
         const VoiceRewards = await Prisma.voiceRoleRewards.findMany({
           where: {
             GuildID: interaction.guildId as string,
@@ -348,6 +396,7 @@ export class LevelingSubcommand extends Subcommand {
     const tipo = interaction.options.getString("tipo") ?? "text";
     switch (tipo) {
       case "text":
+        await this.verifyEnableText(interaction.guild as Guild, interaction);
         const TextLadderboard = await Prisma.usersTextExperienceData.findMany({
           where: {
             GuildID: interaction.guildId as string,
@@ -366,6 +415,7 @@ export class LevelingSubcommand extends Subcommand {
             orderBy: {
               TextExperience: "desc",
             },
+            take: 100
           });
 
           let sorted = rank.sort((a, b) => {
@@ -388,6 +438,7 @@ export class LevelingSubcommand extends Subcommand {
         }
 
       case "voice":
+        await this.verifyEnableVoice(interaction.guild!, interaction);
         const VoiceLadderboard = await Prisma.usersVoiceExperienceData.findMany(
           {
             where: {
@@ -397,7 +448,7 @@ export class LevelingSubcommand extends Subcommand {
         );
 
         if (VoiceLadderboard.length === 0) {
-          return interaction.editReply({
+          return interaction.reply({
             content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`.`,
           });
         } else {
@@ -408,6 +459,7 @@ export class LevelingSubcommand extends Subcommand {
             orderBy: {
               VoiceExperience: "desc",
             },
+            take: 100
           });
 
           let voiceSorted = rank.sort((a, b) => {
@@ -441,67 +493,79 @@ export class LevelingSubcommand extends Subcommand {
     const tipo = interaction.options.getString("tipo") ?? "text";
     const user = interaction.options.getUser("user") ?? interaction.user;
 
+    if(user.bot){
+      return interaction.editReply({
+        content: `Los bots no pueden recibir experiencia ❌`,
+      });
+    }
     switch (tipo) {
       case "text":
-        const TextUserExists = await Prisma.usersTextExperienceData.findUnique({
-          where: {
-            UserID_GuildID: {
-              GuildID: interaction.guildId as string,
-              UserID: user.id,
-            },
-          },
-        });
-
-        if (!TextUserExists) {
-          return interaction.editReply({
-            content: user
-              ? `El usuario ${user.username} no tiene experiencia registrada.`
-              : `No tienes experiencia registrada ${config.emojis.error}, sigue hablando para ganar experiencia`,
-          });
+        if(await this.verifyEnableText(interaction.guild as Guild, interaction)){
+          return;
         } else {
-          let level = TextUserExists.Nivel;
-          let experience = TextUserExists.TextExperience;
-
-          let rank = await Prisma.usersTextExperienceData.findMany({
+          const TextUserExists = await Prisma.usersTextExperienceData.findUnique({
             where: {
-              GuildID: interaction.guildId as string,
+              UserID_GuildID: {
+                GuildID: interaction.guildId as string,
+                UserID: user.id,
+              },
             },
-            orderBy: {
-              TextExperience: "desc",
-            },
           });
-
-          let sorted = rank.sort((a, b) => {
-            if (a.Nivel === b.Nivel) {
-              return b.TextExperience - a.TextExperience;
-            } else {
-              return b.Nivel - a.Nivel;
-            }
-          });
-
-          let currentRank = sorted.findIndex((u) => u.UserID === user.id) + 1;
-
-          const image = new Canvacord.Rank()
-            .setAvatar(user.displayAvatarURL({ extension: "png", size: 512 }))
-            .setCurrentXP(experience)
-            .setRank(currentRank)
-            .setLevel(level)
-            .setRequiredXP(calculateLevelXP(level))
-            .setStatus("dnd")
-            .setProgressBar("#FFFFFF", "COLOR")
-            .setUsername(user.username)
-            .setDiscriminator(user.discriminator);
-
-          const data = await image.build();
-          const attachment = new AttachmentBuilder(data);
-
-          return interaction.editReply({
-            files: [attachment],
-          });
+  
+          if (!TextUserExists) {
+            return interaction.editReply({
+              content: user
+                ? `El usuario \`${user.username}\` no tiene experiencia registrada.`
+                : `No tienes experiencia registrada ${config.emojis.error}, sigue hablando para ganar experiencia`,
+            });
+          } else {
+            let level = TextUserExists.Nivel;
+            let experience = TextUserExists.TextExperience;
+  
+            let rank = await Prisma.usersTextExperienceData.findMany({
+              where: {
+                GuildID: interaction.guildId as string,
+              },
+              orderBy: {
+                TextExperience: "desc",
+              },
+            });
+  
+            let sorted = rank.sort((a, b) => {
+              if (a.Nivel === b.Nivel) {
+                return b.TextExperience - a.TextExperience;
+              } else {
+                return b.Nivel - a.Nivel;
+              }
+            });
+  
+            let currentRank = sorted.findIndex((u) => u.UserID === user.id) + 1;
+  
+            const image = new Canvacord.Rank()
+              .setAvatar(user.displayAvatarURL({ extension: "png", size: 512 }))
+              .setCurrentXP(experience)
+              .setRank(currentRank)
+              .setLevel(level)
+              .setRequiredXP(calculateLevelXP(level))
+              .setStatus("dnd")
+              .setProgressBar("#FFFFFF", "COLOR")
+              .setUsername(user.username)
+              .setDiscriminator(user.discriminator);
+  
+            const data = await image.build();
+            const attachment = new AttachmentBuilder(data);
+  
+            return interaction.editReply({
+              files: [attachment],
+            });
+          }
         }
 
       case "voice":
-        const VoiceuserExists =
+        if(await this.verifyEnableVoice(interaction.guild!, interaction)){
+          return;
+        } else {
+          const VoiceuserExists =
           await Prisma.usersVoiceExperienceData.findUnique({
             where: {
               UserID_GuildID: {
@@ -557,8 +621,8 @@ export class LevelingSubcommand extends Subcommand {
           return interaction.editReply({
             files: [attachment],
           });
+        } 
         }
-
       default:
         break;
     }
