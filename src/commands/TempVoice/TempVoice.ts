@@ -991,6 +991,10 @@ export class TempVoiceCommands extends Subcommand {
                 }
             ])
 
+            return interaction.reply({
+                content: `${config.emojis.success} Se ha reseteado el canal de voz.`,
+            });
+
           }
     }
 }
