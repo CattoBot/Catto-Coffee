@@ -11,7 +11,7 @@ export class LevelingSubcommand extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
     super(context, {
       ...options,
-      preconditions: ["GuildOnly"],
+      preconditions: ["GuildOnly", "CheckTextEnabled", "CheckVoiceEnabled"],
       fullCategory: ["Leveling"],
       name: "xp",
       description: "Comandos de experiencia",

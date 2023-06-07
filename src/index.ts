@@ -9,6 +9,8 @@ declare module "@sapphire/framework" {
       AdminOnly: never;
       TempVoiceExists: never;
       OwnerOnly: never;
+      CheckTextEnabled: never;
+      CheckVoiceEnabled: never;
       // ...
     }
   }
