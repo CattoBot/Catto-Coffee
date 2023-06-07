@@ -17,10 +17,6 @@ export class TempVoiceCommands extends Subcommand {
       description: "Comandos de voz temporales",
       subcommands: [
         {
-          name: "setup",
-          chatInputRun: "chatInputSetup",
-        },
-        {
           name: "name",
           chatInputRun: "chatInputChangeName",
         },
@@ -180,11 +176,6 @@ export class TempVoiceCommands extends Subcommand {
                   )
                   .setRequired(true)
               )
-          )
-          .addSubcommand((Command) =>
-            Command.setName("setup").setDescription(
-              "Configura el canal y la categoria para los TempVoices."
-            )
           )
           .addSubcommand((Command) =>
             Command.setName("bitrate")

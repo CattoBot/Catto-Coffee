@@ -3,7 +3,7 @@ import { Prisma } from "../../../../client/PrismaClient";
 import Client from "../../../../index";
 import calculateLevelXP from "../../General/calculateLevelXP";
 import { getRandomXP } from "../../General/getRandomXP";
-import { Guild, TextChannel, VoiceState } from "discord.js";
+import { TextChannel, VoiceState } from "discord.js";
 
 
 async function getMinMaxEXP(VoiceState: VoiceState) {
@@ -105,7 +105,6 @@ async function addMissingVoiceRoles(UserID: string, GuildID: string, userNivel: 
 
     if (rolesToAdd.length > 0) {
         await member.roles.add(rolesToAdd).catch(() => {});
-        container.logger.info(`Roles ${rolesToAdd.join(', ')} agregados al usuario ${UserID} en el servidor ${GuildID}`)
     }
   }
 }

@@ -23,7 +23,7 @@ model UsersData {
 model UserNotes {
   UserID String
   GuildID String
-  Note String
+  Note String @db.VarChar(65535)
   NoteID Int
   Perpetrator String
   ReadRoleID String?

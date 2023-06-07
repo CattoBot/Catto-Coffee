@@ -21,6 +21,7 @@ export class AdminSubCommands extends Subcommand {
       fullCategory: ["Admin"],
       description: "Comandos de administración",
       preconditions: ["AdminOnly"],
+      cooldownDelay: 10000,
       subcommands: [
         {
           name: "disable",

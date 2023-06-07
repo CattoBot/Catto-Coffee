@@ -301,7 +301,7 @@ export class LevelingSubcommand extends Subcommand {
 
         if (TextRewards.length === 0) {
           return interaction.reply({
-            content: `Parece que en este servidor no hay roles registrados en \`Canales de Texto\`. ${config.emojis.error}`,
+            content: `Parece que en este servidor no hay roles registrados en \`Canales de Texto\`.`,
             ephemeral: true,
           });
         } else {
@@ -323,7 +323,7 @@ export class LevelingSubcommand extends Subcommand {
 
         if (VoiceRewards.length === 0) {
           return interaction.reply({
-            content: `Parece que en este servidor no hay roles registrados en \`Canales de Voz\`. ${config.emojis.error}`,
+            content: `Parece que en este servidor no hay roles registrados en \`Canales de Voz\`.`,
             ephemeral: true,
           });
         } else {
@@ -344,6 +344,7 @@ export class LevelingSubcommand extends Subcommand {
   public async chatInputLadderboard(
     interaction: Subcommand.ChatInputCommandInteraction
   ) {
+    await interaction.deferReply();
     const tipo = interaction.options.getString("tipo") ?? "text";
     switch (tipo) {
       case "text":
@@ -354,9 +355,8 @@ export class LevelingSubcommand extends Subcommand {
         });
 
         if (TextLadderboard.length === 0) {
-          return interaction.reply({
-            content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`. ${config.emojis.error}`,
-            ephemeral: true,
+          return interaction.editReply({
+            content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`.`,
           });
         } else {
           let rank = await Prisma.usersTextExperienceData.findMany({
@@ -366,7 +366,6 @@ export class LevelingSubcommand extends Subcommand {
             orderBy: {
               TextExperience: "desc",
             },
-            take: 10,
           });
 
           let sorted = rank.sort((a, b) => {
@@ -398,9 +397,8 @@ export class LevelingSubcommand extends Subcommand {
         );
 
         if (VoiceLadderboard.length === 0) {
-          return interaction.reply({
-            content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`. ${config.emojis.error}`,
-            ephemeral: true,
+          return interaction.editReply({
+            content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`.`,
           });
         } else {
           let rank = await Prisma.usersVoiceExperienceData.findMany({
@@ -410,7 +408,6 @@ export class LevelingSubcommand extends Subcommand {
             orderBy: {
               VoiceExperience: "desc",
             },
-            take: 10,
           });
 
           let voiceSorted = rank.sort((a, b) => {
