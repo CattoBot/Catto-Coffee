@@ -185,8 +185,6 @@ export class LevelingSubcommand extends Subcommand {
         });
       }
     }
-
-    return true;
   }
 
   private async verifyEnableText(Enabled: Guild, Interaction: Subcommand.ChatInputCommandInteraction){
@@ -208,8 +206,6 @@ export class LevelingSubcommand extends Subcommand {
         });
       }
     }
-
-    return true;
   }
   
   public async chatInputSetLevelXP(interaction: Subcommand.ChatInputCommandInteraction) {
@@ -247,28 +243,74 @@ export class LevelingSubcommand extends Subcommand {
 
     switch (tipo) {
       case "text":
-        await this.verifyEnableText(interaction.guild as Guild, interaction);
-        const textUser = await Prisma.usersTextExperienceData.findUnique({
-          where: {
-            UserID_GuildID: {
-              UserID: user?.id as string,
-              GuildID: interaction.guildId as string,
-            },
-          },
-        });
-
-        if (!textUser) {
-          await Prisma.usersTextExperienceData.create({
-            data: {
-              UserID: user?.id as string,
-              GuildID: interaction.guildId as string,
-              TotalExperience: Math.round(TotalGeneralExperience),
-              Nivel: nivelValue,
+        if(await this.verifyEnableText(interaction.guild as Guild, interaction)){
+          return;
+        }else {
+          const textUser = await Prisma.usersTextExperienceData.findUnique({
+            where: {
+              UserID_GuildID: {
+                UserID: user?.id as string,
+                GuildID: interaction.guildId as string,
+              },
             },
           });
+  
+          if (!textUser) {
+            await Prisma.usersTextExperienceData.create({
+              data: {
+                UserID: user?.id as string,
+                GuildID: interaction.guildId as string,
+                TotalExperience: Math.round(TotalGeneralExperience),
+                Nivel: nivelValue,
+              },
+            });
+          } else {
+            try {
+              await Prisma.usersTextExperienceData.update({
+                where: {
+                  UserID_GuildID: {
+                    UserID: user?.id as string,
+                    GuildID: interaction.guildId as string,
+                  },
+                },
+                data: {
+                  TotalExperience: Math.round(TotalGeneralExperience),
+                  Nivel: nivelValue,
+                },
+              });
+            } catch (err) {
+              this.container.logger.error(err);
+            }
+          }
+  
+          return interaction.reply(
+            `Se ha establecido el nivel de \`${user?.username}\` a \`${nivelValue}\` en canales de texto ${config.emojis.success}`
+          );
+        }
+      case "voice":
+        if(await this.verifyEnableVoice(interaction.guild!, interaction)){
+          return;
         } else {
-          try {
-            await Prisma.usersTextExperienceData.update({
+          const VoiceUser = await Prisma.usersVoiceExperienceData.findUnique({
+            where: {
+              UserID_GuildID: {
+                UserID: user?.id as string,
+                GuildID: interaction.guildId as string,
+              },
+            },
+          });
+  
+          if (!VoiceUser) {
+            await Prisma.usersVoiceExperienceData.create({
+              data: {
+                UserID: user?.id as string,
+                GuildID: interaction.guildId as string,
+                TotalExperience: Math.round(TotalGeneralExperience),
+                Nivel: nivelValue,
+              },
+            });
+          } else {
+            await Prisma.usersVoiceExperienceData.update({
               where: {
                 UserID_GuildID: {
                   UserID: user?.id as string,
@@ -280,54 +322,13 @@ export class LevelingSubcommand extends Subcommand {
                 Nivel: nivelValue,
               },
             });
-          } catch (err) {
-            this.container.logger.error(err);
           }
+  
+          return interaction.reply(
+            `Se ha establecido el nivel de \`${user?.username}\` a \`${nivelValue}\` en canales de voz. ${config.emojis.success}`
+          );
         }
-
-        return interaction.reply(
-          `Se ha establecido el nivel de \`${user?.username}\` a \`${nivelValue}\` en canales de texto ${config.emojis.success}`
-        );
-
-      case "voice":
-        await this.verifyEnableVoice(interaction.guild!, interaction);
-        const VoiceUser = await Prisma.usersVoiceExperienceData.findUnique({
-          where: {
-            UserID_GuildID: {
-              UserID: user?.id as string,
-              GuildID: interaction.guildId as string,
-            },
-          },
-        });
-
-        if (!VoiceUser) {
-          await Prisma.usersVoiceExperienceData.create({
-            data: {
-              UserID: user?.id as string,
-              GuildID: interaction.guildId as string,
-              TotalExperience: Math.round(TotalGeneralExperience),
-              Nivel: nivelValue,
-            },
-          });
-        } else {
-          await Prisma.usersVoiceExperienceData.update({
-            where: {
-              UserID_GuildID: {
-                UserID: user?.id as string,
-                GuildID: interaction.guildId as string,
-              },
-            },
-            data: {
-              TotalExperience: Math.round(TotalGeneralExperience),
-              Nivel: nivelValue,
-            },
-          });
-        }
-
-        return interaction.reply(
-          `Se ha establecido el nivel de \`${user?.username}\` a \`${nivelValue}\` en canales de voz. ${config.emojis.success}`
-        );
-
+        
       default:
         break;
     }
@@ -339,49 +340,55 @@ export class LevelingSubcommand extends Subcommand {
     const tipo = interaction.options.getString("tipo") ?? "text";
     switch (tipo) {
       case "text":
-        await this.verifyEnableText(interaction.guild as Guild, interaction);
-        const TextRewards = await Prisma.textRoleRewards.findMany({
-          where: {
-            GuildID: interaction.guildId as string,
-          },
-        });
-
-        if (TextRewards.length === 0) {
-          return interaction.reply({
-            content: `Parece que en este servidor no hay roles registrados en \`Canales de Texto\`.`,
-            ephemeral: true,
-          });
+        if(await this.verifyEnableText(interaction.guild as Guild, interaction)){
+          return;
         } else {
-          TextRewards.sort((a, b) => a.Nivel - b.Nivel); // Ordenar roles por nivel
-
-          let text = TextRewards.map((r) => {
-            return `Nivel: \`${r.Nivel}\` ➜ <@&${r.RoleID}>`;
+          const TextRewards = await Prisma.textRoleRewards.findMany({
+            where: {
+              GuildID: interaction.guildId as string,
+            },
           });
-
-          return Client.InteractionEmbed(interaction, `\n\n${text.join("\n")}`);
+  
+          if (TextRewards.length === 0) {
+            return interaction.reply({
+              content: `Parece que en este servidor no hay roles registrados en \`Canales de Texto\`.`,
+              ephemeral: true,
+            });
+          } else {
+            TextRewards.sort((a, b) => a.Nivel - b.Nivel); // Ordenar roles por nivel
+  
+            let text = TextRewards.map((r) => {
+              return `Nivel: \`${r.Nivel}\` ➜ <@&${r.RoleID}>`;
+            });
+  
+            return Client.InteractionEmbed(interaction, `\n\n${text.join("\n")}`);
+          }
         }
-
+        
       case "voice":
-        await this.verifyEnableVoice(interaction.guild!, interaction);
-        const VoiceRewards = await Prisma.voiceRoleRewards.findMany({
-          where: {
-            GuildID: interaction.guildId as string,
-          },
-        });
-
-        if (VoiceRewards.length === 0) {
-          return interaction.reply({
-            content: `Parece que en este servidor no hay roles registrados en \`Canales de Voz\`.`,
-            ephemeral: true,
+        if(await this.verifyEnableVoice(interaction.guild!, interaction)){
+          return;
+        } else{
+          const VoiceRewards = await Prisma.voiceRoleRewards.findMany({
+            where: {
+              GuildID: interaction.guildId as string,
+            },
           });
-        } else {
-          VoiceRewards.sort((a, b) => a.Nivel - b.Nivel); // Ordenar roles por nivel
-
-          let text = VoiceRewards.map((r) => {
-            return `Nivel: \`${r.Nivel}\` ➜ <@&${r.RoleID}>`;
-          });
-
-          return Client.InteractionEmbed(interaction, `\n\n${text.join("\n")}`);
+  
+          if (VoiceRewards.length === 0) {
+            return interaction.reply({
+              content: `Parece que en este servidor no hay roles registrados en \`Canales de Voz\`.`,
+              ephemeral: true,
+            });
+          } else {
+            VoiceRewards.sort((a, b) => a.Nivel - b.Nivel); // Ordenar roles por nivel
+  
+            let text = VoiceRewards.map((r) => {
+              return `Nivel: \`${r.Nivel}\` ➜ <@&${r.RoleID}>`;
+            });
+  
+            return Client.InteractionEmbed(interaction, `\n\n${text.join("\n")}`);
+          }
         }
 
       default:
@@ -396,89 +403,93 @@ export class LevelingSubcommand extends Subcommand {
     const tipo = interaction.options.getString("tipo") ?? "text";
     switch (tipo) {
       case "text":
-        await this.verifyEnableText(interaction.guild as Guild, interaction);
-        const TextLadderboard = await Prisma.usersTextExperienceData.findMany({
-          where: {
-            GuildID: interaction.guildId as string,
-          },
-        });
-
-        if (TextLadderboard.length === 0) {
-          return interaction.editReply({
-            content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`.`,
-          });
+        if(await this.verifyEnableText(interaction.guild as Guild, interaction)){
+          return;
         } else {
-          let rank = await Prisma.usersTextExperienceData.findMany({
+          const TextLadderboard = await Prisma.usersTextExperienceData.findMany({
             where: {
               GuildID: interaction.guildId as string,
             },
-            orderBy: {
-              TextExperience: "desc",
-            },
-            take: 100
           });
-
-          let sorted = rank.sort((a, b) => {
-            if (a.Nivel === b.Nivel) {
-              return b.TextExperience - a.TextExperience;
-            } else {
-              return b.Nivel - a.Nivel;
-            }
-          });
-
-          let ladderboard = sorted.slice(0, 10);
-
-          let text = ladderboard.map((u, i) => {
-            return `\`${i + 1}\`. <@${u.UserID}>\nNivel: \`${
-              u.Nivel
-            }\` ➜ XP:\`${u.TextExperience}\``;
-          });
-
-          return Client.InteractionEmbed(interaction, `\n\n${text.join("\n")}`);
-        }
-
-      case "voice":
-        await this.verifyEnableVoice(interaction.guild!, interaction);
-        const VoiceLadderboard = await Prisma.usersVoiceExperienceData.findMany(
-          {
-            where: {
-              GuildID: interaction.guildId as string,
-            },
+  
+          if (TextLadderboard.length === 0) {
+            return interaction.editReply({
+              content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`.`,
+            });
+          } else {
+            let rank = await Prisma.usersTextExperienceData.findMany({
+              where: {
+                GuildID: interaction.guildId as string,
+              },
+              orderBy: {
+                TextExperience: "desc",
+              }
+            });
+  
+            let sorted = rank.sort((a, b) => {
+              if (a.Nivel === b.Nivel) {
+                return b.TextExperience - a.TextExperience;
+              } else {
+                return b.Nivel - a.Nivel;
+              }
+            });
+  
+            let ladderboard = sorted.slice(0, 10);
+  
+            let text = ladderboard.map((u, i) => {
+              return `\`${i + 1}\`. <@${u.UserID}>\nNivel: \`${
+                u.Nivel
+              }\` ➜ XP:\`${u.TextExperience}\``;
+            });
+  
+            return Client.InteractionEmbed(interaction, `\n\n${text.join("\n")}`);
           }
-        );
-
-        if (VoiceLadderboard.length === 0) {
-          return interaction.reply({
-            content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`.`,
-          });
+        }
+        
+      case "voice":
+        if(await this.verifyEnableVoice(interaction.guild!, interaction)){
+          return;
         } else {
-          let rank = await Prisma.usersVoiceExperienceData.findMany({
-            where: {
-              GuildID: interaction.guildId as string,
-            },
-            orderBy: {
-              VoiceExperience: "desc",
-            },
-            take: 100
-          });
-
-          let voiceSorted = rank.sort((a, b) => {
-            if (a.Nivel === b.Nivel) {
-              return b.VoiceExperience - a.VoiceExperience;
-            } else {
-              return b.Nivel - a.Nivel;
+          const VoiceLadderboard = await Prisma.usersVoiceExperienceData.findMany(
+            {
+              where: {
+                GuildID: interaction.guildId as string,
+              },
             }
-          });
-
-          let voiceladderboard = voiceSorted.slice(0, 10);
-
-          let voice = voiceladderboard.map((u, i) => {
-            return `\`${i + 1}\`. <@${u.UserID}>\nNivel: \`${
-              u.Nivel
-            }\` ➜ XP:\`${u.VoiceExperience}\``;
-          });
-
-          return Client.InteractionEmbed(interaction, `${voice.join("\n\n")}`);
+          );
+  
+          if (VoiceLadderboard.length === 0) {
+            return interaction.editReply({
+              content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`.`,
+            });
+          } else {
+            let rank = await Prisma.usersVoiceExperienceData.findMany({
+              where: {
+                GuildID: interaction.guildId as string,
+              },
+              orderBy: {
+                VoiceExperience: "desc",
+              }
+            });
+  
+            let voiceSorted = rank.sort((a, b) => {
+              if (a.Nivel === b.Nivel) {
+                return b.VoiceExperience - a.VoiceExperience;
+              } else {
+                return b.Nivel - a.Nivel;
+              }
+            });
+  
+            let voiceladderboard = voiceSorted.slice(0, 10);
+  
+            let voice = voiceladderboard.map((u, i) => {
+              return `\`${i + 1}\`. <@${u.UserID}>\nNivel: \`${
+                u.Nivel
+              }\` ➜ XP:\`${u.VoiceExperience}\``;
+            });
+  
+            return Client.InteractionEmbed(interaction, `${voice.join("\n\n")}`);
+          }
         }
 
       default:
