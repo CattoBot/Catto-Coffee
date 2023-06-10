@@ -903,7 +903,7 @@ export class TempVoiceCommands extends Subcommand {
     interaction: Subcommand.ChatInputCommandInteraction
   ) {
 
-    try {
+    
       const UserID = interaction.user.id;
       const Member = interaction.guild?.members.cache.get(UserID);
       const VoiceChannel = Member?.voice.channel;
@@ -953,13 +953,8 @@ export class TempVoiceCommands extends Subcommand {
           );
   
         await interaction.showModal(Modal)
-  
-  
-      }
-    } catch (error) {
-      console.log(error)
-    }
-   
+        
+      } 
   }
 
   public async chatInputReset(

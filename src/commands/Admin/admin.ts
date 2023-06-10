@@ -20,6 +20,7 @@ export class AdminSubCommands extends Subcommand {
       name: "admin",
       fullCategory: ["Admin"],
       description: "Comandos de administración",
+      requiredClientPermissions: ['Administrator'],
       preconditions: ["AdminOnly"],
       cooldownDelay: 10000,
       subcommands: [
