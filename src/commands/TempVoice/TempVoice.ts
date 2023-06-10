@@ -3,15 +3,21 @@ import { ChatInputCommand } from "@sapphire/framework";
 import { Time } from "@sapphire/time-utilities";
 import { Prisma } from "../../client/PrismaClient";
 import config from "../../config";
-import { PermissionFlagsBits } from "discord.js";
+import {
+  ActionRowBuilder,
+  ModalBuilder,
+  PermissionFlagsBits,
+  TextInputBuilder,
+  TextInputStyle,
+} from "discord.js";
 
 export class TempVoiceCommands extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
     super(context, {
       ...options,
       cooldownDelay: Time.Second * 5,
-      requiredClientPermissions: ['ManageChannels'],
-      requiredUserPermissions: ['SendMessages'],
+      requiredClientPermissions: ["ManageChannels"],
+      requiredUserPermissions: ["SendMessages"],
       preconditions: ["TempVoiceExists"],
       name: "tempvoice",
       description: "Comandos de voz temporales",
@@ -84,16 +90,9 @@ export class TempVoiceCommands extends Subcommand {
             )
           )
           .addSubcommand((Command) =>
-            Command.setName("name")
-              .setDescription("Cambia el nombre de tu canal de voz.")
-              .addStringOption((option) =>
-                option
-                  .setName("nombre")
-                  .setDescription(
-                    "El nombre que quieres poner en tu canal de voz."
-                  )
-                  .setRequired(true)
-              )
+            Command.setName("name").setDescription(
+              "Cambia el nombre de tu canal de voz."
+            )
           )
           .addSubcommand((Command) =>
             Command.setName("ghost").setDescription(
@@ -635,6 +634,7 @@ export class TempVoiceCommands extends Subcommand {
   ) {
     const TargetUser = interaction.options.getUser("usuario", true);
     const TargetUserID = TargetUser?.id;
+    const MemberTarget = interaction.guild?.members.cache.get(TargetUserID);
     const UserID = interaction.user.id;
     const Member = interaction.guild?.members.cache.get(UserID);
     const VoiceChannel = Member?.voice.channel;
@@ -642,6 +642,13 @@ export class TempVoiceCommands extends Subcommand {
     if (TargetUserID === UserID) {
       return interaction.reply({
         content: `${config.emojis.warning} No puedes denegarte el acceso al canal a ti mismo.`,
+        ephemeral: true,
+      });
+    }
+
+    if (MemberTarget?.permissions.has("MuteMembers" || "ManageMessages")) {
+      return interaction.reply({
+        content: `${config.emojis.error} No puedes denegar el acceso a un miembro con permisos de moderación.`,
         ephemeral: true,
       });
     }
@@ -895,19 +902,13 @@ export class TempVoiceCommands extends Subcommand {
   public async chatInputChangeName(
     interaction: Subcommand.ChatInputCommandInteraction
   ) {
-    const NewChannelName = interaction.options.getString("nombre", true);
-    const UserID = interaction.user.id;
-    const Member = interaction.guild?.members.cache.get(UserID);
-    const VoiceChannel = Member?.voice.channel;
 
-    if(NewChannelName.length > 60) {
-        return interaction.reply({
-            content: `${config.emojis.error} El nombre del canal no puede ser mayor a 60 caracteres.`,
-            ephemeral: true,
-        });
-    }
-
-    if (!VoiceChannel) {
+    try {
+      const UserID = interaction.user.id;
+      const Member = interaction.guild?.members.cache.get(UserID);
+      const VoiceChannel = Member?.voice.channel;
+  
+      if (!VoiceChannel) {
         return interaction.reply({
           content: `${config.emojis.error} Necesitas estar en un canal de voz para usar este comando.`,
           ephemeral: true,
@@ -935,66 +936,74 @@ export class TempVoiceCommands extends Subcommand {
           content: `${config.emojis.error} No eres el propietario de este canal de voz.`,
           ephemeral: true,
         });
-      }else{
-        await VoiceChannel.setName(NewChannelName).catch(() => {
-            return interaction.reply({
-                content: `${config.emojis.error} No se ha podido cambiar el nombre del canal, recuerda que el nombre debe respetar los términos y condiciones de Discord.`,
-                ephemeral: true,
-            });
-        });
-
-        return interaction.reply({
-            content: `${config.emojis.success} Se ha cambiado el nombre del canal de voz a \`${NewChannelName}\`.`,
-        })
+      } else {
+        const Modal = new ModalBuilder()
+          .setCustomId("vc-name")
+          .addComponents(
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setCustomId("voice-name")
+                .setLabel("Nombre")
+                .setPlaceholder("Nombre que tendrá tu canal de voz.")
+                .setRequired(true)
+                .setStyle(TextInputStyle.Paragraph)
+                .setMinLength(1)
+                .setMaxLength(60)
+            )
+          );
+  
+        await interaction.showModal(Modal)
+  
+  
       }
-  }  
-
-    public async chatInputReset(interaction: Subcommand.ChatInputCommandInteraction){
-        const UserID = interaction.user.id;
-        const Member = interaction.guild?.members.cache.get(UserID);
-        const VoiceChannel = Member?.voice.channel;
-
-        if (!VoiceChannel) {
-            return interaction.reply({
-              content: `${config.emojis.error} Necesitas estar en un canal de voz para usar este comando.`,
-              ephemeral: true,
-            });
-          }
-
-          const getChannel = await Prisma.activeTempVoices.findUnique({
-            where: {
-              GuildID_ChannelID: {
-                GuildID: interaction.guild?.id || "",
-                ChannelID: VoiceChannel.id || "", // Add a default value of an empty string if VoiceChannel.id is undefined
-              },
-            },
-          });
-      
-          if (!getChannel) {
-            return interaction.reply({
-              content: `${config.emojis.error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
-              ephemeral: true,
-            });
-          }
-      
-          if (UserID !== getChannel.ChannelOwner) {
-            return interaction.reply({
-              content: `${config.emojis.error} No eres el propietario de este canal de voz.`,
-              ephemeral: true,
-            });
-          } else {
-
-            await VoiceChannel.permissionOverwrites.set([
-                {
-                    id: VoiceChannel.guild.roles.everyone.id,
-                    allow: PermissionFlagsBits.Connect,
-                }
-            ])
-
-            return interaction.reply({
-                content: `${config.emojis.success} Se ha reseteado el canal de voz.`,
-            });
-
-          }
+    } catch (error) {
+      console.log(error)
     }
+   
+  }
+
+  public async chatInputReset(
+    interaction: Subcommand.ChatInputCommandInteraction
+  ) {
+    const UserID = interaction.user.id;
+    const Member = interaction.guild?.members.cache.get(UserID);
+    const VoiceChannel = Member?.voice.channel;
+
+    if (!VoiceChannel) {
+      return interaction.reply({
+        content: `${config.emojis.error} Necesitas estar en un canal de voz para usar este comando.`,
+        ephemeral: true,
+      });
+    }
+
+    const getChannel = await Prisma.activeTempVoices.findUnique({
+      where: {
+        GuildID_ChannelID: {
+          GuildID: interaction.guild?.id || "",
+          ChannelID: VoiceChannel.id || "", // Add a default value of an empty string if VoiceChannel.id is undefined
+        },
+      },
+    });
+
+    if (!getChannel) {
+      return interaction.reply({
+        content: `${config.emojis.error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
+        ephemeral: true,
+      });
+    }
+
+    if (UserID !== getChannel.ChannelOwner) {
+      return interaction.reply({
+        content: `${config.emojis.error} No eres el propietario de este canal de voz.`,
+        ephemeral: true,
+      });
+    } else {
+      await VoiceChannel.permissionOverwrites.set([
+        {
+          id: VoiceChannel.guild.roles.everyone.id,
+          allow: PermissionFlagsBits.Connect,
+        },
+      ]);
+    }
+  }
 }
