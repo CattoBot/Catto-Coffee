@@ -626,10 +626,12 @@ export class TempVoiceCommands extends Subcommand {
     if (UserPermissions) {
       await VoiceChannel.permissionOverwrites.edit(TargetUserID, {
         ...UserPermissions,
+        ViewChannel: true,
         Connect: true,
       });
     } else {
       await VoiceChannel.permissionOverwrites.edit(TargetUserID, {
+        ViewChannel: true,
         Connect: true,
       });
     }
@@ -644,6 +646,7 @@ export class TempVoiceCommands extends Subcommand {
   ) {
     const TargetUser = interaction.options.getUser("usuario", true);
     const TargetUserID = TargetUser?.id;
+    const MemberTarget = interaction.guild?.members.cache.get(TargetUserID);
     const UserID = interaction.user.id;
     const Member = interaction.guild?.members.cache.get(UserID);
     const VoiceChannel = Member?.voice.channel;
@@ -653,6 +656,13 @@ export class TempVoiceCommands extends Subcommand {
         content: `${config.emojis.warning} No puedes denegarte el acceso al canal a ti mismo.`,
         ephemeral: true,
       });
+    }
+
+    if(MemberTarget?.permissions.has('MuteMembers' || 'ManageMessages')){
+      return interaction.reply({
+        content: `${config.emojis.error} No puedes denegar el acceso a un miembro con permisos de moderación.`,
+        ephemeral: true,
+      })
     }
 
     if (!VoiceChannel) {
