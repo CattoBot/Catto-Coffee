@@ -1,5 +1,5 @@
 import { Listener, Events } from "@sapphire/framework";
-import  { EmbedBuilder, Guild, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { EmbedBuilder, Guild, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import config from "../../config";
 import { Prisma } from "../../client/PrismaClient";
 
@@ -13,17 +13,13 @@ export class GuildCreateListener extends Listener {
     }
 
     public async run(Guild: Guild) {
-
         this.container.logger.info(`[GUILD JOIN] ${Guild.name} (${Guild.id}) added the bot.`);
-
         await Prisma.guildsData.create({
             data: {
                 GuildID: Guild.id,
             }
         })
-
         const channel = Guild.systemChannel;
-        
         const embed = new EmbedBuilder()
         .setColor(config.Colors.main)
         .setDescription(`¡Hola! Soy **${this.container.client.user?.username}** y gracias por agregarme a tu servidor. ${config.emojis.happy} \nA continuación te explicaré resumidamente mis funcionalidades y como las puedes configurar, de todas formas, si necesitas profundizar más, puedes revisar mi documentación. <a:twings:1114741873546903563>`)
@@ -39,7 +35,6 @@ export class GuildCreateListener extends Listener {
             text: `El bot sigue en constante desarrollo, te recomendamos unirte a nuestro servidor de soporte para estar al tanto de las novedades y reportar cualquier error que encuentres.`,
         })
         .setThumbnail(`${this.container.client.user?.displayAvatarURL()}`)
-    
         const row = new ActionRowBuilder<ButtonBuilder>({
             components: [
                 new ButtonBuilder({
@@ -61,13 +56,11 @@ export class GuildCreateListener extends Listener {
                 }),
             ]
         })
-
         if(channel){
             channel.send({
                 components: [row],
                 embeds: [embed]
             })
         }
-  
     }
 }

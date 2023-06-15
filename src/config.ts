@@ -4,7 +4,7 @@ export default {
     BotSettings: {
         Token: process.env.BOT_TOKEN,
         OwnerIDs: ['249600415040012309'],
-        DefaultVoiceExperienceSpeed: 60, // segundos
+        DefaultVoiceExperienceSpeed: 5, // segundos
         DefaultTextExperienceCooldown: 60, // segundos
         TopGGLink: process.env.TOPGG_LINK,
         SupportServerLink: process.env.SUPPORT_SERVER_LINK,

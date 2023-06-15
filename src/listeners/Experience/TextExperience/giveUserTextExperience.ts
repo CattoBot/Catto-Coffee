@@ -1,9 +1,9 @@
 import { Listener, Events } from "@sapphire/framework";
 import { Message, TextChannel } from "discord.js";
-import { Prisma } from "../../client/PrismaClient";
-import Client from "../../index";
-import config from "../../config";
-import calculateTextLevelXP from "../../utils/functions/General/calculateLevelXP";
+import { Prisma } from "../../../client/PrismaClient";
+import Client from "../../../index";
+import config from "../../../config";
+import calculateTextLevelXP from "../../../utils/functions/General/calculateLevelXP";
 
 const cooldowns = new Set();
 
