@@ -23,11 +23,11 @@ model UsersData {
 model UserNotes {
   UserID String
   GuildID String
-  Note String
+  Note String @db.VarChar(65535)
   NoteID Int
   Perpetrator String
   ReadRoleID String?
-  AttachmentURL String?
+  AttachmentURL String? @db.VarChar(65535)
   Unix String 
 
   @@id([NoteID, GuildID])

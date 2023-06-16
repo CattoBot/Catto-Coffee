@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { LogLevel, SapphireClient } from "@sapphire/framework";
+import { Time } from "@sapphire/time-utilities";
 import {
   ActivityType,
   Partials,
@@ -20,6 +21,10 @@ export class BotClient extends SapphireClient {
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMembers,
       ],
+      defaultCooldown: {
+        delay: Time.Second * 5,
+        filteredUsers: ['249600415040012309', '216746923070062593'],
+      },
       partials: [
         Partials.Channel,
         Partials.GuildMember,

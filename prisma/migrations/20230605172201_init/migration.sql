@@ -14,7 +14,7 @@ CREATE TABLE `UsersData` (
 CREATE TABLE `UserNotes` (
     `UserID` VARCHAR(191) NOT NULL,
     `GuildID` VARCHAR(191) NOT NULL,
-    `Note` VARCHAR(191) NOT NULL,
+    `Note` VARCHAR(65535) NOT NULL,
     `NoteID` INTEGER NOT NULL,
     `Perpetrator` VARCHAR(191) NOT NULL,
     `ReadRoleID` VARCHAR(191) NULL,

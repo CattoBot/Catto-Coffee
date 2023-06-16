@@ -35,30 +35,24 @@ export class AdminSubCommands extends Subcommand {
           type: "group",
           entries: [
             { name: "xp", chatInputRun: "chatInputExp" },
-            { name: "xp-channel", chatInputRun: "chatInputVoiceExpChannel" },
-            {
-              name: "notification",
-              chatInputRun: "chatInputVoiceExpNotification",
-            },
-            {
-              name: "rol",
-              chatInputRun: "chatInputExpRol",
-            },
+            { name: "channel", chatInputRun: "chatInputChannelConfig" },
+            { name: "notification", chatInputRun: "chatInputVoiceExpNotification" },
+            { name: "rol", chatInputRun: "chatInputExpRol" },
           ],
         },
         {
           name: "reset",
           type: "group",
           entries: [
-            { 
-              name: "server", 
-              chatInputRun: "chatInputResetExp" 
+            {
+              name: "server",
+              chatInputRun: "chatInputResetExp"
             },
             {
               name: "user",
               chatInputRun: "chatInputResetExpUser"
             }
-          
+
           ],
         },
         {
@@ -130,7 +124,7 @@ export class AdminSubCommands extends Subcommand {
             .addSubcommand((command) =>
               command
                 .setName("voices")
-                .setDescription(`Creal el canal de voz para el sistema de canales temporales`)
+                .setDescription(`Crear el canal de voz para el sistema de canales temporales`)
             )
         )
 
@@ -183,7 +177,7 @@ export class AdminSubCommands extends Subcommand {
               command
                 .setName("rol")
                 .setDescription(
-                  `Rol que se le dara al usuario al subir de nivel.`
+                  `Rol que se le dará al usuario al subir de nivel.`
                 )
                 .addStringOption((option) =>
                   option
@@ -207,38 +201,55 @@ export class AdminSubCommands extends Subcommand {
                   option
                     .setName("rol")
                     .setDescription(
-                      `El rol que se le dara al usuario al subir de nivel.`
+                      `El rol que se le dará al usuario al subir de nivel.`
                     )
                     .setRequired(true)
                 )
                 .addIntegerOption((option) =>
                   option
                     .setName("nivel")
-                    .setDescription(`El nivel en el que se le dara el rol.`)
+                    .setDescription(`El nivel en el que se le dará el rol.`)
                     .setRequired(true)
                 )
             )
 
             .addSubcommand((command) =>
               command
-                .setName("xp-channel")
+                .setName("channel")
                 .setDescription(
                   `Canal donde se enviaran los mensajes de felicitación por subir de nivel.`
                 )
                 .addStringOption((option) =>
                   option
-                    .setName("modulo")
-                    .setDescription(
-                      `A que modulo de experiencia quieres configurar el canal`
-                    )
+                    .setName("option")
+                    .setNameLocalizations({
+                      "es-ES": "opción"
+                    })
+                    .setDescription("To which experience module do you want to configure the channel?")
+                    .setDescriptionLocalizations({
+                      "es-ES": "A que módulo de experiencia quieres configurar el canal"
+                    })
                     .addChoices(
                       {
-                        name: "Texto",
-                        value: "text",
+                        name: "Text levelup",
+                        name_localizations: {
+                          "es-ES": "Subida de nivel de texto"
+                        },
+                        value: "xpmsgtext",
                       },
                       {
-                        name: "Voz",
-                        value: "voice",
+                        name: "Voice levelup",
+                        name_localizations: {
+                          "es-ES": "Subida de nivel de voz"
+                        },
+                        value: "xpmsgvoice",
+                      },
+                      {
+                        name: "Note logs",
+                        name_localizations: {
+                          "es-ES": "Registros de notas",
+                        },
+                        value: "notelogs",
                       }
                     )
                     .setRequired(true)
@@ -279,18 +290,18 @@ export class AdminSubCommands extends Subcommand {
         .addSubcommandGroup((group) =>
           group
             .setName("reset")
-            .setDescription("Resetea los datos de experiencia")
+            .setDescription("Restablece los datos de experiencia")
             .addSubcommand((command) =>
               command
                 .setName("server")
                 .setDescription(
-                  "Resetea el nivel de todos los usuarios del servidor."
+                  "Restablece el nivel de todos los usuarios del servidor."
                 )
                 .addStringOption((option) =>
                   option
                     .setName("modulo")
                     .setDescription(
-                      "Que modulo de experiencia quieres resetear"
+                      "Que modulo de experiencia quieres restablecer"
                     )
                     .setRequired(true)
                     .addChoices(
@@ -308,12 +319,12 @@ export class AdminSubCommands extends Subcommand {
             .addSubcommand((command) =>
               command
                 .setName("user")
-                .setDescription(`Resetea el nivel de un usuario.`)
+                .setDescription(`Restablece el nivel de un usuario.`)
                 .addStringOption((option) =>
                   option
                     .setName("modulo")
                     .setDescription(
-                      `Que modulo de experiencia quieres resetear`
+                      `Que modulo de experiencia quieres restablecer`
                     )
                     .setRequired(true)
                     .addChoices(
@@ -330,7 +341,7 @@ export class AdminSubCommands extends Subcommand {
                 .addUserOption((option) =>
                   option
                     .setName("usuario")
-                    .setDescription(`El usuario que quieres resetear`)
+                    .setDescription(`El usuario que quieres restablecer`)
                     .setRequired(true)
                 )
             )
@@ -346,21 +357,21 @@ export class AdminSubCommands extends Subcommand {
       }
     });
 
-    if(getCategories.length >= 2) {
+    if (getCategories.length >= 2) {
       return interaction.reply({
-        content: `${config.emojis.error} Parece que ya tienes 2 categorias de canales temporales, si deseas crear más, considera adquirir mi versión premium.`,
+        content: `${config.emojis.error} Parece que ya tienes 2 categorías de canales temporales, si deseas crear más, considera adquirir mi versión premium.`,
         ephemeral: true,
       });
     }
 
     const Guild = interaction.guild;
     const CategoryName = `Crea tu canal`;
-  
+
     const Category = await Guild?.channels.create({
       name: CategoryName,
       type: 4,
     });
-  
+
     const ChannelName = `🔉・Únete para Crear`;
     const Channel = await Guild?.channels.create({
       name: ChannelName,
@@ -373,11 +384,11 @@ export class AdminSubCommands extends Subcommand {
         },
       ],
     });
-  
+
     const guildId = Guild?.id ?? '';
     const channelId = Channel?.id ?? '';
     const categoryId = Category?.id ?? '';
-  
+
     await Prisma.configTempChannels.create({
       data: {
         GuildID: guildId,
@@ -385,12 +396,12 @@ export class AdminSubCommands extends Subcommand {
         TempVoiceCategory: categoryId,
       },
     });
-  
+
     await interaction.reply({
-      content: `Se ha configurado el sistema de canales voz temporales éxitosamente ${config.emojis.success}. Puedes verificar en <#${Channel?.id}>.`,
+      content: `Se ha configurado el sistema de canales voz temporales exitosamente ${config.emojis.success}. Puedes verificar en <#${Channel?.id}>.`,
     });
   }
-  
+
 
   public async chatInputResetExpUser(
     interaction: Subcommand.ChatInputCommandInteraction
@@ -425,7 +436,7 @@ export class AdminSubCommands extends Subcommand {
             },
           });
           await interaction.reply({
-            content: `Se ha reseteado el nivel del usuario \`${usuario?.username}\` en el modulo de texto. ${config.emojis.success}`,
+            content: `Se ha restablecido el nivel del usuario \`${usuario?.username}\` en el modulo de texto. ${config.emojis.success}`,
           });
         }
 
@@ -455,7 +466,7 @@ export class AdminSubCommands extends Subcommand {
             },
           });
           await interaction.reply({
-            content: `Se ha reseteado el nivel del usuario \`${usuario?.username}\` en el modulo de voz. ${config.emojis.success}`,
+            content: `Se ha restablecido el nivel del usuario \`${usuario?.username}\` en el modulo de voz. ${config.emojis.success}`,
           });
         }
 
@@ -581,8 +592,8 @@ export class AdminSubCommands extends Subcommand {
           });
         }
 
-        default:
-          break;
+      default:
+        break;
     }
   }
 
@@ -591,128 +602,14 @@ export class AdminSubCommands extends Subcommand {
 
     switch (modulo) {
       case "voice":
-        const Modal = new ModalBuilder()
-          .setCustomId("vc-message")
-          .setTitle("Mensaje de felicitación")
-          .addComponents(
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-              new TextInputBuilder()
-                .setCustomId("voice-message")
-                .setLabel("Mensaje de felicitación para niveles en voz")
-                .setPlaceholder(
-                  "Mensaje de felicitación, usa {user} para mencionar el usuario."
-                )
-                .setRequired(true)
-                .setStyle(TextInputStyle.Paragraph)
-                .setMinLength(20)
-                .setMaxLength(250)
-            )
-          );
-        return await interaction.showModal(Modal);
+        const modal1 = await import('../../interaction-handlers/modals/admin/xpvcMsg.ts');
+        modal1.build(interaction)
 
       case "text":
-        const Modal2 = new ModalBuilder()
-          .setCustomId("text-message")
-          .setTitle("Mensaje de felicitación para niveles en texto")
-          .addComponents(
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-              new TextInputBuilder()
-                .setCustomId("text-message")
-                .setLabel("Mensaje de felicitación")
-                .setPlaceholder(
-                  "Mensaje de felicitación, usa {user} para mencionar el usuario."
-                )
-                .setRequired(true)
-                .setStyle(TextInputStyle.Paragraph)
-                .setMinLength(20)
-                .setMaxLength(250)
-            )
-          );
-        return await interaction.showModal(Modal2);
-
-        default:
-          break;
-    }
-  }
-
-  public async chatInputVoiceExpChannel(interaction: Subcommand.ChatInputCommandInteraction) {
-    const modulo = interaction.options.getString("modulo", true);
-    const channel = interaction.options.getChannel("canal", true);
-    const canal = Client.channels.cache.get(channel.id) as TextChannel;
-
-    switch (modulo) {
-      case "voice":
-        if (canal.type === ChannelType.GuildText) {
-          const getChannel = await Prisma.configChannels.findUnique({
-            where: {
-              GuildID: interaction.guildId as string,
-            },
-          });
-
-          if (getChannel) {
-            await Prisma.configChannels.update({
-              where: {
-                GuildID: interaction.guildId as string,
-              },
-              data: {
-                VcXPNotification: canal.id,
-              },
-            });
-          } else {
-            await Prisma.configChannels.create({
-              data: {
-                GuildID: interaction.guildId as string,
-                VcXPNotification: canal.id,
-              },
-            });
-          }
-          return interaction.reply({
-            content: `El canal <#${canal.id}> ha sido configurado para notificar niveles de canales de voz. ${config.emojis.success}`,
-          });
-        } else {
-          return interaction.reply({
-            content: `El canal debe ser de texto ${config.emojis.error}`,
-            ephemeral: true,
-          });
-        }
-
-      case "text":
-        if (canal.type === ChannelType.GuildText) {
-          const getChannel = await Prisma.configChannels.findUnique({
-            where: {
-              GuildID: interaction.guildId as string,
-            },
-          });
-
-          if (getChannel) {
-            await Prisma.configChannels.update({
-              where: {
-                GuildID: interaction.guildId as string,
-              },
-              data: {
-                TextXPNotification: canal.id,
-              },
-            });
-          } else {
-            await Prisma.configChannels.create({
-              data: {
-                GuildID: interaction.guildId as string,
-                TextXPNotification: canal.id,
-              },
-            });
-          }
-          return interaction.reply({
-            content: `El canal <#${canal.id}> ha sido configurado para notificar niveles por texto. ${config.emojis.success}`,
-          });
-        } else {
-          return interaction.reply({
-            content: `El canal debe ser de texto ${config.emojis.error}`,
-            ephemeral: true,
-          });
-        }
-
-        default:
-          break;
+        const modal2 = await import('../../interaction-handlers/modals/admin/xptxtMsg.ts');
+        modal2.build(interaction)
+      default:
+        break;
     }
   }
 
@@ -742,7 +639,7 @@ export class AdminSubCommands extends Subcommand {
         });
 
         return interaction.reply({
-          content: `Se han reseteado los datos de experiencia de texto ${config.emojis.success}`,
+          content: `Se han restablecido los datos de experiencia de texto ${config.emojis.success}`,
         });
 
       case "voice":
@@ -766,11 +663,11 @@ export class AdminSubCommands extends Subcommand {
         });
 
         return interaction.reply({
-          content: `Se han reseteado los datos de experiencia de voz ${config.emojis.success}`,
+          content: `Se han restablecido los datos de experiencia de voz ${config.emojis.success}`,
         });
 
-        default:
-          break;
+      default:
+        break;
     }
   }
 
@@ -878,8 +775,8 @@ export class AdminSubCommands extends Subcommand {
           content: `La experiencia minima ahora es ${min} y la maxima es ${max} para canales de voz. ${config.emojis.success}`,
         });
 
-        default:
-          break;
+      default:
+        break;
     }
   }
 
@@ -939,8 +836,8 @@ export class AdminSubCommands extends Subcommand {
           content: `El sistema de experiencia por voz ha sido desactivado ${config.emojis.success}`,
         });
 
-        default:
-          break;
+      default:
+        break;
     }
   }
 
@@ -1001,8 +898,130 @@ export class AdminSubCommands extends Subcommand {
           });
         }
 
-        default:
-          break;
+      default:
+        break;
     }
+  }
+
+  public async chatInputChannelConfig(interaction: Subcommand.ChatInputCommandInteraction) {
+
+    const modulo = interaction.options.getString("option", true);
+    const channel = interaction.options.getChannel("canal", true);
+    const canal = Client.channels.cache.get(channel.id) as TextChannel;
+
+    switch (modulo) {
+      case "xpmsgvoice":
+        if (canal.type === ChannelType.GuildText) {
+          const getChannel = await Prisma.configChannels.findUnique({
+            where: {
+              GuildID: interaction.guildId as string,
+            },
+          });
+
+          if (getChannel) {
+            await Prisma.configChannels.update({
+              where: {
+                GuildID: interaction.guildId as string,
+              },
+              data: {
+                VcXPNotification: canal.id,
+              },
+            });
+          } else {
+            await Prisma.configChannels.create({
+              data: {
+                GuildID: interaction.guildId as string,
+                VcXPNotification: canal.id,
+              },
+            });
+          }
+          return interaction.reply({
+            content: `El canal <#${canal.id}> ha sido configurado para notificar niveles de canales de voz. ${config.emojis.success}`,
+          });
+        } else {
+          return interaction.reply({
+            content: `El canal debe ser de texto ${config.emojis.error}`,
+            ephemeral: true,
+          });
+        }
+
+      case "xpmsgtext":
+        if (canal.type === ChannelType.GuildText) {
+          const getChannel = await Prisma.configChannels.findUnique({
+            where: {
+              GuildID: interaction.guildId as string,
+            },
+          });
+
+          if (getChannel) {
+            await Prisma.configChannels.update({
+              where: {
+                GuildID: interaction.guildId as string,
+              },
+              data: {
+                TextXPNotification: canal.id,
+              },
+            });
+          } else {
+            await Prisma.configChannels.create({
+              data: {
+                GuildID: interaction.guildId as string,
+                TextXPNotification: canal.id,
+              },
+            });
+          }
+          return interaction.reply({
+            content: `El canal <#${canal.id}> ha sido configurado para notificar niveles por texto. ${config.emojis.success}`,
+          });
+        } else {
+          return interaction.reply({
+            content: `El canal debe ser de texto ${config.emojis.error}`,
+            ephemeral: true,
+          });
+        }
+
+      case "notelogs":
+        if (canal.type === ChannelType.GuildText) {
+          const getChannel = await Prisma.configChannels.findUnique({
+            where: {
+              GuildID: interaction.guildId as string,
+            },
+          });
+
+          if (getChannel) {
+            await Prisma.configChannels.update({
+              where: {
+                GuildID: interaction.guildId as string,
+              },
+              data: {
+                NotesLogs: canal.id,
+              },
+            });
+          } else {
+            await Prisma.configChannels.create({
+              data: {
+                GuildID: interaction.guildId as string,
+                NotesLogs: canal.id,
+              },
+            });
+          }
+          return interaction.reply({
+            content: `El canal <#${canal.id}> ha sido configurado para notificar logs de notas. ${config.emojis.success}`,
+          });
+        } else {
+          return interaction.reply({
+            content: `El canal debe ser de texto ${config.emojis.error}`,
+            ephemeral: true,
+          });
+        }
+
+      default:
+        return interaction.reply({
+          content: `Opción no reconocida ${config.emojis.error}`,
+          ephemeral: true,
+        });
+
+    }
+
   }
 }
