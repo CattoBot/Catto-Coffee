@@ -1,12 +1,11 @@
 -- CreateTable
 CREATE TABLE `UsersData` (
-    `UserID` VARCHAR(191) NOT NULL,
+    `UserID` VARCHAR(50) NOT NULL,
     `UserVoiceRankCardColor` VARCHAR(191) NULL,
     `UserTextRankCardColor` VARCHAR(191) NULL,
     `UserVoiceRankCardBackground` VARCHAR(191) NULL,
     `UserTextRankCardBackground` VARCHAR(191) NULL,
 
-    INDEX `UsersData_UserID_idx`(`UserID`),
     PRIMARY KEY (`UserID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -14,7 +13,7 @@ CREATE TABLE `UsersData` (
 CREATE TABLE `UserNotes` (
     `UserID` VARCHAR(191) NOT NULL,
     `GuildID` VARCHAR(191) NOT NULL,
-    `Note` VARCHAR(65535) NOT NULL,
+    `Note` MEDIUMTEXT NOT NULL,
     `NoteID` INTEGER NOT NULL,
     `Perpetrator` VARCHAR(191) NOT NULL,
     `ReadRoleID` VARCHAR(191) NULL,
@@ -26,17 +25,17 @@ CREATE TABLE `UserNotes` (
 
 -- CreateTable
 CREATE TABLE `GuildsData` (
-    `GuildID` VARCHAR(191) NOT NULL,
-    `Prefix` VARCHAR(191) NOT NULL DEFAULT '!',
-    `VoiceSpeedDefault` INTEGER NOT NULL DEFAULT 60,
-    `TextExperienceMin` INTEGER NOT NULL DEFAULT 5,
-    `TextExperienceMax` INTEGER NOT NULL DEFAULT 20,
+    `GuildID` VARCHAR(50) NOT NULL,
+    `Prefix` CHAR(1) NOT NULL DEFAULT '!',
+    `VoiceSpeedDefault` INTEGER NOT NULL,
+    `TextExperienceMin` INTEGER NOT NULL,
+    `TextExperienceMax` INTEGER NOT NULL,
     `VoiceExperienceMin` INTEGER NOT NULL DEFAULT 5,
     `VoiceExperienceMax` INTEGER NOT NULL DEFAULT 20,
     `TextExpEnabled` BOOLEAN NOT NULL DEFAULT true,
     `VoiceExpEnabled` BOOLEAN NOT NULL DEFAULT true,
-    `TextDefaultMessage` VARCHAR(191) NULL,
-    `VoiceDefaultMessage` VARCHAR(191) NULL,
+    `TextDefaultMessage` MEDIUMTEXT NOT NULL,
+    `VoiceDefaultMessage` MEDIUMTEXT NOT NULL,
 
     INDEX `GuildsData_GuildID_idx`(`GuildID`),
     PRIMARY KEY (`GuildID`)
@@ -44,9 +43,9 @@ CREATE TABLE `GuildsData` (
 
 -- CreateTable
 CREATE TABLE `ConfigTempChannels` (
-    `GuildID` VARCHAR(191) NOT NULL,
-    `TempVoiceChannelCreate` VARCHAR(191) NOT NULL,
-    `TempVoiceCategory` VARCHAR(191) NOT NULL,
+    `GuildID` VARCHAR(30) NOT NULL,
+    `TempVoiceChannelCreate` VARCHAR(30) NOT NULL,
+    `TempVoiceCategory` VARCHAR(30) NOT NULL,
 
     INDEX `ConfigTempChannels_GuildID_idx`(`GuildID`),
     INDEX `ConfigTempChannels_TempVoiceChannelCreate_idx`(`TempVoiceChannelCreate`),
@@ -55,8 +54,8 @@ CREATE TABLE `ConfigTempChannels` (
 
 -- CreateTable
 CREATE TABLE `UsersVoiceExperienceData` (
-    `UserID` VARCHAR(191) NOT NULL,
-    `GuildID` VARCHAR(191) NOT NULL,
+    `UserID` VARCHAR(50) NOT NULL,
+    `GuildID` VARCHAR(50) NOT NULL,
     `VoiceExperience` INTEGER NOT NULL DEFAULT 0,
     `Nivel` INTEGER NOT NULL DEFAULT 0,
     `TotalExperience` INTEGER NOT NULL DEFAULT 0,
@@ -71,9 +70,9 @@ CREATE TABLE `UsersVoiceExperienceData` (
 
 -- CreateTable
 CREATE TABLE `VoiceRoleRewards` (
-    `GuildID` VARCHAR(191) NOT NULL,
+    `GuildID` VARCHAR(50) NOT NULL,
     `Nivel` INTEGER NOT NULL,
-    `RoleID` VARCHAR(191) NOT NULL,
+    `RoleID` VARCHAR(50) NOT NULL,
 
     INDEX `VoiceRoleRewards_GuildID_idx`(`GuildID`),
     INDEX `VoiceRoleRewards_RoleID_idx`(`RoleID`),
@@ -82,8 +81,8 @@ CREATE TABLE `VoiceRoleRewards` (
 
 -- CreateTable
 CREATE TABLE `UsersTextExperienceData` (
-    `UserID` VARCHAR(191) NOT NULL,
-    `GuildID` VARCHAR(191) NOT NULL,
+    `UserID` VARCHAR(50) NOT NULL,
+    `GuildID` VARCHAR(50) NOT NULL,
     `TextExperience` INTEGER NOT NULL DEFAULT 0,
     `Nivel` INTEGER NOT NULL DEFAULT 0,
     `TotalExperience` INTEGER NOT NULL DEFAULT 0,
@@ -95,9 +94,9 @@ CREATE TABLE `UsersTextExperienceData` (
 
 -- CreateTable
 CREATE TABLE `TextRoleRewards` (
-    `GuildID` VARCHAR(191) NOT NULL,
+    `GuildID` VARCHAR(50) NOT NULL,
     `Nivel` INTEGER NOT NULL,
-    `RoleID` VARCHAR(191) NOT NULL,
+    `RoleID` VARCHAR(50) NOT NULL,
 
     INDEX `TextRoleRewards_GuildID_idx`(`GuildID`),
     INDEX `TextRoleRewards_RoleID_idx`(`RoleID`),
@@ -106,8 +105,8 @@ CREATE TABLE `TextRoleRewards` (
 
 -- CreateTable
 CREATE TABLE `UsersEconomyVoiceRewards` (
-    `UserID` VARCHAR(191) NOT NULL,
-    `GuildID` VARCHAR(191) NOT NULL,
+    `UserID` VARCHAR(50) NOT NULL,
+    `GuildID` VARCHAR(50) NOT NULL,
     `Coins` INTEGER NOT NULL DEFAULT 0,
 
     PRIMARY KEY (`UserID`, `GuildID`)
@@ -115,24 +114,26 @@ CREATE TABLE `UsersEconomyVoiceRewards` (
 
 -- CreateTable
 CREATE TABLE `ActiveTempVoices` (
-    `GuildID` VARCHAR(191) NOT NULL,
-    `ChannelID` VARCHAR(191) NOT NULL,
-    `ChannelOwner` VARCHAR(191) NOT NULL,
-    `ChannelCategory` VARCHAR(191) NULL,
+    `GuildID` VARCHAR(50) NOT NULL,
+    `ChannelID` VARCHAR(50) NOT NULL,
+    `ChannelOwner` VARCHAR(50) NOT NULL,
+    `ChannelCategory` VARCHAR(50) NOT NULL,
 
     INDEX `ActiveTempVoices_GuildID_idx`(`GuildID`),
     INDEX `ActiveTempVoices_ChannelID_idx`(`ChannelID`),
+    INDEX `ActiveTempVoices_ChannelOwner_idx`(`ChannelOwner`),
+    INDEX `ActiveTempVoices_ChannelCategory_idx`(`ChannelCategory`),
     PRIMARY KEY (`GuildID`, `ChannelID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `ConfigChannels` (
-    `GuildID` VARCHAR(191) NOT NULL,
-    `NotesLogs` VARCHAR(191) NULL,
-    `ModLog` VARCHAR(191) NULL,
-    `TextXPNotification` VARCHAR(191) NULL,
-    `VcXPNotification` VARCHAR(191) NULL,
-    `VoiceLogs` VARCHAR(191) NULL,
+    `GuildID` VARCHAR(50) NOT NULL,
+    `NotesLogs` VARCHAR(50) NOT NULL,
+    `ModLog` VARCHAR(50) NOT NULL,
+    `TextXPNotification` VARCHAR(50) NOT NULL,
+    `VcXPNotification` VARCHAR(50) NOT NULL,
+    `VoiceLogs` VARCHAR(50) NOT NULL,
 
     INDEX `ConfigChannels_GuildID_idx`(`GuildID`),
     PRIMARY KEY (`GuildID`)
@@ -140,12 +141,12 @@ CREATE TABLE `ConfigChannels` (
 
 -- CreateTable
 CREATE TABLE `Moderation` (
-    `GuildID` VARCHAR(191) NOT NULL,
-    `UserID` VARCHAR(191) NOT NULL,
-    `ModeratorID` VARCHAR(191) NOT NULL,
+    `GuildID` VARCHAR(50) NOT NULL,
+    `UserID` VARCHAR(50) NOT NULL,
+    `ModeratorID` VARCHAR(50) NOT NULL,
     `CaseID` INTEGER NOT NULL,
-    `Type` VARCHAR(191) NOT NULL,
-    `Reason` VARCHAR(191) NULL,
+    `Type` VARCHAR(50) NOT NULL,
+    `Reason` MEDIUMTEXT NOT NULL,
     `Date` DATETIME(3) NOT NULL,
 
     INDEX `Moderation_GuildID_idx`(`GuildID`),
