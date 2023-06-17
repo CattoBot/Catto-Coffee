@@ -1,5 +1,5 @@
 import { Listener, Events } from "@sapphire/framework";
-import { Prisma } from "../../client/PrismaClient";
+import { Prisma } from "../../../client/PrismaClient";
 import { GuildMember, VoiceState } from "discord.js";
 const addXpIntervals = new Map();
 

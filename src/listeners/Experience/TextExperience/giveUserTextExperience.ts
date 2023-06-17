@@ -1,9 +1,9 @@
 import { Listener, Events } from "@sapphire/framework";
 import { Message, TextChannel } from "discord.js";
-import { Prisma } from "../../client/PrismaClient";
-import Client from "../../index";
-import config from "../../config";
-import calculateTextLevelXP from "../../utils/functions/General/calculateLevelXP";
+import { Prisma } from "../../../client/PrismaClient";
+import Client from "../../../index";
+import config from "../../../config";
+import calculateTextLevelXP from "../../../utils/functions/General/calculateLevelXP";
 
 const cooldowns = new Set();
 
@@ -176,6 +176,8 @@ export class TextExperienceListener extends Listener {
                 const canal = message.guild?.channels.cache.get(channel as string) as TextChannel;
                 if (canal) {
                     canal.send(messageWithUserAndNivel);
+                } else {
+                   Client.MessageEmbed(message, messageWithUserAndNivel);
                 }
                 await this.addMissingVoiceRoles(message.author.id, message.guildId as string, level.Nivel);
             }
@@ -193,12 +195,11 @@ export class TextExperienceListener extends Listener {
                     TotalExperience: level?.TotalExperience + XpToGive,
                 },
             });
-    
-            this.container.logger.info(`Se ha añadido ${XpToGive} de experiencia a ${message.author.username}`);
-             cooldowns.add(message.author.id);
-             setTimeout(() => {
-                 cooldowns.delete(message.author.id);
-             }, config.BotSettings.DefaultTextExperienceCooldown * 1000);
+
+              cooldowns.add(message.author.id);
+              setTimeout(() => {
+                  cooldowns.delete(message.author.id);
+              }, config.BotSettings.DefaultTextExperienceCooldown * 1000);
              return;
         } else {
             await Prisma.usersTextExperienceData.create({

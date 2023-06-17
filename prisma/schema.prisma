@@ -11,48 +11,47 @@ datasource db {
 }
 
 model UsersData {
-  UserID                      String  @id
+  UserID                      String @db.VarChar(50)  @id
   UserVoiceRankCardColor      String?
   UserTextRankCardColor       String?
   UserVoiceRankCardBackground String?
   UserTextRankCardBackground  String?
 
-  @@index([UserID])
 }
 
 model UserNotes {
   UserID String
   GuildID String
-  Note String @db.VarChar(65535)
+  Note String @db.MediumText
   NoteID Int
   Perpetrator String
   ReadRoleID String?
-  AttachmentURL String? @db.VarChar(65535)
+  AttachmentURL String?
   Unix String 
 
   @@id([NoteID, GuildID])
 }
 
 model GuildsData {
-  GuildID           String @id
-  Prefix            String @default("!")
-  VoiceSpeedDefault Int    @default(60)
-  TextExperienceMin Int    @default(5)
-  TextExperienceMax Int    @default(20)
+  GuildID           String @db.VarChar(50) @id
+  Prefix            String @db.Char(1) @default("!")
+  VoiceSpeedDefault Int    
+  TextExperienceMin Int   
+  TextExperienceMax Int    
   VoiceExperienceMin Int   @default(5)
   VoiceExperienceMax Int   @default(20)
   TextExpEnabled   Boolean @default(true)
   VoiceExpEnabled  Boolean @default(true)
-  TextDefaultMessage String?
-  VoiceDefaultMessage String?
+  TextDefaultMessage String @db.MediumText
+  VoiceDefaultMessage String @db.MediumText
 
   @@index([GuildID])
 }
 
 model ConfigTempChannels {
-  GuildID String
-  TempVoiceChannelCreate String
-  TempVoiceCategory String
+  GuildID String @db.VarChar(30)
+  TempVoiceChannelCreate String @db.VarChar(30)
+  TempVoiceCategory String @db.VarChar(30)
 
   @@id([GuildID, TempVoiceCategory])
   @@index([GuildID])
@@ -60,8 +59,8 @@ model ConfigTempChannels {
 }
 
 model UsersVoiceExperienceData {
-  UserID          String
-  GuildID         String
+  UserID          String @db.VarChar(50)
+  GuildID         String @db.VarChar(50)
   VoiceExperience Int    @default(0)
   Nivel           Int    @default(0)
   TotalExperience Int    @default(0)
@@ -69,12 +68,15 @@ model UsersVoiceExperienceData {
   @@id([UserID, GuildID])
   @@index([UserID])
   @@index([GuildID])
+  @@index([Nivel])
+  @@index([VoiceExperience])
+  @@index([TotalExperience])
 }
 
 model VoiceRoleRewards {
-  GuildID String
+  GuildID String @db.VarChar(50)
   Nivel   Int
-  RoleID  String
+  RoleID  String @db.VarChar(50)
 
   @@id([GuildID, RoleID])
   @@index([GuildID])
@@ -82,8 +84,8 @@ model VoiceRoleRewards {
 }
 
 model UsersTextExperienceData {
-  UserID          String
-  GuildID         String
+  UserID          String @db.VarChar(50)
+  GuildID         String @db.VarChar(50)
   TextExperience  Int    @default(0)
   Nivel           Int    @default(0)
   TotalExperience Int    @default(0)
@@ -94,9 +96,9 @@ model UsersTextExperienceData {
 }
 
 model TextRoleRewards {
-  GuildID String
+  GuildID String @db.VarChar(50)
   Nivel   Int
-  RoleID  String
+  RoleID  String @db.VarChar(50)
 
   @@id([GuildID, RoleID])
   @@index([GuildID])
@@ -104,42 +106,44 @@ model TextRoleRewards {
 }
 
 model UsersEconomyVoiceRewards {
-  UserID  String
-  GuildID String
+  UserID  String @db.VarChar(50)
+  GuildID String @db.VarChar(50)
   Coins   Int    @default(0)
 
   @@id([UserID, GuildID])
 }
 
 model ActiveTempVoices {
-  GuildID         String
-  ChannelID       String
-  ChannelOwner    String
-  ChannelCategory String?
+  GuildID         String @db.VarChar(50)
+  ChannelID       String @db.VarChar(50)
+  ChannelOwner    String @db.VarChar(50)
+  ChannelCategory String @db.VarChar(50)
 
   @@id([GuildID, ChannelID])
   @@index([GuildID])
   @@index([ChannelID])
+  @@index([ChannelOwner])
+  @@index([ChannelCategory])
 }
 
 model ConfigChannels {
-  GuildID            String  @id
-  NotesLogs          String?
-  ModLog             String?
-  TextXPNotification String?
-  VcXPNotification   String?
-  VoiceLogs          String?
+  GuildID            String @db.VarChar(50)  @id
+  NotesLogs          String @db.VarChar(50) 
+  ModLog             String @db.VarChar(50)
+  TextXPNotification String @db.VarChar(50)
+  VcXPNotification   String @db.VarChar(50)
+  VoiceLogs          String @db.VarChar(50) 
 
   @@index([GuildID])
 }
 
 model Moderation {
-  GuildID     String
-  UserID      String
-  ModeratorID String
+  GuildID     String @db.VarChar(50)
+  UserID      String @db.VarChar(50)
+  ModeratorID String @db.VarChar(50)
   CaseID      Int
-  Type        String
-  Reason      String?
+  Type        String @db.VarChar(50)
+  Reason      String @db.MediumText
   Date        DateTime
 
   @@id([GuildID, CaseID])
