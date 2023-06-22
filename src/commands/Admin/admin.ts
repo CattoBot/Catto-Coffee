@@ -3,15 +3,7 @@ import { ChatInputCommand } from "@sapphire/framework";
 import { Prisma } from "../../client/PrismaClient";
 import config from "../../config";
 import Client from "../..";
-import {
-  ChannelType,
-  TextChannel,
-  ModalBuilder,
-  ActionRowBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-  PermissionFlagsBits,
-} from "discord.js";
+import { ChannelType, TextChannel, PermissionFlagsBits } from "discord.js";
 
 export class AdminSubCommands extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
@@ -38,7 +30,7 @@ export class AdminSubCommands extends Subcommand {
           entries: [
             { name: "xp", chatInputRun: "chatInputExp" },
             { name: "channel", chatInputRun: "chatInputChannelConfig" },
-            { name: "notification", chatInputRun: "chatInputVoiceExpNotification" },
+            { name: "notification", chatInputRun: "chatInputNotification" },
             { name: "rol", chatInputRun: "chatInputExpRol" },
           ],
         },
@@ -599,7 +591,7 @@ export class AdminSubCommands extends Subcommand {
     }
   }
 
-  public async chatInputVoiceExpNotification(interaction: Subcommand.ChatInputCommandInteraction) {
+  public async chatInputNotification(interaction: Subcommand.ChatInputCommandInteraction) {
     const modulo = interaction.options.getString("modulo", true);
 
     switch (modulo) {

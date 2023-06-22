@@ -48,7 +48,7 @@ export class CreateVoiceListener extends Listener {
         name: `Canal de ${newState.member?.displayName}`,
           type: ChannelType.GuildVoice,
           parent: categoryChannel,
-          permissionOverwrites: categoryChannel.permissionOverwrites.cache
+           permissionOverwrites: categoryChannel.permissionOverwrites.cache
         });
 
         await Prisma.activeTempVoices.create({
@@ -56,7 +56,7 @@ export class CreateVoiceListener extends Listener {
             GuildID: guildId,
             ChannelOwner: userId,
             ChannelID: newChannel.id,
-            ChannelCategory: newChannel.parentId,
+            ChannelCategory: `${newChannel.parentId}`,
           },
         });
         

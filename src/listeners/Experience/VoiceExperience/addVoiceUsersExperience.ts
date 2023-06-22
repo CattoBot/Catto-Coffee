@@ -22,8 +22,8 @@ export class AddVoiceExperienceListener extends Listener {
 
         if (guildData) {
             return {
-                min: guildData.VoiceExperienceMin,
-                max: guildData.VoiceExperienceMax
+                min: guildData.VoiceExperienceMin ?? 5,
+                max: guildData.VoiceExperienceMax ?? 20
             };
         } else {
             return {
@@ -148,63 +148,62 @@ export class AddVoiceExperienceListener extends Listener {
         await this.AddMissingRoles(UserID, GuildID, userNivel);
       }
 
-    public async run() {
+      private async processGuild(guild: Guild) {
+        const guildData = await Prisma.guildsData.findUnique({
+          where: {
+            GuildID: guild.id,
+          },
+        });
+    
+        if (guildData?.VoiceExpEnabled === false) {
+          return;
+        }
+    
+        const VoiceChannelMembers = guild.voiceStates.cache.filter(
+          (vs) =>
+            vs.channel &&
+            !vs.member?.user.bot &&
+            !vs.member?.voice.selfMute &&
+            !vs.member?.voice.selfDeaf &&
+            !vs.member?.voice.serverDeaf &&
+            !vs.member?.voice.serverMute
+        );
+    
+        await Promise.all(
+          VoiceChannelMembers.map(async (member) => {
+            const UserID = member.member?.user.id as string;
+            const GuildID = guild.id;
+            const { min, max } = await this.getMinMaxEXP(guild);
+            const experience = await getRandomXP(min, max);
+    
+            const MemberExistsInDB = await Prisma.usersVoiceExperienceData.findUnique({
+              where: {
+                UserID_GuildID: {
+                  UserID,
+                  GuildID,
+                },
+              },
+            });
+    
+            if (!MemberExistsInDB) {
+              await Prisma.usersVoiceExperienceData.create({
+                data: {
+                  UserID,
+                  GuildID,
+                },
+              });
+              let updatedUser = await this.updateVoiceExperience(UserID, GuildID, experience, min, max);
+              if (updatedUser.levelUp) {
+                await this.handleLevelUp(UserID, GuildID, updatedUser.Nivel);
+              }
+            }
+          })
+        );
+      }
+    
+      public async run() {
         setInterval(async () => {
-            await Promise.all(
-                Client.guilds.cache.map(async (guild) => {
-                    const guildData = await Prisma.guildsData.findUnique({
-                        where: {
-                          GuildID: guild.id,
-                        },
-                      });
-                
-                      if (guildData?.VoiceExpEnabled === false) {
-                        return;
-                      }
-    
-                      const VoiceChannelMembers = guild.voiceStates.cache.filter(
-                        (vs) =>
-                          vs.channel &&
-                          !vs.member?.user.bot &&
-                          !vs.member?.voice.selfMute &&
-                          !vs.member?.voice.selfDeaf &&
-                          !vs.member?.voice.serverDeaf &&
-                          !vs.member?.voice.serverMute
-                      );
-    
-                      await Promise.all(
-                        VoiceChannelMembers.map(async (member) => {
-                            const UserID = member.member?.user.id as string;
-                            const GuildID = guild.id;
-                            const { min, max } = await this.getMinMaxEXP(guild);
-                            const experience = await getRandomXP(min, max);
-    
-                            const MemberExistsInDB = await Prisma.usersVoiceExperienceData.findUnique({
-                                where: {
-                                  UserID_GuildID: {
-                                    UserID,
-                                    GuildID,
-                                  },
-                                },
-                              });
-    
-                              if (!MemberExistsInDB) {
-                                  await Prisma.usersVoiceExperienceData.create({
-                                    data: {
-                                      UserID,
-                                      GuildID,
-                                    },
-                                });
-                                let updatedUser = await this.updateVoiceExperience(UserID, GuildID, experience, min, max);
-                                if(updatedUser.levelUp){
-                                    await this.handleLevelUp(UserID, GuildID, updatedUser.Nivel);
-                                }
-                            }
-                        })
-                    )
-                })
-            )
-        }, 60000);
-
-    }
+          await Promise.all(Client.guilds.cache.map((guild) => this.processGuild(guild)));
+        }, 1000);
+      }
 }

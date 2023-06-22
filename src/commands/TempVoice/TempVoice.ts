@@ -625,7 +625,7 @@ export class TempVoiceCommands extends Subcommand {
     }
 
     return interaction.reply({
-      content: `${config.emojis.success} Se ha permitido el acceso a \`${TargetUser.tag}\`.`,
+      content: `${config.emojis.success} Se ha permitido el acceso a \`${TargetUser.username}\`.`,
     });
   }
 
@@ -718,7 +718,7 @@ export class TempVoiceCommands extends Subcommand {
     }
 
     return interaction.reply({
-      content: `${config.emojis.success} Se ha denegado el acceso a \`${TargetUser.tag}\`.`,
+      content: `${config.emojis.success} Se ha denegado el acceso a \`${TargetUser.username}\`.`,
     });
   }
 
@@ -780,7 +780,7 @@ export class TempVoiceCommands extends Subcommand {
       });
 
       return interaction.reply({
-        content: `${config.emojis.success} Has transferido el owner del canal a \`${TargetUser.tag}\`.`,
+        content: `${config.emojis.success} Has transferido el owner del canal a \`${TargetUser.username}\`.`,
       });
     }
   }
@@ -840,10 +840,15 @@ export class TempVoiceCommands extends Subcommand {
       }
       await TargetUser.send({
         content: `Has sido invitado al canal de voz \`${VoiceChannel.name}\`(${VoiceChannel.url}) en el servidor \`${interaction.guild?.name}\`.`,
-      }).catch(() => {});
+      }).catch(async () => {
+        return interaction.reply({
+          content: `${config.emojis.error} No se le ha podido enviar la invitación a \`${TargetUser.username}\` verifica que tenga sus DM disponibles.`,
+          ephemeral: true,
+        })
+      });
       await interaction
         .reply({
-          content: `${config.emojis.success} Se le ha enviado la invitación a \`${TargetUser.tag}\` éxitosamente.`,
+          content: `${config.emojis.success} Se le ha enviado la invitación a \`${TargetUser.username}\` éxitosamente.`,
         })
         .catch(() => {});
     }
@@ -939,8 +944,10 @@ export class TempVoiceCommands extends Subcommand {
       } else {
         const Modal = new ModalBuilder()
           .setCustomId("vc-name")
+          .setTitle("¿Quieres cambiar el nombre?")
           .addComponents(
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
+            new ActionRowBuilder<TextInputBuilder>()
+            .addComponents(
               new TextInputBuilder()
                 .setCustomId("voice-name")
                 .setLabel("Nombre")
@@ -952,7 +959,7 @@ export class TempVoiceCommands extends Subcommand {
             )
           );
   
-        await interaction.showModal(Modal)
+        await interaction.showModal(Modal).catch((error) => {console.log(error)});
         
       } 
   }

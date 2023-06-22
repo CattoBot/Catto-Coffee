@@ -1,23 +1,14 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext, container } from '@sapphire/framework';
 import { Prisma } from "../../../client/PrismaClient";
-import Client from "../../..";
 import config from "../../../config";
 import {
   ModalBuilder,
   ActionRowBuilder,
   TextInputBuilder,
   TextInputStyle,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  GuildMember,
   ModalSubmitInteraction,
-  User
-} from "discord.js";
 
-interface optionsObject {
-  textValue: string | undefined,
-  noteID: string
-}
+} from "discord.js";
 
 export const build = async (interaction: any) => {
   return new Promise(async resolve => {
@@ -28,7 +19,7 @@ export const build = async (interaction: any) => {
       .setCustomId("voice-message")
       .setLabel("Mensaje de felicitación para niveles en voz")
       .setPlaceholder(
-        "Mensaje de felicitación, usa {user} para mencionar el usuario."
+        "Mensaje de felicitación, usa {user} para mencionar el usuario..."
       )
       .setRequired(true)
       .setStyle(TextInputStyle.Paragraph)
@@ -36,7 +27,6 @@ export const build = async (interaction: any) => {
       .setMaxLength(250)
     const text = new ActionRowBuilder<TextInputBuilder>().addComponents(textInput);
     modal.addComponents(text);
-    await interaction.showModal(modal);
     resolve(true)
   })
 }
@@ -50,7 +40,8 @@ export class ModalHandler extends InteractionHandler {
   }
 
   public override parse(interaction: ModalSubmitInteraction) {
-    if (interaction.user.bot || !interaction.member || !interaction.guild) return this.none();
+    if (interaction.user.bot || !interaction.member || !interaction.guild || interaction.customId !== 'admin:xpvcMsg') return this.none();
+    
     return this.some();
   }
 

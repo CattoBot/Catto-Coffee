@@ -70,8 +70,8 @@ export class TextExperienceListener extends Listener {
 
         if (guildData) {
             return {
-                min: guildData.TextExperienceMin,
-                max: guildData.TextExperienceMax,
+                min: guildData.TextExperienceMin ?? 5,
+                max: guildData.TextExperienceMax ?? 20,
             };
         } else {
             return {
@@ -212,5 +212,4 @@ export class TextExperienceListener extends Listener {
             });
         }
     }
-    
 }

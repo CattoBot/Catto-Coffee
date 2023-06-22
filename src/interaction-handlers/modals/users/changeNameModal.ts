@@ -1,6 +1,6 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
 import type { ModalSubmitInteraction } from 'discord.js';
-import  config  from '../../config';
+import  config  from '../../../config';
 
 export class ModalHandler extends InteractionHandler {
   public constructor(ctx: PieceContext, options: InteractionHandler.Options) {

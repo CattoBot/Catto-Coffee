@@ -35,15 +35,15 @@ model UserNotes {
 model GuildsData {
   GuildID           String @db.VarChar(50) @id
   Prefix            String @db.Char(1) @default("!")
-  VoiceSpeedDefault Int    
-  TextExperienceMin Int   
-  TextExperienceMax Int    
-  VoiceExperienceMin Int   @default(5)
-  VoiceExperienceMax Int   @default(20)
-  TextExpEnabled   Boolean @default(true)
-  VoiceExpEnabled  Boolean @default(true)
-  TextDefaultMessage String @db.MediumText
-  VoiceDefaultMessage String @db.MediumText
+  VoiceSpeedDefault Int?    
+  TextExperienceMin Int?  
+  TextExperienceMax Int?     
+  VoiceExperienceMin Int?   @default(5)
+  VoiceExperienceMax Int?  @default(20)
+  TextExpEnabled   Boolean? @default(true)
+  VoiceExpEnabled  Boolean? @default(true)
+  TextDefaultMessage String? @db.MediumText
+  VoiceDefaultMessage String? @db.MediumText
 
   @@index([GuildID])
 }
@@ -128,11 +128,11 @@ model ActiveTempVoices {
 
 model ConfigChannels {
   GuildID            String @db.VarChar(50)  @id
-  NotesLogs          String @db.VarChar(50) 
-  ModLog             String @db.VarChar(50)
-  TextXPNotification String @db.VarChar(50)
-  VcXPNotification   String @db.VarChar(50)
-  VoiceLogs          String @db.VarChar(50) 
+  NotesLogs          String? @db.VarChar(50) 
+  ModLog             String? @db.VarChar(50)
+  TextXPNotification String? @db.VarChar(50)
+  VcXPNotification   String? @db.VarChar(50)
+  VoiceLogs          String? @db.VarChar(50) 
 
   @@index([GuildID])
 }

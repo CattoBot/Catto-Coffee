@@ -1,23 +1,7 @@
-import { InteractionHandler, InteractionHandlerTypes, PieceContext, container } from '@sapphire/framework';
+import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
 import { Prisma } from "../../../client/PrismaClient";
-import Client from "../../..";
 import config from "../../../config";
-import {
-  ModalBuilder,
-  ActionRowBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  GuildMember,
-  ModalSubmitInteraction,
-  User
-} from "discord.js";
-
-interface optionsObject {
-  textValue: string | undefined,
-  noteID: string
-}
+import { ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction } from "discord.js";
 
 export const build = async (interaction: any) => {
   return new Promise(async resolve => {
@@ -50,7 +34,7 @@ export class ModalHandler extends InteractionHandler {
   }
 
   public override parse(interaction: ModalSubmitInteraction) {
-    if (interaction.user.bot || !interaction.member || !interaction.guild) return this.none();
+    if (interaction.user.bot || !interaction.member || !interaction.guild || interaction.customId !== 'admin:xptxtMsg') return this.none();
     return this.some();
   }
 

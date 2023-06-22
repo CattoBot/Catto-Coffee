@@ -4,21 +4,7 @@ import { ChatInputCommand } from "@sapphire/framework";
 import { Prisma } from "../../client/PrismaClient";
 import config from "../../config";
 import Client from "../..";
-import {
-  ChannelType,
-  TextChannel,
-  ModalBuilder,
-  ActionRowBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  GuildMember,
-  StringSelectMenuBuilder,
-  ButtonBuilder,
-  GuildChannel,
-  User
-} from "discord.js";
+import { ActionRowBuilder, EmbedBuilder, PermissionFlagsBits, GuildMember, StringSelectMenuBuilder, ButtonBuilder, User } from "discord.js";
 
 const emojis = {
   selfMuted: "<:selfMuted:1092727485919154246>",
