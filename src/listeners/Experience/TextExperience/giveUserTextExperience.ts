@@ -28,11 +28,6 @@ export class TextExperienceListener extends Listener {
                 data: {
                     GuildID: message.guild?.id as string,
                     Prefix: '!',
-                    TextExperienceMin: 5,
-                    TextExperienceMax: 20,
-                    TextExpEnabled: true,
-                    VoiceExpEnabled: true,
-                    VoiceSpeedDefault: 5,
                 },
             });
         }

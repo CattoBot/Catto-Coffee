@@ -38,10 +38,10 @@ model GuildsData {
   VoiceSpeedDefault Int?    
   TextExperienceMin Int?  
   TextExperienceMax Int?     
-  VoiceExperienceMin Int?   @default(5)
-  VoiceExperienceMax Int?  @default(20)
-  TextExpEnabled   Boolean? @default(true)
-  VoiceExpEnabled  Boolean? @default(true)
+  VoiceExperienceMin Int?  
+  VoiceExperienceMax Int? 
+  TextExpEnabled   Boolean @default(true)
+  VoiceExpEnabled  Boolean @default(true)
   TextDefaultMessage String? @db.MediumText
   VoiceDefaultMessage String? @db.MediumText
 

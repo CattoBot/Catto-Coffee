@@ -402,26 +402,10 @@ export class AdminSubCommands extends Subcommand {
   ) {
     const modulo = interaction.options.getString("modulo", true);
     const usuario = interaction.options.getUser("usuario", true);
-
-    switch (modulo) {
-      case "text":
-        const textUser = await Prisma.usersTextExperienceData.findUnique({
-          where: {
-            UserID_GuildID: {
-              UserID: usuario?.id as string,
-              GuildID: interaction.guildId as string,
-            },
-          },
-        });
-
-        if (!textUser) {
-          await interaction.reply({
-            content: `El usuario \`${usuario?.username}\` no tiene datos de experiencia en el modulo de texto.`,
-            ephemeral: true,
-          });
-          return;
-        } else {
-          await Prisma.usersTextExperienceData.delete({
+    try {
+      switch (modulo) {
+        case "text":
+          const textUser = await Prisma.usersTextExperienceData.findUnique({
             where: {
               UserID_GuildID: {
                 UserID: usuario?.id as string,
@@ -429,44 +413,64 @@ export class AdminSubCommands extends Subcommand {
               },
             },
           });
-          await interaction.reply({
-            content: `Se ha restablecido el nivel del usuario \`${usuario?.username}\` en el modulo de texto. ${config.emojis.success}`,
-          });
-        }
-
-      case "voice":
-        const voiceUser = await Prisma.usersVoiceExperienceData.findUnique({
-          where: {
-            UserID_GuildID: {
-              UserID: usuario?.id as string,
-              GuildID: interaction.guildId as string,
-            },
-          },
-        });
-
-        if (!voiceUser) {
-          await interaction.reply({
-            content: `El usuario \`${usuario?.username}\` no tiene datos de experiencia en el modulo de voz.`,
-            ephemeral: true,
-          });
-          return;
-        } else {
-          await Prisma.usersVoiceExperienceData.delete({
-            where: {
-              UserID_GuildID: {
-                UserID: usuario?.id as string,
-                GuildID: interaction.guildId as string,
+  
+          if (!textUser) {
+            await interaction.reply({
+              content: `El usuario \`${usuario?.username}\` no tiene datos de experiencia en el modulo de texto.`,
+              ephemeral: true,
+            });
+            return;
+          } else {
+            await Prisma.usersTextExperienceData.delete({
+              where: {
+                UserID_GuildID: {
+                  UserID: usuario?.id as string,
+                  GuildID: interaction.guildId as string,
+                },
               },
-            },
-          });
-          await interaction.reply({
-            content: `Se ha restablecido el nivel del usuario \`${usuario?.username}\` en el modulo de voz. ${config.emojis.success}`,
-          });
-        }
-
-      default:
-        break;
+            });
+            await interaction.reply({
+              content: `Se ha restablecido el nivel del usuario \`${usuario?.username}\` en el modulo de texto. ${config.emojis.success}`,
+            });
+          }
+  
+        case "voice":
+            const voiceUser = await Prisma.usersVoiceExperienceData.findUnique({
+              where: {
+                UserID_GuildID: {
+                  UserID: usuario?.id as string,
+                  GuildID: interaction.guildId as string,
+                },
+              },
+            });
+    
+            if (!voiceUser) {
+              await interaction.reply({
+                content: `El usuario \`${usuario?.username}\` no tiene datos de experiencia en el modulo de voz.`,
+                ephemeral: true,
+              });
+              return;
+            } else {
+              await Prisma.usersVoiceExperienceData.delete({
+                where: {
+                  UserID_GuildID: {
+                    UserID: usuario?.id as string,
+                    GuildID: interaction.guildId as string,
+                  },
+                },
+              });
+              await interaction.reply({
+                content: `Se ha restablecido el nivel del usuario \`${usuario?.username}\` en el modulo de voz. ${config.emojis.success}`,
+              });
+            }
+        default:
+          break;
+      }
+    } catch (error) {
+      console.log(error);
     }
+
+
   }
 
   public async chatInputExpRol(interaction: Subcommand.ChatInputCommandInteraction) {
@@ -527,7 +531,7 @@ export class AdminSubCommands extends Subcommand {
             });
           }
           await interaction.reply({
-            content: `El rol ${rol.name} se otorgará al subir a nivel \`${nivel}\` en canales de texto ${config.emojis.success}`,
+            content: `El rol \`${rol.name}\` se otorgará al subir a nivel \`${nivel}\` en canales de texto ${config.emojis.success}`,
           });
         }
       case "voice":

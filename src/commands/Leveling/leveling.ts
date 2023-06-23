@@ -265,7 +265,6 @@ export class LevelingSubcommand extends Subcommand {
               },
             });
           } else {
-            try {
               await Prisma.usersTextExperienceData.update({
                 where: {
                   UserID_GuildID: {
@@ -278,15 +277,37 @@ export class LevelingSubcommand extends Subcommand {
                   Nivel: nivelValue,
                 },
               });
-            } catch (err) {
-              this.container.logger.error(err);
-            }
           }
-  
-          return interaction.reply(
-            `Se ha establecido el nivel de \`${user?.username}\` a \`${nivelValue}\` en canales de texto ${config.emojis.success}`
-          );
+
+          const roles = await Prisma.textRoleRewards.findMany({
+            where: {
+              GuildID: interaction.guildId as string,
+            }
+          })
+
+          if(roles.length === 0){
+            return interaction.reply(
+              `Se ha establecido el nivel de \`${user?.username}\` a \`${nivelValue}\` en canales de texto ${config.emojis.success}`
+            );
+          } else {
+            let roleNames = [];
+            for (let i = 0; i < roles.length; i++) {
+              const RoleID = roles[i].RoleID;
+              const Role = interaction.guild?.roles.cache.get(RoleID);
+              if (Role) {
+                await interaction.guild?.members.cache.get(user?.id as string)?.roles.add(Role);
+                roleNames.push(Role.name);
+              }
+            }
+        
+            const roleNamesString = roleNames.join(', ');
+            return interaction.reply({
+              content: `Se ha establecido el nivel de \`${user?.username}\` a \`${nivelValue}\` en canales de texto ${config.emojis.success} y se han agregado los roles correspondientes. (\`${roleNamesString}\`)`,
+            });
+          }
         }
+
+
       case "voice":
         if(await this.verifyEnableVoice(interaction.guild!, interaction)){
           return;
@@ -323,10 +344,32 @@ export class LevelingSubcommand extends Subcommand {
               },
             });
           }
-  
-          return interaction.reply(
-            `Se ha establecido el nivel de \`${user?.username}\` a \`${nivelValue}\` en canales de voz. ${config.emojis.success}`
-          );
+          const roles = await Prisma.voiceRoleRewards.findMany({
+            where: {
+              GuildID: interaction.guildId as string,
+            }
+          })
+
+          if(roles.length === 0){
+            return interaction.reply(
+              `Se ha establecido el nivel de \`${user?.username}\` a \`${nivelValue}\` en canales de voz ${config.emojis.success}`
+            );
+          } else {
+            let roleNames = [];
+            for (let i = 0; i < roles.length; i++) {
+              const RoleID = roles[i].RoleID;
+              const Role = interaction.guild?.roles.cache.get(RoleID);
+              if (Role) {
+                await interaction.guild?.members.cache.get(user?.id as string)?.roles.add(Role);
+                roleNames.push(Role.name);
+              }
+            }
+        
+            const roleNamesString = roleNames.join(', ');
+            return interaction.reply({
+              content: `Se ha establecido el nivel de \`${user?.username}\` a \`${nivelValue}\` en canales de voz ${config.emojis.success} y se han agregado los roles correspondientes. (\`${roleNamesString}\`)`,
+            });
+          }
         }
         
       default:
@@ -561,7 +604,6 @@ export class LevelingSubcommand extends Subcommand {
               .setStatus("dnd")
               .setProgressBar("#FFFFFF", "COLOR")
               .setUsername(user.username)
-              .setDiscriminator(user.discriminator);
   
             const data = await image.build();
             const attachment = new AttachmentBuilder(data);
@@ -624,7 +666,6 @@ export class LevelingSubcommand extends Subcommand {
             .setStatus("dnd")
             .setProgressBar("#FFFFFF", "COLOR")
             .setUsername(user.username)
-            .setDiscriminator(user.discriminator);
 
           const data = await image.build();
           const attachment = new AttachmentBuilder(data);
