@@ -70,10 +70,10 @@ export class TempVoiceCommands extends Subcommand {
           name: "bitrate",
           chatInputRun: "chatInputBitrate",
         },
-        {
-          name: "reset",
-          chatInputRun: "chatInputReset",
-        },
+        // {
+        //   name: "reset",
+        //   chatInputRun: "chatInputReset",
+        // },
       ],
     });
   }
@@ -187,12 +187,12 @@ export class TempVoiceCommands extends Subcommand {
                   )
                   .setRequired(true)
               )
-          )
-          .addSubcommand((Command) =>
-            Command.setName("reset").setDescription(
-              "Resetea todos los permisos de tu canal de voz."
-            )
           ),
+          // .addSubcommand((Command) =>
+          //   Command.setName("reset").setDescription(
+          //     "Resetea todos los permisos de tu canal de voz."
+          //   )
+          // ),
       {
         idHints: [""],
       }
@@ -964,48 +964,48 @@ export class TempVoiceCommands extends Subcommand {
       } 
   }
 
-  public async chatInputReset(
-    interaction: Subcommand.ChatInputCommandInteraction
-  ) {
-    const UserID = interaction.user.id;
-    const Member = interaction.guild?.members.cache.get(UserID);
-    const VoiceChannel = Member?.voice.channel;
+  // public async chatInputReset(
+  //   interaction: Subcommand.ChatInputCommandInteraction
+  // ) {
+  //   const UserID = interaction.user.id;
+  //   const Member = interaction.guild?.members.cache.get(UserID);
+  //   const VoiceChannel = Member?.voice.channel;
 
-    if (!VoiceChannel) {
-      return interaction.reply({
-        content: `${config.emojis.error} Necesitas estar en un canal de voz para usar este comando.`,
-        ephemeral: true,
-      });
-    }
+  //   if (!VoiceChannel) {
+  //     return interaction.reply({
+  //       content: `${config.emojis.error} Necesitas estar en un canal de voz para usar este comando.`,
+  //       ephemeral: true,
+  //     });
+  //   }
 
-    const getChannel = await Prisma.activeTempVoices.findUnique({
-      where: {
-        GuildID_ChannelID: {
-          GuildID: interaction.guild?.id || "",
-          ChannelID: VoiceChannel.id || "", // Add a default value of an empty string if VoiceChannel.id is undefined
-        },
-      },
-    });
+  //   const getChannel = await Prisma.activeTempVoices.findUnique({
+  //     where: {
+  //       GuildID_ChannelID: {
+  //         GuildID: interaction.guild?.id || "",
+  //         ChannelID: VoiceChannel.id || "", // Add a default value of an empty string if VoiceChannel.id is undefined
+  //       },
+  //     },
+  //   });
 
-    if (!getChannel) {
-      return interaction.reply({
-        content: `${config.emojis.error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
-        ephemeral: true,
-      });
-    }
+  //   if (!getChannel) {
+  //     return interaction.reply({
+  //       content: `${config.emojis.error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
+  //       ephemeral: true,
+  //     });
+  //   }
 
-    if (UserID !== getChannel.ChannelOwner) {
-      return interaction.reply({
-        content: `${config.emojis.error} No eres el propietario de este canal de voz.`,
-        ephemeral: true,
-      });
-    } else {
-      await VoiceChannel.permissionOverwrites.set([
-        {
-          id: VoiceChannel.guild.roles.everyone.id,
-          allow: PermissionFlagsBits.Connect,
-        },
-      ]);
-    }
-  }
+  //   if (UserID !== getChannel.ChannelOwner) {
+  //     return interaction.reply({
+  //       content: `${config.emojis.error} No eres el propietario de este canal de voz.`,
+  //       ephemeral: true,
+  //     });
+  //   } else {
+  //     await VoiceChannel.permissionOverwrites.set([
+  //       {
+  //         id: VoiceChannel.guild.roles.everyone.id,
+  //         allow: PermissionFlagsBits.Connect,
+  //       },
+  //     ]);
+  //   }
+  // }
 }
