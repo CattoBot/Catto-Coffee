@@ -23,7 +23,7 @@ export class BotClient extends SapphireClient {
       ],
       defaultCooldown: {
         delay: Time.Second * 5,
-        filteredUsers: ['249600415040012309', '216746923070062593'],
+        filteredUsers: ['249600415040012309', '216746923070062593', '643575943289634836'],
       },
       partials: [
         Partials.Channel,

@@ -102,7 +102,7 @@ export class ButtonHandler extends InteractionHandler {
     var permited = note_perpetrator.id == miembro.id || miembro.permissions.has(PermissionFlagsBits.ManageRoles)
 
     if (permited) {
-      const modal = await import('../../modals/mod/noteEd.ts');
+      const modal = await import('../../modals/mod/noteEdit.ts');
       modal.build(interaction, { textValue: note.Note, noteID: noteId })
     } else {
       return await interaction.update({

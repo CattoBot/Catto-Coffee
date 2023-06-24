@@ -57,6 +57,8 @@ export class ButtonHandler extends InteractionHandler {
   }
 
   public async run(interaction: ButtonInteraction) {
-    console.log("Hello world!")
+    await interaction.update({embeds: [], components: [], content: "Operación cancelada exitosamente"}).then((m) => {
+      setTimeout(function(){ m.delete() }, 5000)
+    })
   }
 }

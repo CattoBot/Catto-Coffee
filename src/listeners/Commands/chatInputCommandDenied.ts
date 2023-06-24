@@ -9,7 +9,7 @@ export class ChatInputCommandDeniedListener extends Listener<typeof Events.ChatI
     // Si el cooldown está presente (Es por cooldown), enviamos su correspondiente mensaje
     if (Reflect.get(Object(context), 'remaining')) {
       return interaction.reply({
-        content: `¡Más lento!\nDebes esperar \`${Math.floor(Reflect.get(Object(context), 'remaining')/1000)}\` segundos${Math.floor(Reflect.get(Object(context), 'remaining')/1000)>1?"s":""} antes de poder volver a usar un comando.`,
+        content: `¡Más lento!\nDebes esperar \`${Math.floor(Reflect.get(Object(context), 'remaining')/1000)}\` segundo${Math.floor(Reflect.get(Object(context), 'remaining')/1000)>1?"s":""} antes de poder volver a usar un comando.`,
         allowedMentions: { users: [interaction.user.id], roles: [] },
         ephemeral: true
       });

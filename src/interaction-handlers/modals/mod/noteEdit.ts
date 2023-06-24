@@ -21,7 +21,7 @@ interface optionsObject {
 export const build = async (interaction: any, options: optionsObject) => {
   return new Promise(async resolve => {
     const modal = new ModalBuilder()
-      .setCustomId(`mod:noteEd_${options.noteID}`)
+      .setCustomId(`mod:noteEdit_${options.noteID}`)
       .setTitle("Edita una nota");
     const textInput = new TextInputBuilder()
       .setCustomId("text")
@@ -47,7 +47,7 @@ export class ModalHandler extends InteractionHandler {
   }
 
   public override parse(interaction: ModalSubmitInteraction) {
-    if (interaction.user.bot || !interaction.member || !interaction.guild) return this.none();
+    if (interaction.user.bot || !interaction.member || !interaction.guild || interaction.customId !== 'mod:noteEdit') return this.none();
     return this.some();
   }
 

@@ -4,7 +4,7 @@ import { ChatInputCommand } from "@sapphire/framework";
 import { Prisma } from "../../client/PrismaClient";
 import config from "../../config";
 import Client from "../..";
-import { ChannelType, TextChannel, PermissionFlagsBits } from "discord.js";
+import { ChannelType, TextChannel, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, EmbedBuilder } from "discord.js";
 
 export class AdminSubCommands extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
@@ -404,74 +404,32 @@ export class AdminSubCommands extends Subcommand {
     const modulo = interaction.options.getString("modulo", true);
     const usuario = interaction.options.getUser("usuario", true);
     try {
-      switch (modulo) {
-        case "text":
-          const textUser = await Prisma.usersTextExperienceData.findUnique({
-            where: {
-              UserID_GuildID: {
-                UserID: usuario?.id as string,
-                GuildID: interaction.guildId as string,
-              },
-            },
-          });
-  
-          if (!textUser) {
-            await interaction.reply({
-              content: `El usuario \`${usuario?.username}\` no tiene datos de experiencia en el modulo de texto.`,
-              ephemeral: true,
-            });
-            return;
-          } else {
-            await Prisma.usersTextExperienceData.delete({
-              where: {
-                UserID_GuildID: {
-                  UserID: usuario?.id as string,
-                  GuildID: interaction.guildId as string,
-                },
-              },
-            });
-            await interaction.reply({
-              content: `Se ha restablecido el nivel del usuario \`${usuario?.username}\` en el modulo de texto. ${config.emojis.success}`,
-            });
-          }
-  
-        case "voice":
-            const voiceUser = await Prisma.usersVoiceExperienceData.findUnique({
-              where: {
-                UserID_GuildID: {
-                  UserID: usuario?.id as string,
-                  GuildID: interaction.guildId as string,
-                },
-              },
-            });
-    
-            if (!voiceUser) {
-              await interaction.reply({
-                content: `El usuario \`${usuario?.username}\` no tiene datos de experiencia en el modulo de voz.`,
-                ephemeral: true,
-              });
-              return;
-            } else {
-              await Prisma.usersVoiceExperienceData.delete({
-                where: {
-                  UserID_GuildID: {
-                    UserID: usuario?.id as string,
-                    GuildID: interaction.guildId as string,
-                  },
-                },
-              });
-              await interaction.reply({
-                content: `Se ha restablecido el nivel del usuario \`${usuario?.username}\` en el modulo de voz. ${config.emojis.success}`,
-              });
-            }
-        default:
-          break;
-      }
-    } catch (error) {
-      console.log(error);
+
+      const botond = new ActionRowBuilder<ButtonBuilder>
+      const botone = new ActionRowBuilder<ButtonBuilder>
+      const module1 = await import('../../interaction-handlers/buttons/general/cancel.ts');
+      const module2 = await import('../../interaction-handlers/buttons/admin/rsUrXp.ts');
+      await module1.build(botond, { disabled: true, author: interaction.user.id }, [])
+      await module2.build(botond, { disabled: true, author: interaction.user.id }, [`${usuario.id}`, modulo])
+      await module1.build(botone, { disabled: false, author: interaction.user.id }, [])
+      await module2.build(botone, { disabled: false, author: interaction.user.id }, [`${usuario.id}`, modulo])
+
+      await interaction.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setTitle("¡No habrá vuelta atrás!")
+            .setDescription("¡Estás a punto de reiniciar la XP de <@"+usuario.id+">!")
+            .setColor("#2b2d31")
+        ],
+        components: [botond]
+      }).then(() => {
+        setTimeout(async function () {
+          await interaction.editReply({ components: [botone] })
+        }, 3000)
+      })
+    } catch (err) {
+      console.log(err)
     }
-
-
   }
 
   public async chatInputExpRol(interaction: Subcommand.ChatInputCommandInteraction) {
@@ -615,59 +573,8 @@ export class AdminSubCommands extends Subcommand {
   public async chatInputResetExp(interaction: Subcommand.ChatInputCommandInteraction) {
     const modulo = interaction.options.getString("modulo", true);
 
-    switch (modulo) {
-      case "text":
-        const guildTextExperience =
-          await Prisma.usersTextExperienceData.findMany({
-            where: {
-              GuildID: interaction.guildId as string,
-            },
-          });
-
-        if (guildTextExperience.length === 0) {
-          return interaction.reply({
-            content: `No hay datos de experiencia de texto en este servidor ${config.emojis.error}`,
-            ephemeral: true,
-          });
-        }
-
-        await Prisma.usersTextExperienceData.deleteMany({
-          where: {
-            GuildID: interaction.guildId as string,
-          },
-        });
-
-        return interaction.reply({
-          content: `Se han restablecido los datos de experiencia de texto ${config.emojis.success}`,
-        });
-
-      case "voice":
-        const guildVoiceExperience =
-          await Prisma.usersVoiceExperienceData.findMany({
-            where: {
-              GuildID: interaction.guildId as string,
-            },
-          });
-        if (guildVoiceExperience.length === 0) {
-          return interaction.reply({
-            content: `No hay datos de experiencia de voz en este servidor ${config.emojis.error}`,
-            ephemeral: true,
-          });
-        }
-
-        await Prisma.usersVoiceExperienceData.deleteMany({
-          where: {
-            GuildID: interaction.guildId as string,
-          },
-        });
-
-        return interaction.reply({
-          content: `Se han restablecido los datos de experiencia de voz ${config.emojis.success}`,
-        });
-
-      default:
-        break;
-    }
+    const modal = await import("../../interaction-handlers/modals/admin/rsSvXp.ts")
+    modal.build(interaction, modulo)
   }
 
   public async chatInputExp(interaction: Subcommand.ChatInputCommandInteraction) {

@@ -41,7 +41,6 @@ export class ModalHandler extends InteractionHandler {
 
   public override parse(interaction: ModalSubmitInteraction) {
     if (interaction.user.bot || !interaction.member || !interaction.guild || interaction.customId !== 'admin:xpvcMsg') return this.none();
-    
     return this.some();
   }
 
