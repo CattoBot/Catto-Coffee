@@ -1,6 +1,6 @@
 import { Events, Listener, type ChatInputCommandDeniedPayload, type UserError } from '@sapphire/framework';
 
-export class UserEvent extends Listener<typeof Events.ChatInputCommandDenied> {
+export class ChatInputCommandDeniedListener extends Listener<typeof Events.ChatInputCommandDenied> {
   public async run({ context, message: content }: UserError, { interaction }: ChatInputCommandDeniedPayload) {
     
     // Si el error está silenciado, no contesta
@@ -9,7 +9,7 @@ export class UserEvent extends Listener<typeof Events.ChatInputCommandDenied> {
     // Si el cooldown está presente (Es por cooldown), enviamos su correspondiente mensaje
     if (Reflect.get(Object(context), 'remaining')) {
       return interaction.reply({
-        content: `¡Más lento! >:v\nDebes esperar ${Math.floor(Reflect.get(Object(context), 'remaining')/1000)} segundo${Math.floor(Reflect.get(Object(context), 'remaining')/1000)>1?"s":""} antes de poder volver a usar un comando.`,
+        content: `¡Más lento!\nDebes esperar \`${Math.floor(Reflect.get(Object(context), 'remaining')/1000)}\` segundos${Math.floor(Reflect.get(Object(context), 'remaining')/1000)>1?"s":""} antes de poder volver a usar un comando.`,
         allowedMentions: { users: [interaction.user.id], roles: [] },
         ephemeral: true
       });

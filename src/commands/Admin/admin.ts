@@ -1,4 +1,5 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
+import { Time } from "@sapphire/time-utilities";
 import { ChatInputCommand } from "@sapphire/framework";
 import { Prisma } from "../../client/PrismaClient";
 import config from "../../config";
@@ -14,7 +15,7 @@ export class AdminSubCommands extends Subcommand {
       description: "Comandos de administración",
       requiredClientPermissions: ['Administrator'],
       preconditions: ["AdminOnly"],
-      cooldownDelay: 10000,
+      cooldownDelay: Time.Second * 10,
       subcommands: [
         {
           name: "disable",

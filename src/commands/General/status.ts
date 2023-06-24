@@ -11,8 +11,7 @@ export class StatusCommand extends Command {
       fullCategory: ["General"],
       requiredClientPermissions: ["SendMessages"],
       requiredUserPermissions: ["SendMessages"],
-      cooldownDelay: Time.Second * 5,
-      cooldownLimit: 2
+      cooldownDelay: Time.Second * 10,
     });
   }
 

@@ -21,7 +21,7 @@ export class AdminSubCommands extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
     super(context, {
       ...options,
-      cooldownDelay: Time.Second * 5,
+      cooldownDelay: Time.Second * 10,
       name: "mod",
       fullCategory: ["Mod"],
       description: "Comandos de moderación",

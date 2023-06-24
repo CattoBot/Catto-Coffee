@@ -59,7 +59,6 @@ export class AddVoiceExperienceListener extends Listener {
         data: { Nivel: updatedUser.Nivel, VoiceExperience: Math.floor(updatedUser.VoiceExperience), TotalExperience: updatedUser.TotalExperience }
       });
     }
-
     return { ...updatedUser, levelUp };
   }
 
@@ -91,13 +90,12 @@ export class AddVoiceExperienceListener extends Listener {
 
     const messageExists = await Prisma.guildsData.findUnique({ where: { GuildID: GuildID } });
     const notificationMessage = messageExists?.VoiceDefaultMessage ?? "¡Felicidades {user}! has subido a nivel `{nivel}` en canales de voz. **¡GG!**";
-
     this.notificationMessageCache.set(GuildID, notificationMessage);
     return notificationMessage;
   }
 
   private async getNotificationChannel(GuildID: string, UserID: string, userNivel: number) {
-    const respuesta = await this.getNotificationMessage(GuildID);
+    let respuesta = await this.getNotificationMessage(GuildID);
     const userMention = `<@${UserID}>`;
     const messageWithUserAndNivel = respuesta.replace(/\{user\}/g, userMention).replace(/\{nivel\}/g, userNivel.toString());
     const getChannel = await Prisma.configChannels.findUnique({ where: { GuildID: GuildID } });
@@ -129,11 +127,7 @@ export class AddVoiceExperienceListener extends Listener {
         const GuildID = Guild.id;
         const { min, max } = await this.getMinMaxEXP(Guild);
         const experience = await getRandomXP(min, max);
-        const MemberExistsInDB = await Prisma.usersVoiceExperienceData.findUnique({ where: { UserID_GuildID: { UserID, GuildID } } });
-        if (!MemberExistsInDB) {
-          await Prisma.usersVoiceExperienceData.create({ data: { UserID, GuildID } })
-        }
-  
+
         let updatedUser = await this.updateVoiceExperience(UserID, GuildID, experience, min, max);
         if (updatedUser.levelUp) {
           await this.handleLevelUp(UserID, GuildID, updatedUser.Nivel);
@@ -142,11 +136,10 @@ export class AddVoiceExperienceListener extends Listener {
     }
   }
   
-
   public async run() {
     await this.processGuilds();
     setTimeout(() => {
       this.run();
-    }, 1 * 1000);
+    }, config.BotSettings.DefaultVoiceExperienceSpeed * 1000);
   }
 }

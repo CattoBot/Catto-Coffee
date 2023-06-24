@@ -1,4 +1,5 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
+import { Time } from "@sapphire/time-utilities";
 import { ChatInputCommand } from "@sapphire/framework";
 import { AttachmentBuilder, Guild } from "discord.js";
 import Canvacord from "canvacord";
@@ -15,6 +16,7 @@ export class LevelingSubcommand extends Subcommand {
       fullCategory: ["Leveling"],
       name: "xp",
       description: "Comandos de experiencia",
+      cooldownDelay: Time.Second * 10,
       requiredClientPermissions: ['Administrator'],
       requiredUserPermissions: ['SendMessages'],
       subcommands: [
