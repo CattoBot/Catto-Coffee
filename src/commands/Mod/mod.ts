@@ -366,11 +366,11 @@ export class AdminSubCommands extends Subcommand {
 
 
       const row = new ActionRowBuilder<StringSelectMenuBuilder>
-      const options = await import('../../interaction-handlers/stringMenu/mod/vcOptCh.ts');
+      const options = await import('../../interaction-handlers/stringMenu/mod/vcOptCh');
       await options.build(row, { disabled: disabled, author: interaction.user.id }, [channel.id])
 
       const boton = new ActionRowBuilder<ButtonBuilder>
-      const module = await import('../../interaction-handlers/buttons/mod/vcRfCh.ts');
+      const module = await import('../../interaction-handlers/buttons/mod/vcRfCh');
       await module.build(boton, { disabled: false, author: interaction.user.id }, [channel.id])
 
       await interaction.reply({
@@ -468,11 +468,11 @@ export class AdminSubCommands extends Subcommand {
     }
 
     const row = new ActionRowBuilder<StringSelectMenuBuilder>
-    const options = await import('../../interaction-handlers/stringMenu/mod/vcOptUr.ts');
+    const options = await import('../../interaction-handlers/stringMenu/mod/vcOptUr');
     await options.build(row, { disabled: disabled, author: interaction.user.id }, [user.id])
 
     const boton = new ActionRowBuilder<ButtonBuilder>
-    const module = await import('../../interaction-handlers/buttons/mod/vcRfUr.ts');
+    const module = await import('../../interaction-handlers/buttons/mod/vcRfUr');
     await module.build(boton, { disabled: false, author: interaction.user.id }, [user.id])
 
     await interaction.reply({
@@ -854,10 +854,10 @@ export class AdminSubCommands extends Subcommand {
 
     const boton = new ActionRowBuilder<ButtonBuilder>
     const boton2 = new ActionRowBuilder<ButtonBuilder>
-    const reveal = await import('../../interaction-handlers/buttons/mod/noteRv.ts');
-    const edit = await import('../../interaction-handlers/buttons/mod/noteEd.ts');
-    const remove = await import('../../interaction-handlers/buttons/mod/noteRmQ.ts');
-    const attachments = await import('../../interaction-handlers/buttons/mod/noteAt.ts');
+    const reveal = await import('../../interaction-handlers/buttons/mod/noteRv');
+    const edit = await import('../../interaction-handlers/buttons/mod/noteEd');
+    const remove = await import('../../interaction-handlers/buttons/mod/noteRmQ');
+    const attachments = await import('../../interaction-handlers/buttons/mod/noteAt');
     if (!isNaN(parseInt(note.ReadRoleID || "."))) {
       await edit.build(boton, { disabled: true, author: interaction.user.id }, [`${note.NoteID}`])
       await reveal.build(boton, { disabled: false, author: interaction.user.id, emoji: "🔓" }, [`${note.NoteID}`])
@@ -930,8 +930,8 @@ export class AdminSubCommands extends Subcommand {
     if (that_user_notes.length % 5 != 0) pages++;
 
     
-    const page = await import('../../interaction-handlers/buttons/mod/notePage.ts');
-    const purge = await import('../../interaction-handlers/buttons/mod/notePrQ.ts');
+    const page = await import('../../interaction-handlers/buttons/mod/notePage');
+    const purge = await import('../../interaction-handlers/buttons/mod/notePrQ');
     await page.build(row, {disabled: true, author: interaction.user.id, emoji: "⬅️"}, [`${user.id}`, "0", "-1"])
     await purge.build(row, {disabled: false, author: interaction.user.id}, [`${user.id}`])
     await page.build(row, {disabled: that_user_notes.length<=5, author: interaction.user.id, emoji: "➡️"}, [`${user.id}`, "0", "1"])

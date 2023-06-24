@@ -407,8 +407,8 @@ export class AdminSubCommands extends Subcommand {
 
       const botond = new ActionRowBuilder<ButtonBuilder>
       const botone = new ActionRowBuilder<ButtonBuilder>
-      const module1 = await import('../../interaction-handlers/buttons/general/cancel.ts');
-      const module2 = await import('../../interaction-handlers/buttons/admin/rsUrXp.ts');
+      const module1 = await import('../../interaction-handlers/buttons/general/cancel');
+      const module2 = await import('../../interaction-handlers/buttons/admin/rsUrXp');
       await module1.build(botond, { disabled: true, author: interaction.user.id }, [])
       await module2.build(botond, { disabled: true, author: interaction.user.id }, [`${usuario.id}`, modulo])
       await module1.build(botone, { disabled: false, author: interaction.user.id }, [])
@@ -559,11 +559,11 @@ export class AdminSubCommands extends Subcommand {
 
     switch (modulo) {
       case "voice":
-        const modal1 = await import('../../interaction-handlers/modals/admin/xpvcMsg.ts');
+        const modal1 = await import('../../interaction-handlers/modals/admin/xpvcMsg');
         modal1.build(interaction)
 
       case "text":
-        const modal2 = await import('../../interaction-handlers/modals/admin/xptxtMsg.ts');
+        const modal2 = await import('../../interaction-handlers/modals/admin/xptxtMsg');
         modal2.build(interaction)
       default:
         break;
@@ -573,7 +573,7 @@ export class AdminSubCommands extends Subcommand {
   public async chatInputResetExp(interaction: Subcommand.ChatInputCommandInteraction) {
     const modulo = interaction.options.getString("modulo", true);
 
-    const modal = await import("../../interaction-handlers/modals/admin/rsSvXp.ts")
+    const modal = await import("../../interaction-handlers/modals/admin/rsSvXp")
     modal.build(interaction, modulo)
   }
 

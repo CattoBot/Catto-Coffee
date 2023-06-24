@@ -43,7 +43,7 @@ export class ButtonHandler extends InteractionHandler {
   public override async parse(interaction: ButtonInteraction) {
     const cat: string = interaction.customId.split(/:+/g)[0];
     const id: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[0];
-    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.ts` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
+    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.js` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
       const restriction: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[1];
       let permited: boolean = restriction.startsWith("a")
       if (!permited && restriction.startsWith("u")) {
@@ -129,8 +129,8 @@ export class ButtonHandler extends InteractionHandler {
     let ammount = that_user_notes.filter(e => e.GuildID == guildId).length
     let pages = Math.floor(ammount / 5)
     if (ammount % 5 != 0) pages++
-    const pagebutton = await import('./notePage.ts');
-    const purge = await import('./notePrQ.ts');
+    const pagebutton = await import('./notePage');
+    const purge = await import('./notePrQ');
     await pagebutton.build(row, { disabled: new_page==0, author: interaction.user.id, emoji: "⬅️" }, [`${userId}`, `${new_page}`, "-1"])
     await purge.build(row, { disabled: false, author: interaction.user.id }, [`${userId}`])
     await pagebutton.build(row, { disabled: new_page==(pages-1), author: interaction.user.id, emoji: "➡️" }, [`${userId}`, `${new_page}`, "1"])

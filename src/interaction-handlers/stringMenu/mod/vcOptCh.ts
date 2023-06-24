@@ -72,7 +72,7 @@ export class MenuHandler extends InteractionHandler {
   public override async parse(interaction: StringSelectMenuInteraction) {
     const cat: string = interaction.customId.split(/:+/g)[0];
     const id: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[0];
-    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.ts` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
+    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.js` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
       const restriction: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[1];
       let permited: boolean = restriction.startsWith("a")
       if (!permited && restriction.startsWith("u")) {
@@ -259,7 +259,7 @@ export class MenuHandler extends InteractionHandler {
         const options = await import('./vcOptCh');
         await options.build(row, { disabled: users.length == 0, author: interaction.customId.split(/:+/g)[1].split(/_+/g)[1].slice(1, interaction.customId.split(/:+/g)[1].length) }, [channel])
         const boton = new ActionRowBuilder<ButtonBuilder>
-        const refreshModule = await import('../../buttons/mod/vcRfCh.ts');
+        const refreshModule = await import('../../buttons/mod/vcRfCh');
         await refreshModule.build(boton, { disabled: false, author: interaction.customId.split(/:+/g)[1].split(/_+/g)[1].slice(1, interaction.customId.split(/:+/g)[1].length) }, [channel])
         await interaction.update({ embeds: [embed], components: [row, boton] });
       } catch (err) {

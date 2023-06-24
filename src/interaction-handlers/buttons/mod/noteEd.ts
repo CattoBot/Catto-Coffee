@@ -42,7 +42,7 @@ export class ButtonHandler extends InteractionHandler {
   public override async parse(interaction: ButtonInteraction) {
     const cat: string = interaction.customId.split(/:+/g)[0];
     const id: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[0];
-    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.ts` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
+    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.js` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
       const restriction: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[1];
       let permited: boolean = restriction.startsWith("a")
       if (!permited && restriction.startsWith("u")) {
@@ -102,7 +102,7 @@ export class ButtonHandler extends InteractionHandler {
     var permited = note_perpetrator.id == miembro.id || miembro.permissions.has(PermissionFlagsBits.ManageRoles)
 
     if (permited) {
-      const modal = await import('../../modals/mod/noteEdit.ts');
+      const modal = await import('../../modals/mod/noteEdit');
       modal.build(interaction, { textValue: note.Note, noteID: noteId })
     } else {
       return await interaction.update({

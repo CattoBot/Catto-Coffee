@@ -1,4 +1,5 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
+import emojis from '../../../utils/emojis/VoiceModEmojis/emojis';
 import config from "../../../config"
 import Client from "../../..";
 import {
@@ -11,17 +12,6 @@ import {
   StringSelectMenuBuilder,
   GuildMember
 } from "discord.js";
-
-const emojis = {
-  selfMuted: "<:selfMuted:1092727485919154246>",
-  serverMuted: "<:serverMute:1092727481464799292>",
-  selfDeafen: "<:selfDeafened:1092727483289313290>",
-  serverDeafen: "<:serverDeafened:1092727528038350919>",
-  unmute: "<:unmute:1092728384401965166>",
-  undeafen: "<:undeafened:1092728381499523132>",
-  mod: "<:moderator:1092825523849273384>",
-  admin: "<:admin:1092832350783688785>",
-};
 
 interface optionsObject {
   disabled: boolean | undefined,
@@ -52,7 +42,7 @@ export class ButtonHandler extends InteractionHandler {
   public override async parse(interaction: ButtonInteraction) {
     const cat: string = interaction.customId.split(/:+/g)[0];
     const id: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[0];
-    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.ts` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
+    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.js` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
       const restriction: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[1];
       let permited: boolean = restriction.startsWith("a")
       if (!permited && restriction.startsWith("u")) {
@@ -155,11 +145,11 @@ export class ButtonHandler extends InteractionHandler {
     }
 
     const row = new ActionRowBuilder<StringSelectMenuBuilder>
-    const options = await import('../../stringMenu/mod/vcOptUr.ts');
+    const options = await import('../../stringMenu/mod/vcOptUr');
     await options.build(row, { disabled: disabled, author: interaction.customId.split(/:+/g)[1].split(/_+/g)[1].slice(1, interaction.customId.split(/:+/g)[1].length) }, [user.id])
 
     const boton = new ActionRowBuilder<ButtonBuilder>
-    const module = await import('./vcRfUr.ts');
+    const module = await import('./vcRfUr');
     await module.build(boton, { disabled: false, author: interaction.customId.split(/:+/g)[1].split(/_+/g)[1].slice(1, interaction.customId.split(/:+/g)[1].length) }, [user.id])
 
     await interaction.update({ embeds: [embed], components: [row, boton] });

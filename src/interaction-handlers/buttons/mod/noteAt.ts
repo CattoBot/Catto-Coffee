@@ -43,7 +43,7 @@ export class ButtonHandler extends InteractionHandler {
   public override async parse(interaction: ButtonInteraction) {
     const cat: string = interaction.customId.split(/:+/g)[0];
     const id: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[0];
-    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.ts` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
+    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.js` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
       const restriction: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[1];
       let permited: boolean = restriction.startsWith("a")
       if (!permited && restriction.startsWith("u")) {
@@ -159,10 +159,10 @@ export class ButtonHandler extends InteractionHandler {
 
       const boton = new ActionRowBuilder<ButtonBuilder>
       const boton2 = new ActionRowBuilder<ButtonBuilder>
-      const reveal = await import('./noteRv.ts');
-      const edit = await import('./noteEd.ts');
-      const remove = await import('./noteRmQ.ts');
-      const attachments = await import('./noteAt.ts');
+      const reveal = await import('./noteRv');
+      const edit = await import('./noteEd');
+      const remove = await import('./noteRmQ');
+      const attachments = await import('./noteAt');
 
       await edit.build(boton, { disabled: false, author: interaction.user.id }, [`${note.NoteID}`])
       await reveal.build(boton, { disabled: true, author: interaction.user.id, emoji: "🔒" }, [`${note.NoteID}`])

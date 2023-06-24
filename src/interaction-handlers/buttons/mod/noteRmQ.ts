@@ -43,7 +43,7 @@ export class ButtonHandler extends InteractionHandler {
   public override async parse(interaction: ButtonInteraction) {
     const cat: string = interaction.customId.split(/:+/g)[0];
     const id: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[0];
-    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.ts` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
+    if (cat == __dirname.split(/\\+/g)[__dirname.split(/\\+/g).length - 1] && `${id}.js` == __filename.split(/\\+/g)[__filename.split(/\\+/g).length - 1]) {
       const restriction: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[1];
       let permited: boolean = restriction.startsWith("a")
       if (!permited && restriction.startsWith("u")) {
@@ -108,8 +108,8 @@ export class ButtonHandler extends InteractionHandler {
     if (permited) {
       const botond = new ActionRowBuilder<ButtonBuilder>
       const botone = new ActionRowBuilder<ButtonBuilder>
-      const module1 = await import('../general/cancel.ts');
-      const module2 = await import('./noteRm.ts');
+      const module1 = await import('../general/cancel');
+      const module2 = await import('./noteRm');
       await module1.build(botond, { disabled: true, author: interaction.user.id }, [])
       await module2.build(botond, { disabled: true, author: interaction.user.id }, [`${note.NoteID}`])
       await module1.build(botone, { disabled: false, author: interaction.user.id }, [])
