@@ -29,7 +29,7 @@ export class DeleteCategoryListener extends Listener {
                     TempVoiceCategory: channel.id,
                 }
             },
-        }).catch((err) => {});
+        }).catch(() => {});
     }
   }
 }

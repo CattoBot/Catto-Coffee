@@ -29,7 +29,7 @@ export class DeleteVoiceListener extends Listener {
             ChannelID: channel.id,
           },
         },
-      });
+      }).catch(() => {});
     }
   }
 }
