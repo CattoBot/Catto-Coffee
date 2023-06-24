@@ -47,7 +47,7 @@ export class ModalHandler extends InteractionHandler {
   }
 
   public override parse(interaction: ModalSubmitInteraction) {
-    if (interaction.user.bot || !interaction.member || !interaction.guild || interaction.customId !== 'mod:noteEdit') return this.none();
+    if (interaction.user.bot || !interaction.member || !interaction.guild || !interaction.customId.startsWith('mod:noteEdit_')) return this.none();
     return this.some();
   }
 
