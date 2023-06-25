@@ -32,7 +32,6 @@
     "@sapphire/framework": "^4.4.4",
     "@sapphire/plugin-subcommands": "^4.0.1",
     "@sapphire/time-utilities": "^1.7.9",
-    "cache-manager": "^5.2.3",
     "canvacord": "^5.4.9",
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3",
