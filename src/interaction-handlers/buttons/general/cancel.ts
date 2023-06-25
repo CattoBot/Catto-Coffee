@@ -1,12 +1,7 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
 import config from "../../../config"
-import {
-  ActionRowBuilder,
-  ButtonInteraction,
-  ButtonBuilder,
-  ButtonStyle
-} from "discord.js";
+import { ActionRowBuilder, ButtonInteraction, ButtonBuilder, ButtonStyle } from "discord.js";
 
 interface optionsObject {
   disabled: boolean | undefined,

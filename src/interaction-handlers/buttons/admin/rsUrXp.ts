@@ -1,18 +1,8 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
 import config from "../../../config"
-
 import Client from "../../..";
 import { Prisma } from "../../../client/PrismaClient";
-import {
-  ActionRowBuilder,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  ButtonInteraction,
-  ButtonBuilder,
-  ButtonStyle,
-  GuildMember,
-  User
-} from "discord.js";
+import { ActionRowBuilder, EmbedBuilder, PermissionFlagsBits, ButtonInteraction, ButtonBuilder, ButtonStyle, GuildMember } from "discord.js";
 
 interface optionsObject {
   disabled: boolean | undefined,

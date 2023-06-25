@@ -4,7 +4,7 @@ import { ChatInputCommand } from "@sapphire/framework";
 import { Prisma } from "../../client/PrismaClient";
 import config from "../../config";
 import Client from "../..";
-import { ChannelType, TextChannel, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, EmbedBuilder } from "discord.js";
+import { ChannelType, TextChannel, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 
 export class AdminSubCommands extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
@@ -559,12 +559,38 @@ export class AdminSubCommands extends Subcommand {
 
     switch (modulo) {
       case "voice":
-        const modal1 = await import('../../interaction-handlers/modals/admin/xpvcMsg');
-        modal1.build(interaction)
+        const VoiceModal = new ModalBuilder()
+        .setCustomId("admin:xpvoicemsg")
+        .setTitle("Mensaje de felicitación para niveles en voz")
+      const voiceInput = new TextInputBuilder()
+        .setCustomId("voice-message")
+        .setLabel("Mensaje de felicitación")
+        .setPlaceholder(`Mensaje de felicitación, usa {user} para mencionar el usuario.`)
+        .setRequired(true)
+        .setStyle(TextInputStyle.Paragraph)
+        .setMinLength(20)
+        .setMaxLength(250)
+      const voice = new ActionRowBuilder<TextInputBuilder>().addComponents(voiceInput);
+      VoiceModal.addComponents(voice);
+      await interaction.showModal(VoiceModal);
 
       case "text":
-        const modal2 = await import('../../interaction-handlers/modals/admin/xptxtMsg');
-        modal2.build(interaction)
+        const TextModal = new ModalBuilder()
+        .setCustomId("admin:xptxtMsg")
+        .setTitle("Mensaje de felicitación para niveles en texto")
+      const textInput = new TextInputBuilder()
+        .setCustomId("text-message")
+        .setLabel("Mensaje de felicitación")
+        .setPlaceholder(
+          "Mensaje de felicitación, usa {user} para mencionar el usuario."
+        )
+        .setRequired(true)
+        .setStyle(TextInputStyle.Paragraph)
+        .setMinLength(20)
+        .setMaxLength(250)
+      const text = new ActionRowBuilder<TextInputBuilder>().addComponents(textInput);
+      TextModal.addComponents(text);
+      await interaction.showModal(TextModal);
       default:
         break;
     }

@@ -1,35 +1,7 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext, container } from '@sapphire/framework';
+import { ModalSubmitInteraction } from "discord.js";
 import { Prisma } from "../../../client/PrismaClient";
 import config from "../../../config";
-import {
-  ModalBuilder,
-  ActionRowBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-  ModalSubmitInteraction,
-
-} from "discord.js";
-
-export const build = async (interaction: any) => {
-  return new Promise(async resolve => {
-    const modal = new ModalBuilder()
-      .setCustomId("admin:xpvcMsg")
-      .setTitle("Mensaje de felicitación para niveles en voz")
-    const textInput = new TextInputBuilder()
-      .setCustomId("voice-message")
-      .setLabel("Mensaje de felicitación para niveles en voz")
-      .setPlaceholder(
-        "Mensaje de felicitación, usa {user} para mencionar el usuario..."
-      )
-      .setRequired(true)
-      .setStyle(TextInputStyle.Paragraph)
-      .setMinLength(20)
-      .setMaxLength(250)
-    const text = new ActionRowBuilder<TextInputBuilder>().addComponents(textInput);
-    modal.addComponents(text);
-    resolve(true)
-  })
-}
 
 export class ModalHandler extends InteractionHandler {
   public constructor(ctx: PieceContext, options: InteractionHandler.Options) {
@@ -40,36 +12,25 @@ export class ModalHandler extends InteractionHandler {
   }
 
   public override parse(interaction: ModalSubmitInteraction) {
-    if (interaction.user.bot || !interaction.member || !interaction.guild || interaction.customId !== 'admin:xpvcMsg') return this.none();
+    if (interaction.user.bot || !interaction.member || !interaction.guild || interaction.customId !== 'admin:xpvoicemsg') return this.none();
     return this.some();
   }
 
   public async run(interaction: ModalSubmitInteraction) {
     const message = interaction.fields.getTextInputValue("voice-message");
 
-    const guildData = await Prisma.guildsData.findUnique({
+     await Prisma.guildsData.upsert({
       where: {
         GuildID: interaction.guildId as string,
       },
+      create: {
+        GuildID: interaction.guildId as string,
+        VoiceDefaultMessage: message,
+      },
+      update: {
+        VoiceDefaultMessage: message,
+      },
     });
-
-    if (guildData) {
-      await Prisma.guildsData.update({
-        where: {
-          GuildID: interaction.guildId as string,
-        },
-        data: {
-          VoiceDefaultMessage: message,
-        },
-      });
-    } else {
-      await Prisma.guildsData.create({
-        data: {
-          GuildID: interaction.guildId as string,
-          VoiceDefaultMessage: message,
-        },
-      });
-    }
 
     return interaction.reply({
       content: `Se ha actualizado el mensaje correctamente ${config.emojis.success}`,

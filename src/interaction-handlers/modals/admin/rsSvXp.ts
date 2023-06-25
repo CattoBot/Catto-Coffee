@@ -1,15 +1,7 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext, container } from '@sapphire/framework';
 import { Prisma } from "../../../client/PrismaClient";
 import config from "../../../config";
-import {
-  ModalBuilder,
-  ActionRowBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-  ModalSubmitInteraction,
-  EmbedBuilder,
-
-} from "discord.js";
+import { ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, EmbedBuilder } from "discord.js";
 
 export const build = async (interaction: any, module:string) => {
   return new Promise(async resolve => {

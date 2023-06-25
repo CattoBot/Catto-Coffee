@@ -1,5 +1,6 @@
 import { Listener, Events } from "@sapphire/framework";
 import { Message, TextChannel } from "discord.js";
+import { Time } from "@sapphire/time-utilities";
 import { Prisma } from "../../../client/PrismaClient";
 import Client from "../../../index";
 import config from "../../../config";
@@ -18,22 +19,10 @@ export class TextExperienceListener extends Listener {
   private async isGuildInDatabase(message: Message): Promise<boolean> {
     const guildID = message.guild?.id;
     if (!guildID) return false;
-
-    const existingGuild = await Prisma.guildsData.findUnique({
-      where: {
-        GuildID: guildID,
-      },
-    });
-
+    const existingGuild = await Prisma.guildsData.findUnique({ where: { GuildID: guildID }});
     if (!existingGuild) {
-      await Prisma.guildsData.create({
-        data: {
-          GuildID: guildID,
-          Prefix: '!',
-        },
-      });
+      await Prisma.guildsData.create({ data: { GuildID: guildID, Prefix: '!' } });
     }
-
     return !!existingGuild;
   }
 
@@ -41,13 +30,7 @@ export class TextExperienceListener extends Listener {
     await this.isGuildInDatabase(message);
     const guildID = message.guild?.id;
     if (!guildID) return false;
-
-    const guildData = await Prisma.guildsData.findUnique({
-      where: {
-        GuildID: guildID,
-      },
-    });
-
+    const guildData = await Prisma.guildsData.findUnique({ where: { GuildID: guildID } });
     return guildData?.TextExpEnabled !== false;
   }
 
@@ -60,13 +43,7 @@ export class TextExperienceListener extends Listener {
   private async getMinMaxEXP(message: Message): Promise<{ min: number; max: number }> {
     const guildID = message.guild?.id;
     if (!guildID) return { min: 5, max: 20 };
-
-    const guildData = await Prisma.guildsData.findUnique({
-      where: {
-        GuildID: guildID,
-      },
-    });
-
+    const guildData = await Prisma.guildsData.findUnique({ where: { GuildID: guildID } });
     return {
       min: guildData?.TextExperienceMin ?? 5,
       max: guildData?.TextExperienceMax ?? 20,
@@ -76,13 +53,8 @@ export class TextExperienceListener extends Listener {
   private async getTextNotificationChannel(message: Message): Promise<string | undefined> {
     const guildID = message.guild?.id;
     if (!guildID) return;
-
-    const guildData = await Prisma.configChannels.findUnique({
-      where: {
-        GuildID: guildID,
-      },
+    const guildData = await Prisma.configChannels.findUnique({ where: { GuildID: guildID }
     });
-
     return guildData?.TextXPNotification ?? undefined;
   }
 
@@ -92,15 +64,9 @@ export class TextExperienceListener extends Listener {
 
     if (guild && member) {
       const existingRoles = member.roles.cache;
-
       const textRoles = await Prisma.textRoleRewards.findMany({
-        where: {
-          GuildID: GuildID,
-          Nivel: { lte: userNivel },
-        },
-        orderBy: {
-          Nivel: 'asc',
-        },
+        where: { GuildID: GuildID, Nivel: { lte: userNivel } },
+        orderBy: { Nivel: 'asc'}
       });
 
       const rolesToAdd: string[] = [];
@@ -118,18 +84,13 @@ export class TextExperienceListener extends Listener {
   }
 
   private async getAchievementMessage(GuildID: string): Promise<string> {
-    const getMessage = await Prisma.guildsData.findUnique({
-      where: {
-        GuildID: GuildID,
-      },
+    const getMessage = await Prisma.guildsData.findUnique({ where: { GuildID: GuildID }
     });
-
     return getMessage?.TextDefaultMessage || 'Felicidades {user} has subido a nivel `{nivel}`.';
   }
 
   public async run(message: Message) {
     const channel = await this.getTextNotificationChannel(message);
-
     const isEnabled = await this.isTextExperienceModuleEnabled(message);
     if (!isEnabled || !message.guild || message.author.bot || !message.inGuild() || cooldowns.has(message.author.id)) {
       return;
@@ -139,33 +100,15 @@ export class TextExperienceListener extends Listener {
     const XpToGive = this.getRandomXP(min, max);
 
     const level = await Prisma.usersTextExperienceData.upsert({
-      where: {
-        UserID_GuildID: {
-          UserID: message.author.id,
-          GuildID: message.guildId as string,
-        },
-      },
-      create: {
-        UserID: message.author.id,
-        GuildID: message.guildId as string,
-        TextExperience: XpToGive,
-        TotalExperience: XpToGive,
-      },
-      update: {
-        TextExperience: {
-          increment: XpToGive,
-        },
-        TotalExperience: {
-          increment: XpToGive,
-        },
-      },
+      where: { UserID_GuildID: { UserID: message.author.id, GuildID: message.guildId as string}},
+      create: { UserID: message.author.id, GuildID: message.guildId as string, TextExperience: XpToGive, TotalExperience: XpToGive},
+      update: { TextExperience: { increment: XpToGive }, TotalExperience: { increment: XpToGive,}},
     });
 
     if (level.TextExperience > calculateTextLevelXP(level.Nivel)) {
       level.TextExperience = 0;
       level.Nivel += 1;
       level.TotalExperience += XpToGive;
-
       const userMention = `${message.author}`;
       const respuesta = await this.getAchievementMessage(message.guildId as string);
       const messageWithUserAndNivel = respuesta.replace(/\{user\}/g, userMention).replace(/\{nivel\}/g, level.Nivel.toString());
@@ -182,6 +125,6 @@ export class TextExperienceListener extends Listener {
     cooldowns.add(message.author.id);
     setTimeout(() => {
       cooldowns.delete(message.author.id);
-    }, config.BotSettings.DefaultTextExperienceCooldown * 1000);
+    }, Time.Second * config.BotSettings.DefaultTextExperienceCooldown);
   }
 }

@@ -1,14 +1,23 @@
-import { Guild, TextChannel } from "discord.js";
+import { Guild, TextChannel, GuildMember, Channel } from "discord.js";
 import { Listener, Events } from "@sapphire/framework";
+import { Time } from "@sapphire/time-utilities";
 import { Prisma } from "../../../client/PrismaClient";
 import { getRandomXP } from "../../../utils/functions/General/getRandomXP";
 import calculateLevelXP from "../../../utils/functions/General/calculateLevelXP";
 import config from "../../../config";
 import Client from "../../../index";
 
+interface GuildData {
+  VoiceExpEnabled: boolean;
+  VoiceExperienceMin?: number;
+  VoiceExperienceMax?: number;
+  VoiceDefaultMessage?: string;
+}
+
 export class AddVoiceExperienceListener extends Listener {
-  private readonly minMaxExpCache: Map<string, { min: number, max: number }> = new Map();
+  private readonly minMaxExpCache: Map<string, { min: number; max: number }> = new Map();
   private readonly notificationMessageCache: Map<string, string> = new Map();
+  private guildsDataCache: { [guildID: string]: GuildData } = {};
 
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
@@ -20,51 +29,60 @@ export class AddVoiceExperienceListener extends Listener {
   private async getMinMaxEXP(guild: Guild) {
     const guildID = guild.id as string;
     const cachedValue = this.minMaxExpCache.get(guildID);
-    if (cachedValue) {
+    if (cachedValue && this.areMinMaxValuesUpToDate(cachedValue, guildID)) {
       return cachedValue;
     }
-
+  
     const guildData = await Prisma.guildsData.findUnique({ where: { GuildID: guildID } });
     const minMaxExp = {
       min: guildData?.VoiceExperienceMin ?? 5,
       max: guildData?.VoiceExperienceMax ?? 20,
     };
-
+  
     this.minMaxExpCache.set(guildID, minMaxExp);
     return minMaxExp;
   }
+  
+  private areMinMaxValuesUpToDate(cachedValue: { min: number; max: number }, guildID: string) {
+    const guildData = this.guildsDataCache[guildID];
+    return guildData && cachedValue.min === guildData.VoiceExperienceMin && cachedValue.max === guildData.VoiceExperienceMax;
+  }  
 
   private async updateVoiceExperience(UserID: string, GuildID: string, Experience: number, min: number, max: number) {
-    const updatedUser = await Prisma.usersVoiceExperienceData.update({
+    const updatedUser = await Prisma.usersVoiceExperienceData.upsert({
       where: { UserID_GuildID: { UserID, GuildID } },
-      data: { VoiceExperience: { increment: Experience }, TotalExperience: { increment: Experience } },
+      create: { UserID, GuildID, VoiceExperience: Experience, TotalExperience: Experience },
+      update: { VoiceExperience: { increment: Experience }, TotalExperience: { increment: Experience } },
     });
-
+  
     const randInt = await getRandomXP(min, max);
     let levelUp = false;
-
+  
     if (updatedUser) {
       updatedUser.VoiceExperience += randInt;
       updatedUser.TotalExperience += randInt;
-
+  
       const xpHastaNivel = calculateLevelXP(updatedUser.Nivel);
       if (updatedUser.VoiceExperience >= xpHastaNivel) {
         updatedUser.VoiceExperience -= xpHastaNivel;
         updatedUser.Nivel++;
         levelUp = true;
       }
-
+  
       await Prisma.usersVoiceExperienceData.update({
         where: { UserID_GuildID: { UserID, GuildID } },
         data: { Nivel: updatedUser.Nivel, VoiceExperience: Math.floor(updatedUser.VoiceExperience), TotalExperience: updatedUser.TotalExperience }
       });
+  
+      this.minMaxExpCache.delete(GuildID);
     }
     return { ...updatedUser, levelUp };
   }
+  
 
   private async AddMissingRoles(UserID: string, GuildID: string, userNivel: number) {
-    const guild = Client.guilds.cache.get(GuildID);
-    const member = guild?.members.cache.get(UserID);
+    const guild = this.getGuildFromCache(GuildID);
+    const member = this.getMemberFromCache(guild, UserID);
     if (guild && member) {
       const existingRoles = member.roles.cache;
       const voiceRoles = await Prisma.voiceRoleRewards.findMany({ where: { GuildID, Nivel: { lte: userNivel } }, orderBy: { Nivel: "asc" } });
@@ -84,23 +102,28 @@ export class AddVoiceExperienceListener extends Listener {
 
   private async getNotificationMessage(GuildID: string): Promise<string> {
     const cachedMessage = this.notificationMessageCache.get(GuildID);
-    if (cachedMessage) {
+    if (cachedMessage && this.isNotificationMessageUpToDate(cachedMessage, GuildID)) {
       return cachedMessage;
     }
-
-    const messageExists = await Prisma.guildsData.findUnique({ where: { GuildID: GuildID } });
-    const notificationMessage = messageExists?.VoiceDefaultMessage ?? "¡Felicidades {user}! has subido a nivel `{nivel}` en canales de voz. **¡GG!**";
+  
+    const guildData = await Prisma.guildsData.findUnique({ where: { GuildID: GuildID } });
+    const notificationMessage = guildData?.VoiceDefaultMessage ?? "¡Felicidades {user}! has subido a nivel `{nivel}` en canales de voz. **¡GG!**";
     this.notificationMessageCache.set(GuildID, notificationMessage);
     return notificationMessage;
   }
+  
+  private isNotificationMessageUpToDate(cachedMessage: string, guildID: string) {
+    const guildData = this.guildsDataCache[guildID];
+    return guildData && cachedMessage === guildData.VoiceDefaultMessage;
+  }
 
   private async getNotificationChannel(GuildID: string, UserID: string, userNivel: number) {
-    let respuesta = await this.getNotificationMessage(GuildID);
+    let message = await this.getNotificationMessage(GuildID);
     const userMention = `<@${UserID}>`;
-    const messageWithUserAndNivel = respuesta.replace(/\{user\}/g, userMention).replace(/\{nivel\}/g, userNivel.toString());
+    const messageWithUserAndNivel = message.replace(/\{user\}/g, userMention).replace(/\{nivel\}/g, userNivel.toString());
     const getChannel = await Prisma.configChannels.findUnique({ where: { GuildID: GuildID } });
     const getVoiceAchievementChannel = getChannel?.VcXPNotification as string;
-    const VoiceAchievementChannel = Client.channels.cache.get(getVoiceAchievementChannel) as TextChannel;
+    const VoiceAchievementChannel = this.getChannelFromCache(getVoiceAchievementChannel) as TextChannel;
 
     if (VoiceAchievementChannel) {
       VoiceAchievementChannel.send(messageWithUserAndNivel);
@@ -113,33 +136,52 @@ export class AddVoiceExperienceListener extends Listener {
   }
 
   private async processGuilds() {
-    const Guilds = Array.from(Client.guilds.cache.values()); 
+    const Guilds = Array.from(Client.guilds.cache.values());
     for (const Guild of Guilds) {
-      const GuildData = await Prisma.guildsData.findUnique({ where: { GuildID: Guild.id } });
+      const GuildData = this.guildsDataCache[Guild.id];
       if (GuildData?.VoiceExpEnabled === false) {
         continue;
       }
-  
-      const VoiceChannelMembers = Guild.voiceStates.cache.filter((vs) => vs.channel && !vs.member?.user.bot && !vs.member?.voice.selfMute && 
-      !vs.member?.voice.selfDeaf && !vs.member?.voice.serverDeaf && !vs.member?.voice.serverMute);
+
+      const VoiceChannelMembers = Guild.voiceStates.cache.filter((vs) => vs.channel && !vs.member?.user.bot && !vs.member?.voice.selfMute &&
+        !vs.member?.voice.selfDeaf && !vs.member?.voice.serverDeaf && !vs.member?.voice.serverMute);
+      const memberUpdates: Promise<void>[] = [];
       for (const member of VoiceChannelMembers.values()) {
         const UserID = member.member?.user.id as string;
         const GuildID = Guild.id;
         const { min, max } = await this.getMinMaxEXP(Guild);
         const experience = await getRandomXP(min, max);
 
-        let updatedUser = await this.updateVoiceExperience(UserID, GuildID, experience, min, max);
-        if (updatedUser.levelUp) {
-          await this.handleLevelUp(UserID, GuildID, updatedUser.Nivel);
-        }
+        const updatePromise = this.updateVoiceExperience(UserID, GuildID, experience, min, max)
+          .then((updatedUser) => {
+            if (updatedUser.levelUp) {
+              return this.handleLevelUp(UserID, GuildID, updatedUser.Nivel);
+            }
+          });
+
+        memberUpdates.push(updatePromise);
       }
+
+      await Promise.all(memberUpdates);
     }
   }
-  
+
+  private getGuildFromCache(guildID: string): Guild | undefined {
+    return Client.guilds.cache.get(guildID);
+  }
+
+  private getMemberFromCache(guild: Guild, memberID: string): GuildMember | undefined {
+    return guild.members.cache.get(memberID);
+  }
+
+  private getChannelFromCache(channelID: string): Channel | undefined {
+    return Client.channels.cache.get(channelID);
+  }
+
   public async run() {
     await this.processGuilds();
     setTimeout(() => {
       this.run();
-    }, config.BotSettings.DefaultVoiceExperienceSpeed * 1000);
+    }, Time.Second * config.BotSettings.DefaultVoiceExperienceSpeed);
   }
 }
