@@ -12,7 +12,7 @@ export class AdminOnly extends Precondition {
         if (hasPermissions) {
           return this.ok();
         } else {
-          return this.error({ message: "¡Solo los miembros con permisos de `Administrador` pueden usar este comando!" });
+          return this.error({ message: "¡Solo los miembros con permisos de `Eliminar Mensajes` pueden usar este comando!" });
         }
       }
 }
