@@ -99,32 +99,45 @@ export class TextExperienceListener extends Listener {
     const { min, max } = await this.getMinMaxEXP(message);
     const XpToGive = this.getRandomXP(min, max);
 
-    const level = await Prisma.usersTextExperienceData.upsert({
-      where: { UserID_GuildID: { UserID: message.author.id, GuildID: message.guildId as string}},
-      create: { UserID: message.author.id, GuildID: message.guildId as string, TextExperience: XpToGive, TotalExperience: XpToGive},
-      update: { TextExperience: { increment: XpToGive }, TotalExperience: { increment: XpToGive,}},
-    });
+    const level = await Prisma.usersTextExperienceData.findUnique({
+      where: { UserID_GuildID: { UserID: message.author.id, GuildID: message.guildId as string } }
+  });
 
-    if (level.TextExperience > calculateTextLevelXP(level.Nivel)) {
-      level.TextExperience = 0;
-      level.Nivel += 1;
-      level.TotalExperience += XpToGive;
-      const userMention = `${message.author}`;
-      const respuesta = await this.getAchievementMessage(message.guildId as string);
-      const messageWithUserAndNivel = respuesta.replace(/\{user\}/g, userMention).replace(/\{nivel\}/g, level.Nivel.toString());
+    if (level){
+      level.TextExperience += XpToGive;
+      if(level.TextExperience > calculateTextLevelXP(level.Nivel)){
+        level.TextExperience = 0;
+        level.Nivel += 1;
+        level.TotalExperience += XpToGive;
 
-      const canal = message.guild?.channels.cache.get(channel as string) as TextChannel;
-      if (canal) {
-        canal.send(messageWithUserAndNivel);
-      } else {
-        Client.MessageEmbed(message, messageWithUserAndNivel);
+        const userMention = `${message.author}`;
+        let achievementmessage = await this.getAchievementMessage(message.guildId as string)
+        if(!achievementmessage){
+          achievementmessage = 'Felicidades {user} has subido a nivel \`{nivel}\`'
+        }
+
+        const messageWithUserLevel = achievementmessage.replace(/\{user\}/g, userMention).replace(/\{nivel\}/g, level?.Nivel.toString());
+        const SendMessageChannel = message.guild.channels.cache.get(channel as string) as TextChannel;
+        if(SendMessageChannel){
+          SendMessageChannel.send(messageWithUserLevel);
+        } else{
+          Client.MessageEmbed(message, messageWithUserLevel);
+        }
+
+        await this.addMissingVoiceRoles(message.author.id, message.guildId as string, level.Nivel)
       }
-      await this.addMissingVoiceRoles(message.author.id, message.guildId as string, level.Nivel);
+
+      await Prisma.usersTextExperienceData.update({
+        where: { UserID_GuildID: { UserID: message.author.id, GuildID: message.guildId as string}},
+        data: { TextExperience: level.TextExperience, Nivel: level.Nivel, TotalExperience: level.TotalExperience+ XpToGive}
+      })
+    } else {
+      await Prisma.usersTextExperienceData.create({ data: { UserID: message.author.id, GuildID: message.guildId, TextExperience: XpToGive, TotalExperience: XpToGive }})
     }
 
-    cooldowns.add(message.author.id);
-    setTimeout(() => {
-      cooldowns.delete(message.author.id);
-    }, Time.Second * config.BotSettings.DefaultTextExperienceCooldown);
+     cooldowns.add(message.author.id);
+     setTimeout(() => {
+       cooldowns.delete(message.author.id);
+     }, Time.Second * config.BotSettings.DefaultTextExperienceCooldown);
   }
 }

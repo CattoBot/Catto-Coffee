@@ -87,7 +87,7 @@ model UsersTextExperienceData {
   UserID          String @db.VarChar(50)
   GuildID         String @db.VarChar(50)
   TextExperience  Int    @default(0)
-  Nivel           Int    @default(0)
+  Nivel           Int    @default(1)
   TotalExperience Int    @default(0)
 
   @@id([UserID, GuildID])
