@@ -455,6 +455,7 @@ export class LevelingSubcommand extends Subcommand {
             where: {
               GuildID: interaction.guildId as string,
             },
+            take: 300
           });
   
           if (TextLadderboard.length === 0) {
@@ -500,6 +501,7 @@ export class LevelingSubcommand extends Subcommand {
               where: {
                 GuildID: interaction.guildId as string,
               },
+              take: 300
             }
           );
   
