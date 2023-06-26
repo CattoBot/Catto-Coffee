@@ -105,7 +105,7 @@ export class ButtonHandler extends InteractionHandler {
   const note_perpetrator = await Client.users.fetch(note.Perpetrator) as User;
   const note_user = await Client.users.fetch(note.UserID) as User;
 
-  var permited = !isNaN(parseInt(note.ReadRoleID || ".")) || note_perpetrator.id == miembro.id || miembro.roles.cache.has(`${note.ReadRoleID}`) || miembro.permissions.has(PermissionFlagsBits.ManageGuild)
+  var permited = !isNaN(parseInt(note.ReadRoleID || ".")) || note_perpetrator.id == miembro.id || miembro.roles.cache.has(`${note.ReadRoleID}`) || miembro.permissions.has(PermissionFlagsBits.ManageMessages)
 
   if (permited) {
 
