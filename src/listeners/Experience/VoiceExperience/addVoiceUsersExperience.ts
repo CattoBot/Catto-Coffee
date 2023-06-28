@@ -120,7 +120,7 @@ export class AddVoiceExperienceListener extends Listener {
   private async getNotificationChannel(GuildID: string, UserID: string, userNivel: number) {
     let message = await this.getNotificationMessage(GuildID);
     const userMention = `<@${UserID}>`;
-    const messageWithUserAndNivel = message.replace(/\{user\}/g, userMention).replace(/\{nivel\}/g, userNivel.toString());
+    const messageWithUserAndNivel = message.replace(/\{user\}/g, userMention).replace(/\{level\}/g, userNivel.toString());
     const getChannel = await Prisma.configChannels.findUnique({ where: { GuildID: GuildID } });
     const getVoiceAchievementChannel = getChannel?.VcXPNotification as string;
     const VoiceAchievementChannel = this.getChannelFromCache(getVoiceAchievementChannel) as TextChannel;
