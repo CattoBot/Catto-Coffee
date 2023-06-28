@@ -1,6 +1,6 @@
 import { Listener, Events } from "@sapphire/framework";
 import { Prisma } from "../../client/PrismaClient";
-import { VoiceState, CategoryChannel, ChannelType } from "discord.js";
+import { VoiceState, CategoryChannel, ChannelType, PermissionFlagsBits } from "discord.js";
 
 const cooldown = new Map<string, number>();
 
@@ -44,11 +44,27 @@ export class CreateVoiceListener extends Listener {
 
         cooldown.set(userId, Date.now() + 60000);
 
+        const channelOverwrites = categoryChannel.permissionOverwrites.cache.map((overwrite) => {
+          return {
+            id: overwrite.id,
+            allow: overwrite.allow.bitfield,
+            deny: overwrite.deny.bitfield,
+          };
+        });
+
+        const userPermission = {
+          id: userId,
+          allow: PermissionFlagsBits.Connect | PermissionFlagsBits.ViewChannel,
+          deny: BigInt(0),
+        }
+
+        channelOverwrites.push(userPermission);
+          
         const newChannel = await guild.channels.create({
         name: `Canal de ${newState.member?.displayName}`,
           type: ChannelType.GuildVoice,
           parent: categoryChannel,
-           permissionOverwrites: categoryChannel.permissionOverwrites.cache
+           permissionOverwrites: channelOverwrites
         });
 
         await Prisma.activeTempVoices.create({

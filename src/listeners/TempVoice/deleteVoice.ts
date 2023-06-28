@@ -17,26 +17,14 @@ export class DeleteVoiceListener extends Listener {
       const voiceChannel = channel as VoiceChannel;
       const guild = voiceChannel.guild;
       const existingChannel = await Prisma.activeTempVoices.findUnique({
-        where: {
-          GuildID_ChannelID: {
-            GuildID: guild.id,
-            ChannelID: voiceChannel.id,
-          }
-        },
+        where: { GuildID_ChannelID: { GuildID: guild.id, ChannelID: voiceChannel.id } }
       });
 
       if (existingChannel) {
         await Promise.all([
           voiceChannel.delete(),
-          Prisma.activeTempVoices.delete({
-            where: {
-              GuildID_ChannelID: {
-                GuildID: guild.id,
-                ChannelID: voiceChannel.id,
-              }
-            },
-          })
-        ]).catch((err) => {});
+          Prisma.activeTempVoices.delete({ where: { GuildID_ChannelID: { GuildID: guild.id, ChannelID: voiceChannel.id }}})
+        ]).catch(() => {});
       }
     }
   }

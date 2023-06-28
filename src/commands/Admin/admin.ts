@@ -565,7 +565,7 @@ export class AdminSubCommands extends Subcommand {
       const voiceInput = new TextInputBuilder()
         .setCustomId("voice-message")
         .setLabel("Mensaje de felicitación")
-        .setPlaceholder(`Mensaje de felicitación, usa {user} para mencionar el usuario y {nivel} para mostrar su nivel.`)
+        .setPlaceholder(`Mensaje de felicitación, usa {user} para mencionar el usuario y {level} para mostrar su nivel.`)
         .setRequired(true)
         .setStyle(TextInputStyle.Paragraph)
         .setMinLength(20)
@@ -582,7 +582,7 @@ export class AdminSubCommands extends Subcommand {
         .setCustomId("text-message")
         .setLabel("Mensaje de felicitación")
         .setPlaceholder(
-          "Mensaje de felicitación, usa {user} para mencionar el usuario y {nivel} para mostrar su nivel."
+          "Mensaje de felicitación, usa {user} para mencionar el usuario y {level} para mostrar su nivel."
         )
         .setRequired(true)
         .setStyle(TextInputStyle.Paragraph)

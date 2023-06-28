@@ -107,7 +107,7 @@ export class AddVoiceExperienceListener extends Listener {
     }
   
     const guildData = await Prisma.guildsData.findUnique({ where: { GuildID: GuildID } });
-    const notificationMessage = guildData?.VoiceDefaultMessage ?? "¡Felicidades {user}! has subido a nivel `{nivel}` en canales de voz. **¡GG!**";
+    const notificationMessage = guildData?.VoiceDefaultMessage ?? "¡Felicidades {user}! has subido a nivel `{level}` en canales de voz. **¡GG!**";
     this.notificationMessageCache.set(GuildID, notificationMessage);
     return notificationMessage;
   }

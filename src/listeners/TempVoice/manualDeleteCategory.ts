@@ -15,21 +15,16 @@ export class DeleteCategoryListener extends Listener {
     const tempVoice = await Prisma.configTempChannels.findUnique({
       where: {
         GuildID_TempVoiceCategory: {
-            GuildID: channel.guild.id,
-            TempVoiceCategory: channel.id,
+          GuildID: channel.guild.id,
+          TempVoiceCategory: channel.id
         }
       },
     });
 
     if (tempVoice) {
-        await Prisma.configTempChannels.delete({
-            where: {
-                GuildID_TempVoiceCategory: {
-                    GuildID: channel.guild.id,
-                    TempVoiceCategory: channel.id,
-                }
-            },
-        }).catch(() => {});
+      await Prisma.configTempChannels.delete({
+        where: { GuildID_TempVoiceCategory: { GuildID: channel.guild.id, TempVoiceCategory: channel.id } }
+      }).catch(() => { });
     }
   }
 }

@@ -86,7 +86,7 @@ export class TextExperienceListener extends Listener {
   private async getAchievementMessage(GuildID: string): Promise<string> {
     const getMessage = await Prisma.guildsData.findUnique({ where: { GuildID: GuildID }
     });
-    return getMessage?.TextDefaultMessage || 'Felicidades {user} has subido a nivel `{nivel}`.';
+    return getMessage?.TextDefaultMessage || 'Felicidades {user} has subido a nivel `{level}`.';
   }
 
   public async run(message: Message) {
@@ -113,10 +113,10 @@ export class TextExperienceListener extends Listener {
         const userMention = `${message.author}`;
         let achievementmessage = await this.getAchievementMessage(message.guildId as string)
         if(!achievementmessage){
-          achievementmessage = 'Felicidades {user} has subido a nivel \`{nivel}\`'
+          achievementmessage = 'Felicidades {user} has subido a nivel \`{level}\`'
         }
 
-        const messageWithUserLevel = achievementmessage.replace(/\{user\}/g, userMention).replace(/\{nivel\}/g, level?.Nivel.toString());
+        const messageWithUserLevel = achievementmessage.replace(/\{user\}/g, userMention).replace(/\{level\}/g, level?.Nivel.toString());
         const SendMessageChannel = message.guild.channels.cache.get(channel as string) as TextChannel;
         if(SendMessageChannel){
           SendMessageChannel.send(messageWithUserLevel);
