@@ -28,4 +28,7 @@ para un entorno de desarrollo de producción correr el comando:
 npm run build
 ```
 
-Nota: En caso de querer correr el proyecto en un entorno de desarrollo, modificar el archivo `package.json` en la propiedad `main` y cambiarlo de `src/index.ts` a `dist/index.js`
+Nota: En caso de querer correr el proyecto en un entorno de producción, modificar el archivo `package.json` en la propiedad `main` y cambiarlo de `src/index.ts` a `dist/index.js` y finalmente correr el proyecto con el comando:
+```
+npm run start 
+```
