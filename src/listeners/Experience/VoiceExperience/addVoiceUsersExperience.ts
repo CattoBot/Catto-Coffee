@@ -18,6 +18,9 @@ export class AddVoiceExperienceListener extends Listener {
   private readonly minMaxExpCache: Map<string, { min: number; max: number }> = new Map();
   private readonly notificationMessageCache: Map<string, string> = new Map();
   private guildsDataCache: { [guildID: string]: GuildData } = {};
+  private getGuildFromCache(guildID: string): Guild | undefined { return Client.guilds.cache.get(guildID) }
+  private getMemberFromCache(guild: Guild, memberID: string): GuildMember | undefined { return guild.members.cache.get(memberID) }
+  private getChannelFromCache(channelID: string): Channel | undefined { return Client.channels.cache.get(channelID) }
 
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
@@ -78,7 +81,6 @@ export class AddVoiceExperienceListener extends Listener {
     }
     return { ...updatedUser, levelUp };
   }
-  
 
   private async AddMissingRoles(UserID: string, GuildID: string, userNivel: number) {
     const guild = this.getGuildFromCache(GuildID);
@@ -124,7 +126,6 @@ export class AddVoiceExperienceListener extends Listener {
     const getChannel = await Prisma.configChannels.findUnique({ where: { GuildID: GuildID } });
     const getVoiceAchievementChannel = getChannel?.VcXPNotification as string;
     const VoiceAchievementChannel = this.getChannelFromCache(getVoiceAchievementChannel) as TextChannel;
-
     if (VoiceAchievementChannel) {
       VoiceAchievementChannel.send(messageWithUserAndNivel);
     }
@@ -139,19 +140,16 @@ export class AddVoiceExperienceListener extends Listener {
     const Guilds = Array.from(Client.guilds.cache.values());
     for (const Guild of Guilds) {
       const GuildData = this.guildsDataCache[Guild.id];
-      if (GuildData?.VoiceExpEnabled === false) {
-        continue;
-      }
-
+      if (GuildData?.VoiceExpEnabled === false) { continue }
+      const afkchannel = Guild.afkChannel;
       const VoiceChannelMembers = Guild.voiceStates.cache.filter((vs) => vs.channel && !vs.member?.user.bot && !vs.member?.voice.selfMute &&
-        !vs.member?.voice.selfDeaf && !vs.member?.voice.serverDeaf && !vs.member?.voice.serverMute);
+        !vs.member?.voice.selfDeaf && !vs.member?.voice.serverDeaf && !vs.member?.voice.serverMute && vs.member?.voice.channelId !== afkchannel?.id);
       const memberUpdates: Promise<void>[] = [];
       for (const member of VoiceChannelMembers.values()) {
         const UserID = member.member?.user.id as string;
         const GuildID = Guild.id;
         const { min, max } = await this.getMinMaxEXP(Guild);
         const experience = await getRandomXP(min, max);
-
         const updatePromise = this.updateVoiceExperience(UserID, GuildID, experience, min, max)
           .then((updatedUser) => {
             if (updatedUser.levelUp) {
@@ -164,18 +162,6 @@ export class AddVoiceExperienceListener extends Listener {
 
       await Promise.all(memberUpdates);
     }
-  }
-
-  private getGuildFromCache(guildID: string): Guild | undefined {
-    return Client.guilds.cache.get(guildID);
-  }
-
-  private getMemberFromCache(guild: Guild, memberID: string): GuildMember | undefined {
-    return guild.members.cache.get(memberID);
-  }
-
-  private getChannelFromCache(channelID: string): Channel | undefined {
-    return Client.channels.cache.get(channelID);
   }
 
   public async run() {

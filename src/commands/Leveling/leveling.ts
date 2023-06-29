@@ -438,7 +438,6 @@ export class LevelingSubcommand extends Subcommand {
   public async chatInputLadderboard(
     interaction: Subcommand.ChatInputCommandInteraction
   ) {
-    await interaction.deferReply();
     const tipo = interaction.options.getString("tipo") ?? "text";
     switch (tipo) {
       case "text":
@@ -449,12 +448,13 @@ export class LevelingSubcommand extends Subcommand {
             where: {
               GuildID: interaction.guildId as string,
             },
-            take: 300
+            take: 150
           });
   
           if (TextLadderboard.length === 0) {
-            return interaction.editReply({
-              content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`.`,
+            return interaction.reply({
+              content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`. ${config.emojis.error}`,
+              ephemeral: true,
             });
           } else {
             let rank = await Prisma.usersTextExperienceData.findMany({
@@ -495,13 +495,14 @@ export class LevelingSubcommand extends Subcommand {
               where: {
                 GuildID: interaction.guildId as string,
               },
-              take: 300
+              take: 150
             }
           );
   
           if (VoiceLadderboard.length === 0) {
-            return interaction.editReply({
-              content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`.`,
+            return interaction.reply({
+              content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`. ${config.emojis.error}`,
+              ephemeral: true,
             });
           } else {
             let rank = await Prisma.usersVoiceExperienceData.findMany({
