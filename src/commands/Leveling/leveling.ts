@@ -542,13 +542,12 @@ export class LevelingSubcommand extends Subcommand {
   public async chatInputRank(
     interaction: Subcommand.ChatInputCommandInteraction
   ) {
-    await interaction.deferReply();
     const tipo = interaction.options.getString("tipo") ?? "text";
     const user = interaction.options.getUser("user") ?? interaction.user;
 
     if(user.bot){
-      return interaction.editReply({
-        content: `Los bots no pueden recibir experiencia ❌`,
+      return interaction.reply({
+        content: `Los bots no pueden recibir experiencia ${config.emojis.error}`,
       });
     }
     switch (tipo) {
@@ -566,11 +565,7 @@ export class LevelingSubcommand extends Subcommand {
           });
   
           if (!TextUserExists) {
-            return interaction.editReply({
-              content: user
-                ? `El usuario \`${user.username}\` no tiene experiencia registrada.`
-                : `No tienes experiencia registrada ${config.emojis.error}, sigue hablando para ganar experiencia`,
-            });
+            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${config.emojis.error}`, ephemeral: true });
           } else {
             let level = TextUserExists.Nivel;
             let experience = TextUserExists.TextExperience;
@@ -607,13 +602,20 @@ export class LevelingSubcommand extends Subcommand {
             const data = await image.build();
             const attachment = new AttachmentBuilder(data);
   
-            return interaction.editReply({
+            return interaction.reply({
               files: [attachment],
             });
           }
         }
 
       case "voice":
+
+      if(user.bot){
+        return interaction.reply({
+          content: `Los bots no pueden recibir experiencia ${config.emojis.error}`,
+        });
+      }
+
         if(await this.verifyEnableVoice(interaction.guild!, interaction)){
           return;
         } else {
@@ -628,11 +630,7 @@ export class LevelingSubcommand extends Subcommand {
           });
 
         if (!VoiceuserExists) {
-          return interaction.editReply({
-            content: user
-              ? `No se ha encontrado experiencia registrada para \`${user.username}\`.`
-              : `No tienes experiencia registrada ${config.emojis.error}, sigue hablando para ganar experiencia`,
-          });
+          return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${config.emojis.error}`, ephemeral: true });
         } else {
           let level = VoiceuserExists.Nivel;
           let experience = VoiceuserExists.VoiceExperience;
@@ -669,7 +667,7 @@ export class LevelingSubcommand extends Subcommand {
           const data = await image.build();
           const attachment = new AttachmentBuilder(data);
 
-          return interaction.editReply({
+          return interaction.reply({
             files: [attachment],
           });
         } 

@@ -616,10 +616,12 @@ export class TempVoiceCommands extends Subcommand {
     if (UserPermissions) {
       await VoiceChannel.permissionOverwrites.edit(TargetUserID, {
         ...UserPermissions,
+        ViewChannel: true,
         Connect: true,
       });
     } else {
       await VoiceChannel.permissionOverwrites.edit(TargetUserID, {
+        ViewChannel: true,
         Connect: true,
       });
     }
