@@ -15,7 +15,7 @@ export class TextExperienceListener extends Listener {
       event: Events.MessageCreate,
     });
   }
-
+// Declaramos la función para determinar si el servidor está en la base de datos.
   private async isGuildInDatabase(message: Message): Promise<boolean> {
     const guildID = message.guild?.id;
     if (!guildID) return false;
@@ -25,7 +25,7 @@ export class TextExperienceListener extends Listener {
     }
     return !!existingGuild;
   }
-
+// Declaramos la función para determinar si la experiencia por texto está habilitada en el servidor.
   private async isTextExperienceModuleEnabled(message: Message): Promise<boolean> {
     await this.isGuildInDatabase(message);
     const guildID = message.guild?.id;
@@ -33,13 +33,13 @@ export class TextExperienceListener extends Listener {
     const guildData = await Prisma.guildsData.findUnique({ where: { GuildID: guildID } });
     return guildData?.TextExpEnabled !== false;
   }
-
+// Declaramos la función para determinar la experiencia random que se puede ganar por mensaje.
   private getRandomXP(min: number, max: number): number {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
-
+// Obtenemos el mínimo y máximo de experiencia que se puede ganar por mensaje.
   private async getMinMaxEXP(message: Message): Promise<{ min: number; max: number }> {
     const guildID = message.guild?.id;
     if (!guildID) return { min: 5, max: 20 };
@@ -49,7 +49,7 @@ export class TextExperienceListener extends Listener {
       max: guildData?.TextExperienceMax ?? 20,
     };
   }
-
+// Declaramos la función para obtener el canal de texto donde se enviará la notificación de nivel.
   private async getTextNotificationChannel(message: Message): Promise<string | undefined> {
     const guildID = message.guild?.id;
     if (!guildID) return;
@@ -57,8 +57,8 @@ export class TextExperienceListener extends Listener {
     });
     return guildData?.TextXPNotification ?? undefined;
   }
-
-  private async addMissingVoiceRoles(UserID: string, GuildID: string, userNivel: number) {
+// Declaramos la función para obtener el canal de texto donde se enviará la notificación de nivel.
+  private async addMissingTextRoles(UserID: string, GuildID: string, userNivel: number) {
     const guild = Client.guilds.cache.get(GuildID);
     const member = guild?.members.cache.get(UserID);
 
@@ -82,13 +82,13 @@ export class TextExperienceListener extends Listener {
       }
     }
   }
-
+// Declaramos la función para obtener el mensaje de nivel por defecto.
   private async getAchievementMessage(GuildID: string): Promise<string> {
     const getMessage = await Prisma.guildsData.findUnique({ where: { GuildID: GuildID }
     });
     return getMessage?.TextDefaultMessage || 'Felicidades {user} has subido a nivel `{level}`.';
   }
-
+// Declaramos la función run para ejecutar el listener al completo y llamar las funciones necesarias.
   public async run(message: Message) {
     const channel = await this.getTextNotificationChannel(message);
     const isEnabled = await this.isTextExperienceModuleEnabled(message);
@@ -124,7 +124,7 @@ export class TextExperienceListener extends Listener {
           Client.MessageEmbed(message, messageWithUserLevel);
         }
 
-        await this.addMissingVoiceRoles(message.author.id, message.guildId as string, level.Nivel)
+        await this.addMissingTextRoles(message.author.id, message.guildId as string, level.Nivel)
       }
 
       await Prisma.usersTextExperienceData.update({
@@ -134,7 +134,7 @@ export class TextExperienceListener extends Listener {
     } else {
       await Prisma.usersTextExperienceData.create({ data: { UserID: message.author.id, GuildID: message.guildId, TextExperience: XpToGive, TotalExperience: XpToGive }})
     }
-
+//  Agregamos un cooldown cada que se agrega experiencia por texto.
      cooldowns.add(message.author.id);
      setTimeout(() => {
        cooldowns.delete(message.author.id);

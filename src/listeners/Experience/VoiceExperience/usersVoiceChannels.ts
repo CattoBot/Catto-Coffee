@@ -10,7 +10,7 @@ export class VoiceChannelUsers extends Listener {
       event: Events.ClientReady
     });
   }
-
+  // Declaramos la función para agregar los usuarios que se encuentren en un canal de voz a la base de datos.
   public async run(): Promise<void> {
     for (const guild of Client.guilds.cache.values()) {
       const guildUsersIDs: string[] = [];
@@ -32,15 +32,15 @@ export class VoiceChannelUsers extends Listener {
       });
       const existingUsersIDs: string[] = existingUsers.map(user => user.UserID);
       const newUsersIDs = guildUsersIDs.filter(id => !existingUsersIDs.includes(id));
-      const createUsersPromises = newUsersIDs.map(async userID => {
-        await Prisma.usersVoiceExperienceData.create({
-          data: {
-            UserID: userID,
-            GuildID: guild.id
-          },
-        });
+      const newUsersData = newUsersIDs.map(userID => ({
+        UserID: userID,
+        GuildID: guild.id
+      }));
+      await Prisma.usersVoiceExperienceData.createMany({
+        data: newUsersData, skipDuplicates: true
       });
-      await Promise.all(createUsersPromises);
+      newUsersIDs.length = 0; // Limpiar el array de IDs de usuarios nuevos
+      newUsersData.length = 0; // Limpiar el array de datos de usuarios nuevos
     }
   }
 }

@@ -10,7 +10,8 @@ export class storeVoiceUsersInDatabase extends Listener {
       event: Events.VoiceStateUpdate
     });
   }
-
+// Declaramos la función para agregar los usuarios que se encuentren en un canal de voz a la base de datos.
+// Esto se ejecutará cuando un nuevo usuario ingresa a un canal de voz.
   private async addNewMember(member: GuildMember) {
       await Prisma.usersVoiceExperienceData.createMany({
         data: {
@@ -20,7 +21,7 @@ export class storeVoiceUsersInDatabase extends Listener {
         skipDuplicates: true,
       });
   }
-
+// función run para llamar nuestra función previa
   public async run(newState: VoiceState) {
     const member = newState.member as GuildMember;
     if (!member || member.user.bot) return;
