@@ -137,33 +137,38 @@ export class AddVoiceExperienceListener extends Listener {
   }
 
   private async processGuilds() {
-    const Guilds = Array.from(Client.guilds.cache.values());
-    for (const Guild of Guilds) {
-      const GuildData = this.guildsDataCache[Guild.id];
-      if (GuildData?.VoiceExpEnabled === false) { continue }
-      const afkchannel = Guild.afkChannel;
-      const VoiceChannelMembers = Guild.voiceStates.cache.filter((vs) => vs.channel && !vs.member?.user.bot && !vs.member?.voice.selfMute &&
-        !vs.member?.voice.selfDeaf && !vs.member?.voice.serverDeaf && !vs.member?.voice.serverMute && vs.member?.voice.channelId !== afkchannel?.id);
-      const memberUpdates: Promise<void>[] = [];
-      for (const member of VoiceChannelMembers.values()) {
-        const UserID = member.member?.user.id as string;
-        const GuildID = Guild.id;
-        const { min, max } = await this.getMinMaxEXP(Guild);
-        const experience = await getRandomXP(min, max);
-        const updatePromise = this.updateVoiceExperience(UserID, GuildID, experience, min, max)
-          .then((updatedUser) => {
-            if (updatedUser.levelUp) {
-              return this.handleLevelUp(UserID, GuildID, updatedUser.Nivel);
-            }
-          });
-
-        memberUpdates.push(updatePromise);
+    const guilds = Array.from(Client.guilds.cache.values());
+    for (const guild of guilds) {
+      const guildID = guild.id;
+      const guildData = this.guildsDataCache[guildID];
+      if (guildData?.VoiceExpEnabled === false) {
+        continue;
       }
-
-      await Promise.all(memberUpdates);
+  
+      const afkChannel = guild.afkChannel;
+      const voiceChannelMembers = Array.from(guild.voiceStates.cache.values()).filter((vs) =>
+        vs.channel &&
+        !vs.member?.user.bot &&
+        !vs.member?.voice.selfMute &&
+        !vs.member?.voice.selfDeaf &&
+        !vs.member?.voice.serverDeaf &&
+        !vs.member?.voice.serverMute &&
+        vs.member?.voice.channelId !== afkChannel?.id
+      );
+  
+      for (const member of voiceChannelMembers) {
+        const userID = member.member?.user.id as string;
+        const { min, max } = await this.getMinMaxEXP(guild);
+        const experience = await getRandomXP(min, max);
+  
+        const updatedUser = await this.updateVoiceExperience(userID, guildID, experience, min, max);
+        if (updatedUser.levelUp) {
+          await this.handleLevelUp(userID, guildID, updatedUser.Nivel);
+        }
+      }
     }
   }
-
+  
   public async run() {
     await this.processGuilds();
     setTimeout(() => {
