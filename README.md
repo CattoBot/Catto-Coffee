@@ -10,7 +10,7 @@ Tras clonar el proyecto se debe ejecutar el siguiente comando
 npm install
 ```
 
-Luego se debe editar los archivos `.env.example` y renombrarlo a `.env` luego llenar los campos dentro de ese archivo y el archivo `config.ts` para cambios adicionales.
+Luego se debe editar los archivos `.env.example` y renombrarlo a `.env` luego llenar los campos dentro de ese archivo.
 <br>
 Luego se ejecuta los siguientes comandos:
 
