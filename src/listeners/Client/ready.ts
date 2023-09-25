@@ -16,7 +16,7 @@ export class ReadyListener extends Listener {
   public async run(client: Client) {
 
     try {
-      let dbLatency: number;
+      let dbLatency: any
       const startTime = Date.now();
       await Database.$queryRaw`SELECT 1`;
       dbLatency = Date.now() - startTime;

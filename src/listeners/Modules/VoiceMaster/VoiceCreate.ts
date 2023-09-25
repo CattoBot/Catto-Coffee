@@ -1,6 +1,6 @@
-import { Listener, Events } from "@sapphire/framework";
-import { VoiceState, CategoryChannel, ChannelType, PermissionFlagsBits } from "discord.js";
-import { Database } from "../../../structures/Database";
+import { Listener, Events } from "@sapphire/framework"
+import { VoiceState, CategoryChannel, ChannelType, PermissionFlagsBits } from "discord.js"
+import { Database } from "../../../structures/Database"
 import { Utils } from "../../../util/utils";
 
 let Cooldown = new Map<string, number>();
@@ -25,55 +25,49 @@ export class VoiceCreateListener extends Listener {
         }));
     }
 
-    private async createUserPermissions(UserID: string): Promise<{ id: string, allow: bigint, deny: bigint }> {
-        return {
-            id: UserID,
-            allow: PermissionFlagsBits.Connect | PermissionFlagsBits.ViewChannel,
-            deny: BigInt(0),
-        };
-    }
-
     public async run(OldState: VoiceState, NewState: VoiceState) {
-        try {
-            const { guild } = NewState;
-            const { id: GuildID } = guild;
-            const { id: UserID } = NewState.member || {};
-            if (!GuildID || !UserID) return;
+        const { guild } = NewState;
+        const { id: GuildID } = guild;
+        const { id: UserID } = NewState.member ?? {};
+        if (!GuildID || !UserID) return;
 
-            const ChannelData = await this.getChannel(GuildID);
+        const ChannelData = await this.getChannel(GuildID);
+        await Promise.all(ChannelData.map(async ({ ChannelID, CategoryID }) => {
+            const CategoryChannel = guild.channels.resolve(CategoryID) as CategoryChannel;
 
-            await Promise.all(ChannelData.map(async ({ ChannelID, CategoryID }) => {
-                const CategoryChannel = guild.channels.resolve(CategoryID) as CategoryChannel;
+            if (NewState.channelId === ChannelID && OldState.channelId !== ChannelID || (NewState.channelId === ChannelID && !OldState.channelId)) {
+                const UserCooldown = Cooldown.get(UserID);
+                if (UserCooldown && UserCooldown > Date.now()) {
+                    return;
+                }
 
-                if (
-                    (NewState.channelId === ChannelID && OldState.channelId !== ChannelID) ||
-                    (NewState.channelId === ChannelID && !OldState.channelId)
-                ) {
-                    const UserCooldown = Cooldown.get(UserID);
-                    if (UserCooldown && UserCooldown > Date.now()) {
-                        return;
-                    }
+                Cooldown.set(UserID, Date.now() + Utils.getCooldowns().VoiceCreate);
 
-                    Cooldown.set(UserID, Date.now() + Utils.getCooldowns().VoiceCreate);
-
-                    const ChannelOverwrites = CategoryChannel.permissionOverwrites.cache.map((overwrite) => ({
+                const ChannelOverwrites = CategoryChannel.permissionOverwrites.cache.map((overwrite) => {
+                    return {
                         id: overwrite.id,
                         allow: overwrite.allow.bitfield,
                         deny: overwrite.deny.bitfield,
-                    }));
+                    };
+                });
 
-                    ChannelOverwrites.push(await this.createUserPermissions(UserID));
+                const UserPermissions = {
+                    id: UserID,
+                    allow: PermissionFlagsBits.Connect | PermissionFlagsBits.ViewChannel,
+                    deny: BigInt(0),
+                }
 
-                    const channel = await guild.channels.create({
-                        name: `Canal de ${NewState.member?.displayName}`,
-                        type: ChannelType.GuildVoice,
-                        parent: CategoryChannel,
-                        permissionOverwrites: ChannelOverwrites
-                    });
+                ChannelOverwrites.push(UserPermissions)
 
-                    await NewState.setChannel(channel).catch(() => { });
-
-
+                await guild.channels.create({
+                    name: `Canal de ${NewState.member?.displayName}`,
+                    type: ChannelType.GuildVoice,
+                    parent: CategoryChannel,
+                    permissionOverwrites: ChannelOverwrites
+                }).then((channel) => {
+                    NewState.setChannel(channel).catch(() => { });
+                    return channel;
+                }).then(async (channel) => {
                     await Database.activeTempVoices.create({
                         data: {
                             GuildID: GuildID,
@@ -81,12 +75,9 @@ export class VoiceCreateListener extends Listener {
                             ChannelOwner: UserID,
                             ChannelCategory: channel.parentId
                         }
-                    });
-
-                }
-            }));
-        } catch (error) {
-            // Manejar el error o registrar un mensaje de error aquí
-        }
+                    }).catch(() => { });
+                });
+            }
+        }))
     }
 }

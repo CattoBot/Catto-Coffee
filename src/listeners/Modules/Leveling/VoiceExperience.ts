@@ -5,9 +5,6 @@ import { Database } from "../../../structures/Database";
 import { GetRandomXP, XPCalculator } from "../../../util/utilities/index";
 import { Utils } from "../../../util/utils";
 import { Catto_Coffee } from "../../../Catto";
-import { User } from "../../../Classes/Galaxy";
-import { CattoLogger } from "../../../structures/CattoLogger";
-const Logger = new CattoLogger();
 
 interface GuildData {
     VoiceExpEnabled: boolean;
@@ -42,8 +39,7 @@ export class VoiceExperienceListener extends Listener {
     }
 
     private async processGuild(guild: Guild) {
-        try {
-            const isEnabled = await this.isVoiceExperienceModuleEnabled(guild);
+        const isEnabled = await this.isVoiceExperienceModuleEnabled(guild);
 
         if (!isEnabled) {
             return;
@@ -69,10 +65,6 @@ export class VoiceExperienceListener extends Listener {
                 await this.handleLevelUp(voiceState.member, guild.id, updatedUser.Nivel);
             }
         }
-        } catch (error) {
-           
-        }
-        
     }
 
     private async isVoiceExperienceModuleEnabled(guild: Guild) {
@@ -108,45 +100,38 @@ export class VoiceExperienceListener extends Listener {
     }
 
     private async updateVoiceExperience(member: GuildMember, guildID: string, experience: number, min: number, max: number) {
+        const { id: UserID } = member.user;
 
-        try {
-            const { id: UserID } = member.user;
-            if (!UserID) return;
+        const updatedUser = await Database.usersVoiceExperienceData.upsert({
+            where: { UserID_GuildID: { UserID, GuildID: guildID } },
+            create: { UserID, GuildID: guildID, VoiceExperience: experience, TotalExperience: experience },
+            update: { VoiceExperience: { increment: experience }, TotalExperience: { increment: experience } },
+        });
 
-            const updatedUser = await Database.usersVoiceExperienceData.upsert({
-                where: { UserID_GuildID: { UserID, GuildID: guildID } },
-                create: { UserID, GuildID: guildID, VoiceExperience: experience, TotalExperience: experience },
-                update: { VoiceExperience: { increment: experience }, TotalExperience: { increment: experience } },
-            });
+        const randInt = await GetRandomXP(min, max);
+        let levelUp = false;
 
-            const randInt = await GetRandomXP(min, max);
-            let levelUp = false;
+        if (updatedUser) {
+            updatedUser.VoiceExperience += randInt;
+            updatedUser.TotalExperience += randInt;
 
-            if (updatedUser) {
-                updatedUser.VoiceExperience += randInt;
-                updatedUser.TotalExperience += randInt;
+            const xpHastaNivel = XPCalculator(updatedUser.Nivel);
 
-                const xpHastaNivel = XPCalculator(updatedUser.Nivel);
-
-                if (updatedUser.VoiceExperience >= xpHastaNivel) {
-                    updatedUser.VoiceExperience -= xpHastaNivel;
-                    updatedUser.Nivel++;
-                    levelUp = true;
-                }
-
-                await Database.usersVoiceExperienceData.update({
-                    where: { UserID_GuildID: { UserID, GuildID: guildID } },
-                    data: { Nivel: updatedUser.Nivel, VoiceExperience: Math.floor(updatedUser.VoiceExperience), TotalExperience: updatedUser.TotalExperience }
-                });
-
-                this.minMaxExpCache.delete(guildID);
+            if (updatedUser.VoiceExperience >= xpHastaNivel) {
+                updatedUser.VoiceExperience -= xpHastaNivel;
+                updatedUser.Nivel++;
+                levelUp = true;
             }
 
-            return { ...updatedUser, levelUp };
-        } catch (error) {
-          
+            await Database.usersVoiceExperienceData.update({
+                where: { UserID_GuildID: { UserID, GuildID: guildID } },
+                data: { Nivel: updatedUser.Nivel, VoiceExperience: Math.floor(updatedUser.VoiceExperience), TotalExperience: updatedUser.TotalExperience }
+            });
+
+            this.minMaxExpCache.delete(guildID);
         }
 
+        return { ...updatedUser, levelUp };
     }
 
     private async handleLevelUp(member: GuildMember, guildID: string, userNivel: number) {

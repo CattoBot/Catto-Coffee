@@ -12,24 +12,19 @@ export class DeleteCategoryListener extends Listener {
     }
 
     public async run(channel: CategoryChannel) {
-        try {
-            const tempVoice = await Database.configTempChannels.findUnique({
-                where: {
-                    GuildID_TempVoiceCategory: {
-                        GuildID: channel.guild.id,
-                        TempVoiceCategory: channel.id
-                    }
-                },
-            });
+        const tempVoice = await Database.configTempChannels.findUnique({
+            where: {
+                GuildID_TempVoiceCategory: {
+                    GuildID: channel.guild.id,
+                    TempVoiceCategory: channel.id
+                }
+            },
+        });
 
-            if (tempVoice) {
-                await Database.configTempChannels.delete({
-                    where: { GuildID_TempVoiceCategory: { GuildID: channel.guild.id, TempVoiceCategory: channel.id } }
-                })
-            }
-        } catch (error) {
-
+        if (tempVoice) {
+            await Database.configTempChannels.delete({
+                where: { GuildID_TempVoiceCategory: { GuildID: channel.guild.id, TempVoiceCategory: channel.id } }
+            }).catch(() => { });
         }
-
     }
 }

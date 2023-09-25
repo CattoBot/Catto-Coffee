@@ -9,6 +9,7 @@ const options: SignaleOptions = {
 export class CattoLogger extends Signale {
     constructor() {
         super(options),
+        
         {
             types: {
                 info: {

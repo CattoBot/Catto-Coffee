@@ -1,16 +1,15 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { ChatInputCommand } from "@sapphire/framework";
 import { Time } from "@sapphire/time-utilities";
-import { Database } from "../../../structures/Database";
-import { Utils } from "../../../util/utils";
-import { ActionRowBuilder, ModalBuilder, PermissionFlagsBits, TextInputBuilder, TextInputStyle, User } from "discord.js";
+import { Database } from "../../structures/Database";
+import { Utils } from "../../util/utils";
+import { ActionRowBuilder, ModalBuilder, PermissionFlagsBits, TextInputBuilder, TextInputStyle } from "discord.js";
 
 export class TempVoiceCommands extends Subcommand {
     public constructor(context: Subcommand.Context, options: Subcommand.Options) {
         super(context, {
             ...options,
             cooldownDelay: Time.Second * 8,
-            fullCategory: ["SubCommands"],
             requiredClientPermissions: ["ManageChannels"],
             requiredUserPermissions: ["SendMessages"],
             preconditions: ["VoiceMaster"],

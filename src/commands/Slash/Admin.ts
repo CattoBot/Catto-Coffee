@@ -1,18 +1,18 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Time } from "@sapphire/time-utilities";
 import { ChatInputCommand } from "@sapphire/framework";
-import { Database } from "../../../structures/Database";
-import { Utils } from "../../../util/utils";
-import { Catto_Coffee } from "../../../Catto";
+import { Database } from "../../structures/Database";
+import { Utils } from "../../util/utils";
+import { Catto_Coffee } from "../../Catto";
 import { ChannelType, TextChannel, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
-import { CattoLogger } from "../../../structures/CattoLogger";
+import { CattoLogger } from "../../structures/CattoLogger";
 const Logger = new CattoLogger();
 export class AdminSubCommands extends Subcommand {
     public constructor(context: Subcommand.Context, options: Subcommand.Options) {
         super(context, {
             ...options,
             name: "admin",
-            fullCategory: ["SubCommands"],
+            fullCategory: ["Admin"],
             description: "Comandos de administración",
             requiredClientPermissions: ['Administrator'],
             preconditions: ["AdminOnly"],
@@ -409,8 +409,8 @@ export class AdminSubCommands extends Subcommand {
 
             const botond = new ActionRowBuilder<ButtonBuilder>
             const botone = new ActionRowBuilder<ButtonBuilder>
-            const module1 = await import('../../../interaction-handlers/buttons/general/cancel');
-            const module2 = await import('../../../interaction-handlers/buttons/admin/rsUrXp');
+            const module1 = await import('../../interaction-handlers/buttons/general/cancel');
+            const module2 = await import('../../interaction-handlers/buttons/admin/rsUrXp');
             await module1.build(botond, { disabled: true, author: interaction.user.id }, [])
             await module2.build(botond, { disabled: true, author: interaction.user.id }, [`${usuario.id}`, modulo])
             await module1.build(botone, { disabled: false, author: interaction.user.id }, [])
@@ -601,7 +601,7 @@ export class AdminSubCommands extends Subcommand {
     public async chatInputResetExp(interaction: Subcommand.ChatInputCommandInteraction) {
         const modulo = interaction.options.getString("modulo", true);
 
-        const modal = await import("../../../interaction-handlers/modals/admin/rsSvXp")
+        const modal = await import("../../interaction-handlers/modals/admin/rsSvXp")
         modal.build(interaction, modulo)
     }
 

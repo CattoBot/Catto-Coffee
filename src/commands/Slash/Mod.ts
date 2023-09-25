@@ -1,21 +1,11 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Time } from "@sapphire/time-utilities";
 import { ChatInputCommand } from "@sapphire/framework";
-import { Prisma } from "../../client/PrismaClient";
-import config from "../../config";
-import Client from "../..";
+import { Database } from "../../structures/Database";
+import { Utils } from "../../util/utils";
+import { Catto_Coffee } from "../../Catto";
 import { ActionRowBuilder, EmbedBuilder, PermissionFlagsBits, GuildMember, StringSelectMenuBuilder, ButtonBuilder, User } from "discord.js";
-
-const emojis = {
-  selfMuted: "<:selfMuted:1092727485919154246>",
-  serverMuted: "<:serverMute:1092727481464799292>",
-  selfDeafen: "<:selfDeafened:1092727483289313290>",
-  serverDeafen: "<:serverDeafened:1092727528038350919>",
-  unmute: "<:unmute:1092728384401965166>",
-  undeafen: "<:undeafened:1092728381499523132>",
-  mod: "<:moderator:1092825523849273384>",
-  admin: "<:admin:1092832350783688785>",
-};
+const emojis = Utils.getEmojis().VoiceMod
 
 export class AdminSubCommands extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
@@ -313,25 +303,25 @@ export class AdminSubCommands extends Subcommand {
     try {
       var users: any[] = [];
 
-      const canal: any = Client.channels.resolve(channel.id);
+      const canal: any = Catto_Coffee.channels.resolve(channel.id);
       if (canal && canal.type === 2) {
         const members = canal.members;
         members.forEach((user: any) => {
           users.push(
             `${user.voice.mute
-              ? `${user.voice.serverMute ? emojis.serverMuted : emojis.selfMuted
+              ? `${user.voice.serverMute ? Utils.getEmojis().VoiceMod.serverMuted : Utils.getEmojis().VoiceMod.selfMuted
               }`
-              : emojis.unmute
+              : Utils.getEmojis().VoiceMod.unmute
             }${user.voice.deaf
               ? `${user.voice.serverDeaf
-                ? emojis.serverDeafen
-                : emojis.selfDeafen
+                ? Utils.getEmojis().VoiceMod.serverDeafen
+                : Utils.getEmojis().VoiceMod.selfDeafen
               } `
-              : emojis.undeafen
+              : Utils.getEmojis().VoiceMod.undeafen
             } <@${user.id}> ${user.permissions.has(PermissionFlagsBits.MuteMembers)
               ? `${user.permissions.has(PermissionFlagsBits.ManageGuild)
-                ? `${emojis.admin}`
-                : `${emojis.mod}`
+                ? `${Utils.getEmojis().VoiceMod.admin}`
+                : `${Utils.getEmojis().VoiceMod.mod}`
               }`
               : ""
             }`
@@ -417,7 +407,7 @@ export class AdminSubCommands extends Subcommand {
     if (user.voice.channel) {
       var users: any[] = [];
 
-      const canal: any = Client.channels.resolve(user.voice.channel.id);
+      const canal: any = Catto_Coffee.channels.resolve(user.voice.channel.id);
       if (canal && canal.type === 2) {
         const members = canal.members;
         members.forEach((user: any) => {
@@ -529,7 +519,7 @@ export class AdminSubCommands extends Subcommand {
       });
 
     // Buscamos todas las otras notas de este usuario
-    const that_user_notes: any = await Prisma.userNotes.findMany({
+    const that_user_notes: any = await Database.userNotes.findMany({
       where: {
         UserID: user?.id,
         GuildID: guildId
@@ -548,7 +538,7 @@ export class AdminSubCommands extends Subcommand {
       });
 
     // Buscamos todas las notas del servidor
-    const this_guild_notes: any = await Prisma.userNotes.findMany({
+    const this_guild_notes: any = await Database.userNotes.findMany({
       where: {
         GuildID: guildId
       }
@@ -575,7 +565,7 @@ export class AdminSubCommands extends Subcommand {
     const embed = new EmbedBuilder().setColor("#2b2d31")
 
     // Añadimos la nota a la base de datos
-    await Prisma.userNotes.create({
+    await Database.userNotes.create({
       data: {
         NoteID: new_note_id,
         UserID: `${user?.id}`,
@@ -588,7 +578,7 @@ export class AdminSubCommands extends Subcommand {
     });
 
     // Buscamos los canales configurados del servidor
-    const this_guild_config_channels = await Prisma.configChannels.findUnique({
+    const this_guild_config_channels = await Database.configChannels.findUnique({
       where: {
         GuildID: guildId
       }
@@ -625,7 +615,7 @@ export class AdminSubCommands extends Subcommand {
       }
 
       // Obtenemos el canal al que enviaremos el log
-      const notes_logs_channel: any = Client.channels.resolve(this_guild_config_channels.NotesLogs)
+      const notes_logs_channel: any = Catto_Coffee.channels.resolve(this_guild_config_channels.NotesLogs)
 
       // Creamos el mensaje que se enviará como log
       const new_note_log = new EmbedBuilder()
@@ -704,7 +694,7 @@ export class AdminSubCommands extends Subcommand {
                 }
 
                 // Actualiza la base de datos e ingresa las URLs de los adjuntos
-                await Prisma.userNotes.update({
+                await Database.userNotes.update({
                   where: {
                     NoteID_GuildID: {
                       NoteID: new_note_id,
@@ -773,7 +763,7 @@ export class AdminSubCommands extends Subcommand {
     const week = that_user_notes.filter(callback7)
 
     // Una vez finalizado, indicamos que la nota ha sido creada exitosamente
-    embed.setDescription(`¡Nota \`#${new_note_id}\` creada exitosamente!\n${today.length>0?`\n${config.emojis.warning} \`|\` Esta es la ${today.length +1}ª nota de este usuario hoy.`:`${week.length>0?`\n${config.emojis.warning} \`|\` Esta es la ${today.length +1}ª nota de este usuario esta semana.`:""}`}${that_user_notes.length > 2?`\n${config.emojis.warning} \`|\`Esta es la ${that_user_notes.length + 1}ª nota del usuario.`:""}`)
+    embed.setDescription(`¡Nota \`#${new_note_id}\` creada exitosamente!\n${today.length>0?`\n${Utils.getEmojis().General.Error} \`|\` Esta es la ${today.length +1}ª nota de este usuario hoy.`:`${week.length>0?`\n${Utils.getEmojis().General.Warning} \`|\` Esta es la ${today.length +1}ª nota de este usuario esta semana.`:""}`}${that_user_notes.length > 2?`\n${Utils.getEmojis().General.Warning} \`|\`Esta es la ${that_user_notes.length + 1}ª nota del usuario.`:""}`)
     if (!interaction.deferred) {
       await interaction.reply({ embeds: [embed], ephemeral: true })
     }
@@ -798,7 +788,7 @@ export class AdminSubCommands extends Subcommand {
         ephemeral: true
       });
 
-    const note = await Prisma.userNotes.findUnique({
+    const note = await Database.userNotes.findUnique({
       where: {
         NoteID_GuildID: {
           NoteID: noteID || 1,
@@ -817,8 +807,8 @@ export class AdminSubCommands extends Subcommand {
         ephemeral: true
       });
 
-    const note_perpetrator = await Client.users.fetch(note.Perpetrator) as User;
-    const note_user = await Client.users.fetch(note.UserID) as User;
+    const note_perpetrator = await Catto_Coffee.users.fetch(note.Perpetrator) as User;
+    const note_user = await Catto_Coffee.users.fetch(note.UserID) as User;
 
     var permited = !isNaN(parseInt(note.ReadRoleID || ".")) || note_perpetrator.id == miembro.id || miembro.roles.cache.has(`${note.ReadRoleID}`) || miembro.permissions.has(PermissionFlagsBits.ManageGuild)
 
@@ -893,7 +883,7 @@ export class AdminSubCommands extends Subcommand {
       })
     }
 
-    const that_user_notes = await Prisma.userNotes.findMany({
+    const that_user_notes = await Database.userNotes.findMany({
       where: {
         UserID: user.id,
         GuildID: guildId
@@ -911,7 +901,7 @@ export class AdminSubCommands extends Subcommand {
       })
     let fields: any[] = [];
     that_user_notes.filter(async (nota) => {
-      const note_perpetrator = await Client.users.fetch(nota.Perpetrator) as User;
+      const note_perpetrator = await Catto_Coffee.users.fetch(nota.Perpetrator) as User;
       return !isNaN(parseInt(nota.ReadRoleID || ".")) || note_perpetrator.id == miembro.id || miembro.roles.cache.has(`${nota.ReadRoleID}`) || miembro.permissions.has(PermissionFlagsBits.ManageGuild)
     }).slice(0, 5).forEach(async (nota) => {
   
