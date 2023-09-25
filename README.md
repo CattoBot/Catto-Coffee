@@ -12,23 +12,12 @@ npm install
 
 Luego se debe editar los archivos `.env.example` y renombrarlo a `.env` luego llenar los campos dentro de ese archivo y el archivo `config.ts` para cambios adicionales.
 <br>
-Luego se ejecuta el siguiente comando (OJO: Debes haber realizado ya tu conexión a tu base de datos MySQL)
+Luego se ejecuta los siguientes comandos:
 
 ```
 npx prisma migrate dev --name init
 ```
-Para configurar las tablas y todo lo necesario a la base de datos.
-<br>
-Y finalmente una vez terminados todos estos pasos, ejecutar el proyecto con
-```
-npm run dev
-```
-para un entorno de desarrollo de producción correr el comando: 
-```
-npm run build
-```
 
-Nota: En caso de querer correr el proyecto en un entorno de producción, modificar el archivo `package.json` en la propiedad `main` y cambiarlo de `src/index.ts` a `dist/index.js` y finalmente correr el proyecto con el comando:
 ```
 npm run start 
 ```
