@@ -1,7 +1,6 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
-import config from "../../../config"
-import Client from "../../..";
-import { Prisma } from "../../../client/PrismaClient";
+import { Utils } from '../../../util/utils';
+import { Database } from '../../../structures/Database';
 import {
   ActionRowBuilder,
   EmbedBuilder,
@@ -42,7 +41,7 @@ export class ButtonHandler extends InteractionHandler {
   public override async parse(interaction: ButtonInteraction) {
     const cat: string = interaction.customId.split(/:+/g)[0];
     const id: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[0];
-    if (cat == __dirname.split(/\/+/g)[__dirname.split(/\/+/g).length - 1] && id == __filename.split(/\/+/g)[__filename.split(/\/+/g).length - 1].split(/\.+/g)[0]) {
+   if (cat == __dirname.split(/\/+/g)[__dirname.split(/\/+/g).length - 1] && id == __filename.split(/\/+/g)[__filename.split(/\/+/g).length - 1].split(/\.+/g)[0]) {
       const restriction: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[1];
       let permited: boolean = restriction.startsWith("a")
       if (!permited && restriction.startsWith("u")) {
@@ -52,7 +51,7 @@ export class ButtonHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(config.messages.interactionOwner.button)
+          .setDescription(Utils.getMessages().InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();
@@ -79,7 +78,7 @@ export class ButtonHandler extends InteractionHandler {
         components: [],
       });
 
-    const that_user_notes = await Prisma.userNotes.findMany({
+    const that_user_notes = await Database.userNotes.findMany({
       where: {
         UserID: `${userId}`,
         GuildID: `${guildId}`

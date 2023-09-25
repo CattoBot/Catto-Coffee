@@ -1,7 +1,6 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
-import config from "../../../config"
-
-import Client from "../../..";
+import { Utils } from '../../../util/utils';
+import { Catto_Coffee } from '../../../Catto';
 import {
   ActionRowBuilder,
   EmbedBuilder,
@@ -72,7 +71,7 @@ export class MenuHandler extends InteractionHandler {
   public override async parse(interaction: StringSelectMenuInteraction) {
     const cat: string = interaction.customId.split(/:+/g)[0];
     const id: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[0];
-    if (cat == __dirname.split(/\/+/g)[__dirname.split(/\/+/g).length - 1] && id == __filename.split(/\/+/g)[__filename.split(/\/+/g).length - 1].split(/\.+/g)[0]) {
+   if (cat == __dirname.split(/\/+/g)[__dirname.split(/\/+/g).length - 1] && id == __filename.split(/\/+/g)[__filename.split(/\/+/g).length - 1].split(/\.+/g)[0]) {
       const restriction: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[1];
       let permited: boolean = restriction.startsWith("a")
       if (!permited && restriction.startsWith("u")) {
@@ -82,7 +81,7 @@ export class MenuHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(config.messages.interactionOwner.button)
+          .setDescription(Utils.getMessages().InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();
@@ -131,7 +130,7 @@ export class MenuHandler extends InteractionHandler {
       } else {
 
         var users: any[] = [];
-        const canal: any = Client.channels.resolve(channel);
+        const canal: any = Catto_Coffee.channels.resolve(channel);
         if (canal && canal.type === 2) {
           const members = canal.members;
           members.forEach((user: any) => {
@@ -165,7 +164,7 @@ export class MenuHandler extends InteractionHandler {
       }
     } else if (args[0][0] == "kick") {
       var users: any[] = [];
-      const canal: any = Client.channels.resolve(channel);
+      const canal: any = Catto_Coffee.channels.resolve(channel);
       if (canal && canal.type === 2) {
         const members = canal.members;
         members.forEach((user: any) => {
@@ -208,7 +207,7 @@ export class MenuHandler extends InteractionHandler {
       try {
 
         var users: any[] = [];
-        const canal: any = Client.channels.resolve(channel);
+        const canal: any = Catto_Coffee.channels.resolve(channel);
         if (canal && canal.type === 2) {
           const members = canal.members;
           members.forEach((user: any) => {

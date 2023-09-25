@@ -1,7 +1,6 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
-import config from "../../../config"
-import emojis from '../../../utils/emojis/VoiceModEmojis/emojis';
-import Client from "../../..";
+import { Catto_Coffee } from '../../../Catto';
+import { Utils } from '../../../util/utils';
 import {
   ActionRowBuilder,
   EmbedBuilder,
@@ -12,7 +11,6 @@ import {
   StringSelectMenuBuilder,
   GuildMember
 } from "discord.js";
-
 
 
 interface optionsObject {
@@ -44,7 +42,7 @@ export class ButtonHandler extends InteractionHandler {
   public override async parse(interaction: ButtonInteraction) {
     const cat: string = interaction.customId.split(/:+/g)[0];
     const id: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[0];
-    if (cat == __dirname.split(/\/+/g)[__dirname.split(/\/+/g).length - 1] && id == __filename.split(/\/+/g)[__filename.split(/\/+/g).length - 1].split(/\.+/g)[0]) {
+   if (cat == __dirname.split(/\/+/g)[__dirname.split(/\/+/g).length - 1] && id == __filename.split(/\/+/g)[__filename.split(/\/+/g).length - 1].split(/\.+/g)[0]) {
       const restriction: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[1];
       let permited: boolean = restriction.startsWith("a")
       if (!permited && restriction.startsWith("u")) {
@@ -54,7 +52,7 @@ export class ButtonHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(config.messages.interactionOwner.button)
+          .setDescription(Utils.getMessages().InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();
@@ -83,25 +81,25 @@ export class ButtonHandler extends InteractionHandler {
 
     var users: any[] = [];
 
-    const canal: any = Client.channels.resolve(channel);
+    const canal: any = Catto_Coffee.channels.resolve(channel);
     if (canal && canal.type === 2) {
       const members = canal.members;
       members.forEach((user: any) => {
         users.push(
           `${user.voice.mute
-            ? `${user.voice.serverMute ? emojis.serverMuted : emojis.selfMuted
+            ? `${user.voice.serverMute ? Utils.getEmojis().VoiceMod.serverMuted : Utils.getEmojis().VoiceMod.selfMuted
             }`
-            : emojis.unmute
+            : Utils.getEmojis().VoiceMod.unmute
           }${user.voice.deaf
             ? `${user.voice.serverDeaf
-              ? emojis.serverDeafen
-              : emojis.selfDeafen
+              ? Utils.getEmojis().VoiceMod.serverDeafen
+              : Utils.getEmojis().VoiceMod.selfDeafen
             } `
-            : emojis.undeafen
+            : Utils.getEmojis().VoiceMod.undeafen
           } <@${user.id}> ${user.permissions.has(PermissionFlagsBits.MuteMembers)
             ? `${user.permissions.has(PermissionFlagsBits.ManageGuild)
-              ? `${emojis.admin}`
-              : `${emojis.mod}`
+              ? `${Utils.getEmojis().VoiceMod.admin}`
+              : `${Utils.getEmojis().VoiceMod.mod}`
             }`
             : ""
           }`

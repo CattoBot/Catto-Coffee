@@ -1,7 +1,6 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
-import config from "../../../config"
 
-import Client from "../../..";
+import { Catto_Coffee } from '../../../Catto';
 import {
   ActionRowBuilder,
   EmbedBuilder,
@@ -11,17 +10,7 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction
 } from "discord.js";
-
-const emojis = {
-  selfMuted: "<:selfMuted:1092727485919154246>",
-  serverMuted: "<:serverMute:1092727481464799292>",
-  selfDeafen: "<:selfDeafened:1092727483289313290>",
-  serverDeafen: "<:serverDeafened:1092727528038350919>",
-  unmute: "<:unmute:1092728384401965166>",
-  undeafen: "<:undeafened:1092728381499523132>",
-  mod: "<:moderator:1092825523849273384>",
-  admin: "<:admin:1092832350783688785>",
-};
+import { Utils } from '../../../util/utils';
 
 interface optionsObject {
   disabled: boolean | undefined,
@@ -97,7 +86,7 @@ export class MenuHandler extends InteractionHandler {
   public override async parse(interaction: StringSelectMenuInteraction) {
     const cat: string = interaction.customId.split(/:+/g)[0];
     const id: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[0];
-    if (cat == __dirname.split(/\/+/g)[__dirname.split(/\/+/g).length - 1] && id == __filename.split(/\/+/g)[__filename.split(/\/+/g).length - 1].split(/\.+/g)[0]) {
+   if (cat == __dirname.split(/\/+/g)[__dirname.split(/\/+/g).length - 1] && id == __filename.split(/\/+/g)[__filename.split(/\/+/g).length - 1].split(/\.+/g)[0]) {
       const restriction: string = interaction.customId.split(/:+/g)[1].split(/_+/g)[1];
       let permited: boolean = restriction.startsWith("a")
       if (!permited && restriction.startsWith("u")) {
@@ -107,7 +96,7 @@ export class MenuHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(config.messages.interactionOwner.button)
+          .setDescription(Utils.getMessages().InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();
@@ -191,7 +180,7 @@ export class MenuHandler extends InteractionHandler {
             .setColor("#fb6444");
         } else {
 
-          const canal: any = Client.channels.resolve(member.voice.channel.id);
+          const canal: any = Catto_Coffee.channels.resolve(member.voice.channel.id);
           if (canal && canal.type === 2) {
             const members = canal.members;
             members.forEach((user: any) => {
@@ -231,7 +220,7 @@ export class MenuHandler extends InteractionHandler {
             )
             .setColor("#fb6444");
         } else if (args[1][0] == "US") {
-          if (!Client.channels.cache.get(args[2][0])) {
+          if (!Catto_Coffee.channels.cache.get(args[2][0])) {
             error.embed = new EmbedBuilder()
               .setDescription("No se ha encontrado el canal en el servidor\n¿El bot puede verlo?")
               .setColor("#fb6444");
@@ -255,7 +244,7 @@ export class MenuHandler extends InteractionHandler {
           let tempmember = interaction.guild?.members.cache.get(args[1][0]) as GuildMember;
           let tempmember_2 = interaction.guild?.members.cache.get(args[2][0]) as GuildMember;
           let tempchannel: any = args[2][0];
-          if (!Client.channels.cache.get(tempchannel))
+          if (!Catto_Coffee.channels.cache.get(tempchannel))
             tempchannel = tempmember_2.voice.channel?.id;
           tempmember?.voice.setChannel(
             tempchannel,
@@ -267,7 +256,7 @@ export class MenuHandler extends InteractionHandler {
       // Si la opción es kick...
       else if (opcion == "kick") {
 
-        const canal: any = Client.channels.resolve(member.voice.channel.id);
+        const canal: any = Catto_Coffee.channels.resolve(member.voice.channel.id);
         if (canal && canal.type === 2) {
           const members = canal.members;
           members.forEach((user: any) => {
@@ -306,25 +295,25 @@ export class MenuHandler extends InteractionHandler {
           .setDescription("El usuario no se encuentra en ningún canal de voz")
           .setColor("#fb6444");
       } else {
-        const canal: any = Client.channels.resolve(member.voice.channel.id);
+        const canal: any = Catto_Coffee.channels.resolve(member.voice.channel.id);
         if (canal && canal.type === 2) {
           const members = canal.members;
           members.forEach((user: any) => {
             users.push(
               `${user.voice.mute
-                ? `${user.voice.serverMute ? emojis.serverMuted : emojis.selfMuted
+                ? `${user.voice.serverMute ? Utils.getEmojis().VoiceMod.serverMuted : Utils.getEmojis().VoiceMod.selfMuted
                 }`
-                : emojis.unmute
+                : Utils.getEmojis().VoiceMod.unmute
               }${user.voice.deaf
                 ? `${user.voice.serverDeaf
-                  ? emojis.serverDeafen
-                  : emojis.selfDeafen
+                  ? Utils.getEmojis().VoiceMod.serverDeafen
+                  : Utils.getEmojis().VoiceMod.selfDeafen
                 } `
-                : emojis.undeafen
+                : Utils.getEmojis().VoiceMod.undeafen
               } <@${user.id}> ${user.permissions.has(PermissionFlagsBits.MuteMembers)
                 ? `${user.permissions.has(PermissionFlagsBits.ManageGuild)
-                  ? `${emojis.admin}`
-                  : `${emojis.mod}`
+                  ? `${Utils.getEmojis().VoiceMod.admin}`
+                  : `${Utils.getEmojis().VoiceMod.mod}`
                 }`
                 : ""
               }`

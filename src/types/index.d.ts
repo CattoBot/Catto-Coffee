@@ -1,11 +1,10 @@
 declare module "@sapphire/framework" {
-  interface Preconditions {
+    interface Preconditions {
+    VoiceMaster: never;
+    ModOnly: never;
     AdminOnly: never;
-    ModOnly:never;
-    TempVoiceExists: never;
-    OwnerOnly: never;
-    // ...
+      // ...
+    }
   }
-}
 
-export default undefined;
+  export default undefined;

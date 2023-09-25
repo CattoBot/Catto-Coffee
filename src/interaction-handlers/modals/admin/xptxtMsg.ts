@@ -1,7 +1,7 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
 import { ModalSubmitInteraction } from "discord.js";
-import { Prisma } from "../../../client/PrismaClient";
-import config from "../../../config";
+import { Database } from '../../../structures/Database';
+import { Utils } from '../../../util/utils';
 
 export class ModalHandler extends InteractionHandler {
   public constructor(ctx: PieceContext, options: InteractionHandler.Options) {
@@ -19,7 +19,7 @@ export class ModalHandler extends InteractionHandler {
   public async run(interaction: ModalSubmitInteraction) {
     const message = interaction.fields.getTextInputValue("text-message");
 
-    await Prisma.guildsData.upsert({
+    await Database.guildsData.upsert({
       where: {
         GuildID: interaction.guildId as string,
       },
@@ -33,7 +33,7 @@ export class ModalHandler extends InteractionHandler {
     });
 
     return interaction.reply({
-      content: `Se ha actualizado el mensaje correctamente ${config.emojis.success}`,
+      content: `Se ha actualizado el mensaje correctamente ${Utils.getEmojis().General.Success}`,
     });
   }
 }

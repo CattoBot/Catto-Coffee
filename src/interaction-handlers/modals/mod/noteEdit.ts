@@ -1,17 +1,7 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext, container } from '@sapphire/framework';
-import { Prisma } from "../../../client/PrismaClient";
-import Client from "../../..";
-import {
-  ModalBuilder,
-  ActionRowBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  GuildMember,
-  ModalSubmitInteraction,
-  User
-} from "discord.js";
+import { Catto_Coffee } from '../../../Catto';
+import { Database } from '../../../structures/Database';
+import { ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder, PermissionFlagsBits, GuildMember, ModalSubmitInteraction, User } from "discord.js";
 
 interface optionsObject {
   textValue: string | undefined,
@@ -58,7 +48,7 @@ export class ModalHandler extends InteractionHandler {
     const guildId = interaction.guild?.id;
     const text = interaction.fields.getTextInputValue("text");
 
-    const note = await Prisma.userNotes.findUnique({
+    const note = await Database.userNotes.findUnique({
       where: {
         NoteID_GuildID: {
           NoteID: parseInt(noteId),
@@ -76,13 +66,13 @@ export class ModalHandler extends InteractionHandler {
         ], ephemeral: true
       })
 
-    const note_perpetrator = await Client.users.fetch(note.Perpetrator) as User;
+    const note_perpetrator = await Catto_Coffee.users.fetch(note.Perpetrator) as User;
 
     var permited = note_perpetrator.id == miembro.id || miembro.permissions.has(PermissionFlagsBits.ManageRoles)
 
     if (permited) {
 
-      await Prisma.userNotes.update({
+      await Database.userNotes.update({
         where: {
           NoteID_GuildID: {
             NoteID: parseInt(noteId),
@@ -94,7 +84,7 @@ export class ModalHandler extends InteractionHandler {
         }
       })
 
-      const this_guild_config_channels = await Prisma.configChannels.findUnique({
+      const this_guild_config_channels = await Database.configChannels.findUnique({
         where: {
           GuildID: guildId
         }
@@ -135,7 +125,7 @@ export class ModalHandler extends InteractionHandler {
           )
           .setFooter({ text: `Nota #${noteId}` })
 
-        const notes_logs_channel: any = Client.channels.resolve(this_guild_config_channels.NotesLogs)
+        const notes_logs_channel: any = Catto_Coffee.channels.resolve(this_guild_config_channels.NotesLogs)
         notes_logs_channel
           .send({ embeds: [new_note_log] })
       }

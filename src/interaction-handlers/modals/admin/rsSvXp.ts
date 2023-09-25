@@ -1,6 +1,6 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext, container } from '@sapphire/framework';
-import { Prisma } from "../../../client/PrismaClient";
-import config from "../../../config";
+import { Database } from '../../../structures/Database';
+import { Utils } from '../../../util/utils';
 import { ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, EmbedBuilder } from "discord.js";
 
 export const build = async (interaction: any, module:string) => {
@@ -77,7 +77,7 @@ export class ModalHandler extends InteractionHandler {
     switch (modulo) {
       case "text":
         const guildTextExperience =
-          await Prisma.usersTextExperienceData.findMany({
+          await Database.usersTextExperienceData.findMany({
             where: {
               GuildID: interaction.guildId as string,
             },
@@ -85,43 +85,43 @@ export class ModalHandler extends InteractionHandler {
 
         if (guildTextExperience.length === 0) {
           return interaction.reply({
-            content: `No hay datos de experiencia de texto en este servidor ${config.emojis.error}`,
+            content: `No hay datos de experiencia de texto en este servidor ${Utils.getEmojis().General.Error})}`,
             ephemeral: true,
           });
         }
 
-        await Prisma.usersTextExperienceData.deleteMany({
+        await Database.usersTextExperienceData.deleteMany({
           where: {
             GuildID: interaction.guildId as string,
           },
         });
 
         return interaction.reply({
-          content: `Se han restablecido los datos de experiencia de texto ${config.emojis.success}`,
+          content: `Se han restablecido los datos de experiencia de texto ${Utils.getEmojis().General.Success}`,
         });
 
       case "voice":
         const guildVoiceExperience =
-          await Prisma.usersVoiceExperienceData.findMany({
+          await Database.usersVoiceExperienceData.findMany({
             where: {
               GuildID: interaction.guildId as string,
             },
           });
         if (guildVoiceExperience.length === 0) {
           return interaction.reply({
-            content: `No hay datos de experiencia de voz en este servidor ${config.emojis.error}`,
+            content: `No hay datos de experiencia de voz en este servidor ${Utils.getEmojis().General.Error}`,
             ephemeral: true,
           });
         }
 
-        await Prisma.usersVoiceExperienceData.deleteMany({
+        await Database.usersVoiceExperienceData.deleteMany({
           where: {
             GuildID: interaction.guildId as string,
           },
         });
 
         return interaction.reply({
-          content: `Se han restablecido los datos de experiencia de voz ${config.emojis.success}`,
+          content: `Se han restablecido los datos de experiencia de voz ${Utils.getEmojis().General.Success}`,
         });
 
       default:

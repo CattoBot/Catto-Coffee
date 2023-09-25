@@ -1,9 +1,10 @@
 import { Precondition } from "@sapphire/framework";
 import { CommandInteraction } from "discord.js";
+import { Utils } from "../util/utils";
 
 export class AdminOnly extends Precondition {
     private checkMemberPermissions(interaction: CommandInteraction) {
-        return interaction.memberPermissions?.has('Administrator');
+        return interaction.memberPermissions?.has('ManageMessages');
       }
 
       public override async chatInputRun(interaction: CommandInteraction) {
@@ -12,7 +13,7 @@ export class AdminOnly extends Precondition {
         if (hasPermissions) {
           return this.ok();
         } else {
-          return this.error({ message: "¡Solo los miembros con permisos de `Administrador` pueden usar este comando!" });
+          return this.error({ message: "¡Solo los miembros con permisos de `Administración` pueden usar este comando!" + ` ${Utils.getEmojis().General.Error}`});
         }
       }
 }
