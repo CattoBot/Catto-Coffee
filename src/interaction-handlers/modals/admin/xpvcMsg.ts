@@ -2,7 +2,7 @@ import { InteractionHandler, InteractionHandlerTypes, PieceContext, container } 
 import { ModalSubmitInteraction } from "discord.js";
 import { Database } from '../../../structures/Database';
 import { Utils } from '../../../util/utils';
-
+const { Emojis } = Utils;
 export class ModalHandler extends InteractionHandler {
   public constructor(ctx: PieceContext, options: InteractionHandler.Options) {
     super(ctx, {
@@ -33,7 +33,7 @@ export class ModalHandler extends InteractionHandler {
     });
 
     return interaction.reply({
-      content: `Se ha actualizado el mensaje correctamente ${Utils.getEmojis().General.Success}`,
+      content: `Se ha actualizado el mensaje correctamente ${Emojis.General.Success}`,
     });
   }
 }

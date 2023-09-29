@@ -4,8 +4,8 @@ import { Time } from "@sapphire/time-utilities";
 import { Database } from "../../../structures/Database";
 import { GetRandomXP, XPCalculator } from "../../../util/utilities/index";
 import { Utils } from "../../../util/utils";
-import { Catto_Coffee } from "../../../Catto";
-
+import { Catto_Coffee } from "../../../App";
+const { Cooldowns } = Utils;
 interface GuildData {
     VoiceExpEnabled: boolean;
     VoiceExperienceMin?: number;
@@ -29,7 +29,7 @@ export class VoiceExperienceListener extends Listener {
         await this.processGuilds();
         setTimeout(() => {
             this.run();
-        }, Time.Second * Utils.getCooldowns().Voice);
+        }, Time.Second * Cooldowns.Voice);
     }
 
     private async processGuilds() {

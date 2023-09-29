@@ -1,6 +1,6 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
 import { Utils } from '../../../util/utils';
-import { Catto_Coffee } from '../../../Catto';
+import { Catto_Coffee } from '../../../App';
 import {
   ActionRowBuilder,
   EmbedBuilder,
@@ -11,17 +11,7 @@ import {
   StringSelectMenuInteraction
 } from "discord.js";
 
-const emojis = {
-  selfMuted: "<:selfMuted:1092727485919154246>",
-  serverMuted: "<:serverMute:1092727481464799292>",
-  selfDeafen: "<:selfDeafened:1092727483289313290>",
-  serverDeafen: "<:serverDeafened:1092727528038350919>",
-  unmute: "<:unmute:1092728384401965166>",
-  undeafen: "<:undeafened:1092728381499523132>",
-  mod: "<:moderator:1092825523849273384>",
-  admin: "<:admin:1092832350783688785>",
-};
-
+const { Emojis, Messages } = Utils;
 interface optionsObject {
   disabled: boolean | undefined,
   author: string | undefined
@@ -81,7 +71,7 @@ export class MenuHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(Utils.getMessages().InteractionOwner.Button)
+          .setDescription(Messages.InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();
@@ -214,20 +204,20 @@ export class MenuHandler extends InteractionHandler {
             users.push(
               `${user.voice.mute
                 ? `${user.voice.serverMute
-                  ? emojis.serverMuted
-                  : emojis.selfMuted
+                  ? Emojis.VoiceMod.serverMuted
+                  : Emojis.VoiceMod.selfMuted
                 }`
-                : emojis.unmute
+                : Emojis.VoiceMod.unmute
               }${user.voice.deaf
                 ? `${user.voice.serverDeaf
-                  ? emojis.serverDeafen
-                  : emojis.selfDeafen
+                  ? Emojis.VoiceMod.serverDeafen
+                  : Emojis.VoiceMod.selfDeafen
                 } `
-                : emojis.undeafen
+                : Emojis.VoiceMod.undeafen
               } <@${user.id}> ${user.permissions.has(PermissionFlagsBits.MuteMembers)
                 ? `${user.permissions.has(PermissionFlagsBits.ManageGuild)
-                  ? `${emojis.admin}`
-                  : `${emojis.mod}`
+                  ? `${Emojis.VoiceMod.admin}`
+                  : `${Emojis.VoiceMod.mod}`
                 }`
                 : ""
               }`

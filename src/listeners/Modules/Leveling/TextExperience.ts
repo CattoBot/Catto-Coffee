@@ -2,9 +2,10 @@ import { Listener, Events } from "@sapphire/framework";
 import { Message, TextChannel } from "discord.js";
 import { Time } from "@sapphire/time-utilities";
 import { Database } from "../../../structures/Database";
-import { Catto_Coffee } from "../../../Catto";
+import { Catto_Coffee } from "../../../App";
 import { XPCalculator, GetRandomXP } from "../../../util/utilities/index";
 import { Utils } from "../../../util/utils";
+const { Cooldowns } = Utils;
 const cooldowns = new Set<string>();
 
 export class TextExperienceListener extends Listener {
@@ -124,6 +125,6 @@ export class TextExperienceListener extends Listener {
     cooldowns.add(message.author.id);
     setTimeout(() => {
       cooldowns.delete(message.author.id);
-    }, Time.Second * Utils.getCooldowns().Text);
+    }, Time.Second * Cooldowns.Text);
   }
 }
