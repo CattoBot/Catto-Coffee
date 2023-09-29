@@ -1,7 +1,7 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
 import type { ModalSubmitInteraction } from 'discord.js';
 import { Utils } from '../../../util/utils';
-
+const { Emojis } = Utils;
 export class VoiceNameModal extends InteractionHandler {
     cooldowns: any;
     public constructor(ctx: PieceContext, options: InteractionHandler.Options) {
@@ -39,13 +39,27 @@ export class VoiceNameModal extends InteractionHandler {
             }
             await voiceChannel?.setName(message);
             await interaction.reply({
+<<<<<<< Updated upstream
                 content: `${Utils.getEmojis().General.Success} El nombre del canal de voz ha sido cambiado a \`${message}\``,
+=======
+                content: `${Emojis.General.Error} Debes esperar \`${minutes}\` minutos y \`${seconds}\` segundos antes de cambiar el nombre del canal de voz nuevamente.`,
+                ephemeral: true,
+>>>>>>> Stashed changes
             });
             const newCooldownExpiration = now + cooldownDuration;
             this.cooldowns.set(user, newCooldownExpiration);
         } catch (error) {
             
         }
+<<<<<<< Updated upstream
        
+=======
+        await voiceChannel?.setName(message);
+        await interaction.reply({
+            content: `${Emojis.General.Success} El nombre del canal de voz ha sido cambiado a \`${message}\``,
+        });
+        const newCooldownExpiration = now + cooldownDuration;
+        this.cooldowns.set(user, newCooldownExpiration);
+>>>>>>> Stashed changes
     }
 }

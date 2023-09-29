@@ -1,16 +1,8 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
-import { Catto_Coffee } from '../../../Catto';
+import { CattoCoffee } from '../../../App';
 import { Utils } from '../../../util/utils';
-import {
-  ActionRowBuilder,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  ButtonInteraction,
-  ButtonBuilder,
-  ButtonStyle,
-  StringSelectMenuBuilder,
-  GuildMember
-} from "discord.js";
+import { ActionRowBuilder,EmbedBuilder,PermissionFlagsBits,ButtonInteraction,ButtonBuilder,ButtonStyle,GuildMember, User, StringSelectMenuBuilder } from "discord.js";
+const { Messages, Emojis } = Utils;
 
 
 interface optionsObject {
@@ -52,7 +44,7 @@ export class ButtonHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(Utils.getMessages().InteractionOwner.Button)
+          .setDescription(Messages.InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();
@@ -81,25 +73,25 @@ export class ButtonHandler extends InteractionHandler {
 
     var users: any[] = [];
 
-    const canal: any = Catto_Coffee.channels.resolve(channel);
+    const canal: any = CattoCoffee.channels.resolve(channel);
     if (canal && canal.type === 2) {
       const members = canal.members;
       members.forEach((user: any) => {
         users.push(
           `${user.voice.mute
-            ? `${user.voice.serverMute ? Utils.getEmojis().VoiceMod.serverMuted : Utils.getEmojis().VoiceMod.selfMuted
+            ? `${user.voice.serverMute ? Emojis.VoiceMod.serverMuted : Emojis.VoiceMod.selfMuted
             }`
-            : Utils.getEmojis().VoiceMod.unmute
+            : Emojis.VoiceMod.unmute
           }${user.voice.deaf
             ? `${user.voice.serverDeaf
-              ? Utils.getEmojis().VoiceMod.serverDeafen
-              : Utils.getEmojis().VoiceMod.selfDeafen
+              ? Emojis.VoiceMod.serverDeafen
+              : Emojis.VoiceMod.selfDeafen
             } `
-            : Utils.getEmojis().VoiceMod.undeafen
+            : Emojis.VoiceMod.undeafen
           } <@${user.id}> ${user.permissions.has(PermissionFlagsBits.MuteMembers)
             ? `${user.permissions.has(PermissionFlagsBits.ManageGuild)
-              ? `${Utils.getEmojis().VoiceMod.admin}`
-              : `${Utils.getEmojis().VoiceMod.mod}`
+              ? `${Emojis.VoiceMod.admin}`
+              : `${Emojis.VoiceMod.mod}`
             }`
             : ""
           }`

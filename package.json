@@ -1,8 +1,13 @@
 {
   "name": "coffee",
   "version": "1.0.0",
+<<<<<<< Updated upstream
   "description": "Nueva versión de Catto con prisma.",
   "main": "src/index.ts",
+=======
+  "description": "",
+  "main": "dist/App.js",
+>>>>>>> Stashed changes
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",

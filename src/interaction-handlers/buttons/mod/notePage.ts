@@ -1,9 +1,9 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
-import { Catto_Coffee } from '../../../Catto';
+import { CattoCoffee } from '../../../App';
 import { Utils } from '../../../util/utils';
 import { Database } from '../../../structures/Database';
 import { ActionRowBuilder, EmbedBuilder, PermissionFlagsBits, ButtonInteraction, ButtonBuilder, ButtonStyle, GuildMember, User } from "discord.js";
-
+const { Messages } = Utils;
 interface optionsObject {
   disabled: boolean | undefined,
   author: string | undefined,
@@ -44,7 +44,7 @@ export class ButtonHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(Utils.getMessages().InteractionOwner.Button)
+          .setDescription(Messages.InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();
@@ -102,7 +102,7 @@ export class ButtonHandler extends InteractionHandler {
     let fields: any[] = []
 
     that_user_notes.filter(async (nota) => {
-      const note_perpetrator = await Catto_Coffee.users.fetch(nota.Perpetrator) as User;
+      const note_perpetrator = await CattoCoffee.users.fetch(nota.Perpetrator) as User;
       return !isNaN(parseInt(nota.ReadRoleID || ".")) || note_perpetrator.id == miembro.id || miembro.roles.cache.has(`${nota.ReadRoleID}`) || miembro.permissions.has(PermissionFlagsBits.ManageGuild)
     }).slice(5 * (new_page), 5 * (new_page + 1)).forEach(async (nota) => {
 

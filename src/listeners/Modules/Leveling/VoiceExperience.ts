@@ -4,10 +4,15 @@ import { Time } from "@sapphire/time-utilities";
 import { Database } from "../../../structures/Database";
 import { GetRandomXP, XPCalculator } from "../../../util/utilities/index";
 import { Utils } from "../../../util/utils";
+<<<<<<< Updated upstream
 import { Catto_Coffee } from "../../../Catto";
 import { User } from "../../../Classes/Galaxy";
 import { CattoLogger } from "../../../structures/CattoLogger";
 const Logger = new CattoLogger();
+=======
+import { CattoCoffee } from "../../../App";
+const { Cooldowns } = Utils;
+>>>>>>> Stashed changes
 
 interface GuildData {
     VoiceExpEnabled: boolean;
@@ -32,11 +37,11 @@ export class VoiceExperienceListener extends Listener {
         await this.processGuilds();
         setTimeout(() => {
             this.run();
-        }, Time.Second * Utils.getCooldowns().Voice);
+        }, Time.Second * Cooldowns.Voice);
     }
 
     private async processGuilds() {
-        Catto_Coffee.guilds.cache.forEach(async (guild) => {
+        CattoCoffee.guilds.cache.forEach(async (guild) => {
             await this.processGuild(guild);
         });
     }
@@ -204,6 +209,6 @@ export class VoiceExperienceListener extends Listener {
     }
 
     private getChannelFromCache(channelID: string): Channel | undefined {
-        return Catto_Coffee.channels.cache.get(channelID);
+        return CattoCoffee.channels.cache.get(channelID);
     }
 }

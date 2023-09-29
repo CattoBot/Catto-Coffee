@@ -1,11 +1,17 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Time } from "@sapphire/time-utilities";
 import { ChatInputCommand } from "@sapphire/framework";
+<<<<<<< Updated upstream:src/commands/Slash/SubCommands/Mod.ts
 import { Database } from "../../../structures/Database";
 import { Utils } from "../../../util/utils";
 import { Catto_Coffee } from "../../../Catto";
+=======
+import { Database } from "../../structures/Database";
+import { Utils } from "../../util/utils";
+import { CattoCoffee } from "../../App";
+>>>>>>> Stashed changes:src/commands/Slash/Mod.ts
 import { ActionRowBuilder, EmbedBuilder, PermissionFlagsBits, GuildMember, StringSelectMenuBuilder, ButtonBuilder, User } from "discord.js";
-const emojis = Utils.getEmojis().VoiceMod
+const { Emojis } = Utils
 
 export class AdminSubCommands extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
@@ -303,25 +309,25 @@ export class AdminSubCommands extends Subcommand {
     try {
       var users: any[] = [];
 
-      const canal: any = Catto_Coffee.channels.resolve(channel.id);
+      const canal: any = CattoCoffee.channels.resolve(channel.id);
       if (canal && canal.type === 2) {
         const members = canal.members;
         members.forEach((user: any) => {
           users.push(
             `${user.voice.mute
-              ? `${user.voice.serverMute ? Utils.getEmojis().VoiceMod.serverMuted : Utils.getEmojis().VoiceMod.selfMuted
+              ? `${user.voice.serverMute ? Emojis.VoiceMod.serverMuted : Emojis.VoiceMod.selfMuted
               }`
-              : Utils.getEmojis().VoiceMod.unmute
+              : Emojis.VoiceMod.unmute
             }${user.voice.deaf
               ? `${user.voice.serverDeaf
-                ? Utils.getEmojis().VoiceMod.serverDeafen
-                : Utils.getEmojis().VoiceMod.selfDeafen
+                ? Emojis.VoiceMod.serverDeafen
+                : Emojis.VoiceMod.selfDeafen
               } `
-              : Utils.getEmojis().VoiceMod.undeafen
+              : Emojis.VoiceMod.undeafen
             } <@${user.id}> ${user.permissions.has(PermissionFlagsBits.MuteMembers)
               ? `${user.permissions.has(PermissionFlagsBits.ManageGuild)
-                ? `${Utils.getEmojis().VoiceMod.admin}`
-                : `${Utils.getEmojis().VoiceMod.mod}`
+                ? `${Emojis.VoiceMod.admin}`
+                : `${Emojis.VoiceMod.mod}`
               }`
               : ""
             }`
@@ -407,25 +413,25 @@ export class AdminSubCommands extends Subcommand {
     if (user.voice.channel) {
       var users: any[] = [];
 
-      const canal: any = Catto_Coffee.channels.resolve(user.voice.channel.id);
+      const canal: any = CattoCoffee.channels.resolve(user.voice.channel.id);
       if (canal && canal.type === 2) {
         const members = canal.members;
         members.forEach((user: any) => {
           users.push(
             `${user.voice.mute
-              ? `${user.voice.serverMute ? emojis.serverMuted : emojis.selfMuted
+              ? `${user.voice.serverMute ? Emojis.VoiceMod.serverMuted : Emojis.VoiceMod.selfMuted
               }`
-              : emojis.unmute
+              : Emojis.VoiceMod.unmute
             }${user.voice.deaf
               ? `${user.voice.serverDeaf
-                ? emojis.serverDeafen
-                : emojis.selfDeafen
+                ? Emojis.VoiceMod.serverDeafen
+                : Emojis.VoiceMod.selfDeafen
               } `
-              : emojis.undeafen
+              : Emojis.VoiceMod.undeafen
             } <@${user.id}> ${user.permissions.has(PermissionFlagsBits.MuteMembers)
               ? `${user.permissions.has(PermissionFlagsBits.ManageGuild)
-                ? `${emojis.admin}`
-                : `${emojis.mod}`
+                ? `${Emojis.VoiceMod.admin}`
+                : `${Emojis.VoiceMod.mod}`
               }`
               : ""
             }`
@@ -615,7 +621,7 @@ export class AdminSubCommands extends Subcommand {
       }
 
       // Obtenemos el canal al que enviaremos el log
-      const notes_logs_channel: any = Catto_Coffee.channels.resolve(this_guild_config_channels.NotesLogs)
+      const notes_logs_channel: any = CattoCoffee.channels.resolve(this_guild_config_channels.NotesLogs)
 
       // Creamos el mensaje que se enviará como log
       const new_note_log = new EmbedBuilder()
@@ -756,14 +762,14 @@ export class AdminSubCommands extends Subcommand {
       embed.setFooter({ text: "Para guardar logs y adjuntos es necesario configurar un canal de logs de notas." })
     }
 
-    const callback24 = (note:any) => parseInt(note.Unix) > (Date.now() as number)-(24000*3600)
+    const callback24 = (note: any) => parseInt(note.Unix) > (Date.now() as number) - (24000 * 3600)
     const today = that_user_notes.filter(callback24)
 
-    const callback7 = (note:any) => parseInt(note.Unix) > (Date.now() as number)-(24000*3600*7)
+    const callback7 = (note: any) => parseInt(note.Unix) > (Date.now() as number) - (24000 * 3600 * 7)
     const week = that_user_notes.filter(callback7)
 
     // Una vez finalizado, indicamos que la nota ha sido creada exitosamente
-    embed.setDescription(`¡Nota \`#${new_note_id}\` creada exitosamente!\n${today.length>0?`\n${Utils.getEmojis().General.Error} \`|\` Esta es la ${today.length +1}ª nota de este usuario hoy.`:`${week.length>0?`\n${Utils.getEmojis().General.Warning} \`|\` Esta es la ${today.length +1}ª nota de este usuario esta semana.`:""}`}${that_user_notes.length > 2?`\n${Utils.getEmojis().General.Warning} \`|\`Esta es la ${that_user_notes.length + 1}ª nota del usuario.`:""}`)
+    embed.setDescription(`¡Nota \`#${new_note_id}\` creada exitosamente!\n${today.length > 0 ? `\n${Emojis.General.Error} \`|\` Esta es la ${today.length + 1}ª nota de este usuario hoy.` : `${week.length > 0 ? `\n${Emojis.General.Warning} \`|\` Esta es la ${today.length + 1}ª nota de este usuario esta semana.` : ""}`}${that_user_notes.length > 2 ? `\n${Emojis.General.Warning} \`|\`Esta es la ${that_user_notes.length + 1}ª nota del usuario.` : ""}`)
     if (!interaction.deferred) {
       await interaction.reply({ embeds: [embed], ephemeral: true })
     }
@@ -807,8 +813,8 @@ export class AdminSubCommands extends Subcommand {
         ephemeral: true
       });
 
-    const note_perpetrator = await Catto_Coffee.users.fetch(note.Perpetrator) as User;
-    const note_user = await Catto_Coffee.users.fetch(note.UserID) as User;
+    const note_perpetrator = await CattoCoffee.users.fetch(note.Perpetrator) as User;
+    const note_user = await CattoCoffee.users.fetch(note.UserID) as User;
 
     var permited = !isNaN(parseInt(note.ReadRoleID || ".")) || note_perpetrator.id == miembro.id || miembro.roles.cache.has(`${note.ReadRoleID}`) || miembro.permissions.has(PermissionFlagsBits.ManageGuild)
 
@@ -901,14 +907,14 @@ export class AdminSubCommands extends Subcommand {
       })
     let fields: any[] = [];
     that_user_notes.filter(async (nota) => {
-      const note_perpetrator = await Catto_Coffee.users.fetch(nota.Perpetrator) as User;
+      const note_perpetrator = await CattoCoffee.users.fetch(nota.Perpetrator) as User;
       return !isNaN(parseInt(nota.ReadRoleID || ".")) || note_perpetrator.id == miembro.id || miembro.roles.cache.has(`${nota.ReadRoleID}`) || miembro.permissions.has(PermissionFlagsBits.ManageGuild)
     }).slice(0, 5).forEach(async (nota) => {
-  
+
       let text = nota.Note.replace(/%39%+/g, "'")
-  
+
       if (text.length > 250) text = text.substring(0, 197) + ` \`[...]\`\n**\`${Math.floor(text.length - 197)} caracteres restantes\`**`
-  
+
       fields.push(
         {
           name: `Nota #${nota.NoteID} ${isNaN(parseInt(nota.ReadRoleID || ".")) ? "" : "`(PRIVADA)`"} ${!nota.AttachmentURL || nota.AttachmentURL == "BLANK" ? "" : "<:attachment:1098012443231396033>"}`,
@@ -919,12 +925,21 @@ export class AdminSubCommands extends Subcommand {
     var pages = Math.floor(that_user_notes.length / 5);
     if (that_user_notes.length % 5 != 0) pages++;
 
+<<<<<<< Updated upstream:src/commands/Slash/SubCommands/Mod.ts
     
     const page = await import('../../../interaction-handlers/buttons/mod/notePage');
     const purge = await import('../../../interaction-handlers/buttons/mod/notePrQ');
     await page.build(row, {disabled: true, author: interaction.user.id, emoji: "⬅️"}, [`${user.id}`, "0", "-1"])
     await purge.build(row, {disabled: false, author: interaction.user.id}, [`${user.id}`])
     await page.build(row, {disabled: that_user_notes.length<=5, author: interaction.user.id, emoji: "➡️"}, [`${user.id}`, "0", "1"])
+=======
+
+    const page = await import('../../interaction-handlers/buttons/mod/notePage');
+    const purge = await import('../../interaction-handlers/buttons/mod/notePrQ');
+    await page.build(row, { disabled: true, author: interaction.user.id, emoji: "⬅️" }, [`${user.id}`, "0", "-1"])
+    await purge.build(row, { disabled: false, author: interaction.user.id }, [`${user.id}`])
+    await page.build(row, { disabled: that_user_notes.length <= 5, author: interaction.user.id, emoji: "➡️" }, [`${user.id}`, "0", "1"])
+>>>>>>> Stashed changes:src/commands/Slash/Mod.ts
 
     if (interaction.deferred) {
       await interaction

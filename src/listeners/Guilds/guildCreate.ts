@@ -2,7 +2,8 @@ import { Listener, Events } from "@sapphire/framework";
 import { EmbedBuilder, Guild, ActionRowBuilder, ButtonBuilder, ButtonStyle, Channel, TextChannel } from "discord.js";
 import { Database } from "../../structures/Database";
 import { Utils } from "../../util/utils"
-import { Catto_Coffee } from "../../Catto";
+import { CattoCoffee } from "../../App";
+const { Colors, Docs, Emojis } = Utils
 
 export class GuildCreateListener extends Listener {
     public constructor(context: Listener.Context, options: Listener.Options) {
@@ -13,12 +14,12 @@ export class GuildCreateListener extends Listener {
         });
     }
 
-    private getChannelFromCache(channelID: string): Channel | undefined { return Catto_Coffee.channels.cache.get(channelID) }
+    private getChannelFromCache(channelID: string): Channel | undefined { return CattoCoffee.channels.cache.get(channelID) }
 
     public async run(Guild: Guild) {
 
         const canal = this.getChannelFromCache('1128070491878465606') as TextChannel
-        canal.send(`**[GUILD JOIN]** __[${Catto_Coffee.guilds.cache.size}]__ \`${Guild.name}\` (\`${Guild.id}\`) ha agregado el bot. <a:pickaxe:1127394494350884974>`)
+        canal.send(`**[GUILD JOIN]** __[${CattoCoffee.guilds.cache.size}]__ \`${Guild.name}\` (\`${Guild.id}\`) ha agregado el bot. <a:pickaxe:1127394494350884974>`)
         // await channelinfo.send(``)
         await Database.guildsData.createMany({
             data: {
@@ -30,8 +31,8 @@ export class GuildCreateListener extends Listener {
         const SystemChannel = Guild.systemChannel
 
         const embed = new EmbedBuilder()
-        .setColor(Utils.getColors().Main)
-        .setDescription(`¡Hola! Soy **${this.container.client.user?.username}** y gracias por agregarme a tu servidor. ${Utils.getEmojis().General.Success} \nA continuación te explicaré resumidamente mis funcionalidades y como las puedes configurar, de todas formas, si necesitas profundizar más, puedes revisar mi documentación. <a:twings:1114741873546903563>`)
+        .setColor(Colors.Main)
+        .setDescription(`¡Hola! Soy **${this.container.client.user?.username}** y gracias por agregarme a tu servidor. ${Emojis.General.Success} \nA continuación te explicaré resumidamente mis funcionalidades y como las puedes configurar, de todas formas, si necesitas profundizar más, puedes revisar mi documentación. <a:twings:1114741873546903563>`)
         .addFields(
             { name: `Leveling System <a:spinning:1114747500688068628>`, value: 'El bot proporciona un sistema de niveles intuitivo tanto para ¡Texto como para Voz! ambos vienen por defecto activados, si deseas desactivar alguno de los módulos, solo usa el comando `/admin disable` y selecciona el que desees.', inline: true},
             { name: `Temp Voice Channels <:voiceChannel:1092751257145462784>`, value: 'Para configurar el sistema de canales de voz temporales, puedes utilizar el comando `/admin setup voices` y se creará tanto una categoría como un canal, al unirse a ese canal, los usuarios podrán ¡personalizarlos a su gusto!', inline: true},
@@ -49,19 +50,19 @@ export class GuildCreateListener extends Listener {
                 new ButtonBuilder({
                     label: 'Support Server',
                     style: ButtonStyle.Link,
-                    url: `${Utils.getDocs().Support}`
+                    url: `${Docs.Support}`
                 }),
     
                 new ButtonBuilder({
                     label: 'Documentación',
                     style: ButtonStyle.Link,
-                    url: `${Utils.getDocs().Documentation}`
+                    url: `${Docs.Documentation}`
                 }),
     
                 new ButtonBuilder({
                     label: 'Top.gg',
                     style: ButtonStyle.Link,
-                    url: `${Utils.getDocs().TopGG}`
+                    url: `${Docs.TopGG}`
                 }),
             ]
         })

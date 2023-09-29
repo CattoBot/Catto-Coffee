@@ -26,8 +26,8 @@ export class PingCommand extends Command {
   }
 
   public override async chatInputRun(interaction: ChatInputCommand.Interaction) {
-    
-    const shardPing = Math.round(this.container.client.ws.shards.first()?.ping ?? 0);
+
+    const msg = interaction.reply(`Pinging...`)
 
     let dbLatency: any
     const startTime = Date.now();
@@ -35,10 +35,10 @@ export class PingCommand extends Command {
     dbLatency = Date.now() - startTime;
 
     const embed = new EmbedBuilder()
-      .setDescription(`\`🟢\` Shard: \`${shardPing}\`ms\n\`🟢\` Data: \`${dbLatency}\`ms`)
+      .setDescription(`Pong! \`🟢\` Latency: ${Math.round(this.container.client.ws.ping)}ms. \n\`🟢\` API: ${(await msg).createdTimestamp - interaction.createdTimestamp}ms. \n\`🟢\` Data: \`${dbLatency}\`ms`)
       .setColor(Colors.Green)
 
-    return interaction.reply({
+    return interaction.editReply({
       content: '',
       embeds: [embed]
     });

@@ -1,6 +1,6 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
 
-import { Catto_Coffee } from '../../../Catto';
+import { CattoCoffee } from '../../../App';
 import {
   ActionRowBuilder,
   EmbedBuilder,
@@ -11,6 +11,7 @@ import {
   StringSelectMenuInteraction
 } from "discord.js";
 import { Utils } from '../../../util/utils';
+const { Emojis, Messages } = Utils;
 
 interface optionsObject {
   disabled: boolean | undefined,
@@ -96,7 +97,7 @@ export class MenuHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(Utils.getMessages().InteractionOwner.Button)
+          .setDescription(Messages.InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();
@@ -180,7 +181,7 @@ export class MenuHandler extends InteractionHandler {
             .setColor("#fb6444");
         } else {
 
-          const canal: any = Catto_Coffee.channels.resolve(member.voice.channel.id);
+          const canal: any = CattoCoffee.channels.resolve(member.voice.channel.id);
           if (canal && canal.type === 2) {
             const members = canal.members;
             members.forEach((user: any) => {
@@ -220,7 +221,7 @@ export class MenuHandler extends InteractionHandler {
             )
             .setColor("#fb6444");
         } else if (args[1][0] == "US") {
-          if (!Catto_Coffee.channels.cache.get(args[2][0])) {
+          if (!CattoCoffee.channels.cache.get(args[2][0])) {
             error.embed = new EmbedBuilder()
               .setDescription("No se ha encontrado el canal en el servidor\n¿El bot puede verlo?")
               .setColor("#fb6444");
@@ -244,7 +245,7 @@ export class MenuHandler extends InteractionHandler {
           let tempmember = interaction.guild?.members.cache.get(args[1][0]) as GuildMember;
           let tempmember_2 = interaction.guild?.members.cache.get(args[2][0]) as GuildMember;
           let tempchannel: any = args[2][0];
-          if (!Catto_Coffee.channels.cache.get(tempchannel))
+          if (!CattoCoffee.channels.cache.get(tempchannel))
             tempchannel = tempmember_2.voice.channel?.id;
           tempmember?.voice.setChannel(
             tempchannel,
@@ -256,7 +257,7 @@ export class MenuHandler extends InteractionHandler {
       // Si la opción es kick...
       else if (opcion == "kick") {
 
-        const canal: any = Catto_Coffee.channels.resolve(member.voice.channel.id);
+        const canal: any = CattoCoffee.channels.resolve(member.voice.channel.id);
         if (canal && canal.type === 2) {
           const members = canal.members;
           members.forEach((user: any) => {
@@ -295,25 +296,25 @@ export class MenuHandler extends InteractionHandler {
           .setDescription("El usuario no se encuentra en ningún canal de voz")
           .setColor("#fb6444");
       } else {
-        const canal: any = Catto_Coffee.channels.resolve(member.voice.channel.id);
+        const canal: any = CattoCoffee.channels.resolve(member.voice.channel.id);
         if (canal && canal.type === 2) {
           const members = canal.members;
           members.forEach((user: any) => {
             users.push(
               `${user.voice.mute
-                ? `${user.voice.serverMute ? Utils.getEmojis().VoiceMod.serverMuted : Utils.getEmojis().VoiceMod.selfMuted
+                ? `${user.voice.serverMute ? Emojis.VoiceMod.serverMuted : Emojis.VoiceMod.selfMuted
                 }`
-                : Utils.getEmojis().VoiceMod.unmute
+                : Emojis.VoiceMod.unmute
               }${user.voice.deaf
                 ? `${user.voice.serverDeaf
-                  ? Utils.getEmojis().VoiceMod.serverDeafen
-                  : Utils.getEmojis().VoiceMod.selfDeafen
+                  ? Emojis.VoiceMod.serverDeafen
+                  : Emojis.VoiceMod.selfDeafen
                 } `
-                : Utils.getEmojis().VoiceMod.undeafen
+                : Emojis.VoiceMod.undeafen
               } <@${user.id}> ${user.permissions.has(PermissionFlagsBits.MuteMembers)
                 ? `${user.permissions.has(PermissionFlagsBits.ManageGuild)
-                  ? `${Utils.getEmojis().VoiceMod.admin}`
-                  : `${Utils.getEmojis().VoiceMod.mod}`
+                  ? `${Emojis.VoiceMod.admin}`
+                  : `${Emojis.VoiceMod.mod}`
                 }`
                 : ""
               }`

@@ -1,16 +1,8 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
 import { Utils } from '../../../util/utils';
 import { Database } from '../../../structures/Database';
-import {
-  ActionRowBuilder,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  ButtonInteraction,
-  ButtonBuilder,
-  ButtonStyle,
-  GuildMember,
-  User
-} from "discord.js";
+import { ActionRowBuilder,EmbedBuilder,PermissionFlagsBits,ButtonInteraction,ButtonBuilder,ButtonStyle,GuildMember } from "discord.js";
+const { Messages } = Utils;
 
 interface optionsObject {
   disabled: boolean | undefined,
@@ -51,7 +43,7 @@ export class ButtonHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(Utils.getMessages().InteractionOwner.Button)
+          .setDescription(Messages.InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();

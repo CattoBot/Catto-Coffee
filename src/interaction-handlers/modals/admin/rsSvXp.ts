@@ -2,7 +2,7 @@ import { InteractionHandler, InteractionHandlerTypes, PieceContext, container } 
 import { Database } from '../../../structures/Database';
 import { Utils } from '../../../util/utils';
 import { ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, EmbedBuilder } from "discord.js";
-
+const { Emojis } = Utils;
 export const build = async (interaction: any, module:string) => {
   return new Promise(async resolve => {
     const chars = "ABCDEFGHJKLMNOPQRSTUVWXYZ0123456789!?()/#$@=+-._<>%"
@@ -85,7 +85,7 @@ export class ModalHandler extends InteractionHandler {
 
         if (guildTextExperience.length === 0) {
           return interaction.reply({
-            content: `No hay datos de experiencia de texto en este servidor ${Utils.getEmojis().General.Error})}`,
+            content: `No hay datos de experiencia de texto en este servidor ${Emojis.General.Error})}`,
             ephemeral: true,
           });
         }
@@ -97,7 +97,7 @@ export class ModalHandler extends InteractionHandler {
         });
 
         return interaction.reply({
-          content: `Se han restablecido los datos de experiencia de texto ${Utils.getEmojis().General.Success}`,
+          content: `Se han restablecido los datos de experiencia de texto ${Emojis.General.Success}`,
         });
 
       case "voice":
@@ -109,7 +109,7 @@ export class ModalHandler extends InteractionHandler {
           });
         if (guildVoiceExperience.length === 0) {
           return interaction.reply({
-            content: `No hay datos de experiencia de voz en este servidor ${Utils.getEmojis().General.Error}`,
+            content: `No hay datos de experiencia de voz en este servidor ${Emojis.General.Error}`,
             ephemeral: true,
           });
         }
@@ -121,7 +121,7 @@ export class ModalHandler extends InteractionHandler {
         });
 
         return interaction.reply({
-          content: `Se han restablecido los datos de experiencia de voz ${Utils.getEmojis().General.Success}`,
+          content: `Se han restablecido los datos de experiencia de voz ${Emojis.General.Success}`,
         });
 
       default:

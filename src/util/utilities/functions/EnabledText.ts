@@ -18,7 +18,7 @@ export async function verifyEnableText(Enabled: Guild, Interaction: Subcommand.C
         });
       } else {
         return Interaction.reply({
-          content: `La experiencia por texto está desactivada en este servidor. ${Utils.getEmojis().General.Error}`,
+          content: `La experiencia por texto está desactivada en este servidor. ${Emojis.General.Error}`,
           ephemeral: true,
         });
       }

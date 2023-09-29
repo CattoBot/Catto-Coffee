@@ -179,7 +179,7 @@ export class LevelingSubcommand extends Subcommand {
   public async chatInputSetLevelXP(interaction: Subcommand.ChatInputCommandInteraction) {
     if (!interaction.memberPermissions?.has('ManageRoles')) {
       return interaction.reply({
-        content: `No tienes permisos para usar este comando. ${Utils.getEmojis().General.Error} permiso requerido: \`Manage Roles\``,
+        content: `No tienes permisos para usar este comando. ${Emojis.General.Error} permiso requerido: \`Manage Roles\``,
         ephemeral: true,
       });
     }
@@ -192,14 +192,14 @@ export class LevelingSubcommand extends Subcommand {
 
     if (nivelValue > 100) {
       return interaction.reply({
-        content: `El nivel no puede ser mayor a 100. ${Utils.getEmojis().General.Error}`,
+        content: `El nivel no puede ser mayor a 100. ${Emojis.General.Error}`,
         ephemeral: true,
       });
     }
 
     if (nivelValue < 0) {
       return interaction.reply({
-        content: `El nivel no puede ser menor a 0.  ${Utils.getEmojis().General.Error}`,
+        content: `El nivel no puede ser menor a 0.  ${Emojis.General.Error}`,
         ephemeral: true,
       });
     }
@@ -424,7 +424,7 @@ export class LevelingSubcommand extends Subcommand {
 
             if (TextLadderboard.length === 0) {
               return interaction.reply({
-                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`. ${Utils.getEmojis().General.Error}`,
+                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`. ${Emojis.General.Error}`,
                 ephemeral: true,
               });
             } else {
@@ -631,7 +631,7 @@ export class LevelingSubcommand extends Subcommand {
             });
             if (VoiceLeaderboard.length === 0) {
               return interaction.reply({
-                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`. ${Utils.getEmojis().General.Error}`,
+                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`. ${Emojis.General.Error}`,
                 ephemeral: true,
               });
             }
@@ -830,7 +830,7 @@ export class LevelingSubcommand extends Subcommand {
     const user = interaction.options.getUser("user") ?? interaction.user;
     if (user.bot) {
       return interaction.reply({
-        content: `Los bots no pueden recibir experiencia ${Utils.getEmojis().General.Error}`,
+        content: `Los bots no pueden recibir experiencia ${Emojis.General.Error}`,
         ephemeral: true
       });
     }
@@ -849,7 +849,7 @@ export class LevelingSubcommand extends Subcommand {
             },
           });
           if (!TextUserExists) {
-            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Utils.getEmojis().General.Error}`, ephemeral: true });
+            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Emojis.General.Error}`, ephemeral: true });
           }
           else {
             await interaction.reply({
@@ -946,7 +946,7 @@ export class LevelingSubcommand extends Subcommand {
             },
           });
           if (!VoiceuserExists) {
-            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Utils.getEmojis().General.Error}`, ephemeral: true });
+            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Emojis.General.Error}`, ephemeral: true });
           }
           else {
             await interaction.reply({

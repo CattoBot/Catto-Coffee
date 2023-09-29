@@ -2,6 +2,7 @@ import { ChatInputCommand, Command } from "@sapphire/framework";
 import { Time } from "@sapphire/time-utilities";
 import { ActionRowBuilder, ButtonStyle, ButtonBuilder } from "discord.js";
 import { Utils } from "../../../util/utils";
+const { Docs } = Utils;
 
 export class HelpCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -32,7 +33,7 @@ export class HelpCommand extends Command {
             new ButtonBuilder({
                 label: 'Documentación',
                 style: ButtonStyle.Link,
-                url: `${Utils.getDocs().Documentation}`
+                url: `${Docs.Documentation}`
             }),
         ]
     })

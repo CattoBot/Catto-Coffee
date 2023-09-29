@@ -1,18 +1,10 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
-import { Catto_Coffee } from '../../../Catto';
+import { CattoCoffee } from '../../../App';
 import { Database } from '../../../structures/Database';
 import { Utils } from '../../../util/utils';
 import { container } from "@sapphire/framework";
-import {
-  ActionRowBuilder,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  ButtonInteraction,
-  ButtonBuilder,
-  ButtonStyle,
-  GuildMember,
-  User
-} from "discord.js";
+import { ActionRowBuilder,EmbedBuilder,PermissionFlagsBits,ButtonInteraction,ButtonBuilder,ButtonStyle,GuildMember, User } from "discord.js";
+const { Messages } = Utils;
 
 interface optionsObject {
   disabled: boolean | undefined,
@@ -53,7 +45,7 @@ export class ButtonHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(Utils.getMessages().InteractionOwner.Button)
+          .setDescription(Messages.InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();
@@ -99,7 +91,7 @@ export class ButtonHandler extends InteractionHandler {
         ], components: []
       })
 
-    const note_perpetrator = await Catto_Coffee.users.fetch(note.Perpetrator) as User;
+    const note_perpetrator = await CattoCoffee.users.fetch(note.Perpetrator) as User;
     var permited = note_perpetrator.id == miembro.id || miembro.permissions.has(PermissionFlagsBits.ManageGuild)
 
     if (permited) {
@@ -139,7 +131,7 @@ export class ButtonHandler extends InteractionHandler {
           )
           .setFooter({ text: `Nota #${noteId}` })
 
-        const notes_logs_channel: any = Catto_Coffee.channels.resolve(this_guild_config_channels.NotesLogs)
+        const notes_logs_channel: any = CattoCoffee.channels.resolve(this_guild_config_channels.NotesLogs)
         notes_logs_channel
           .send({ embeds: [new_note_log] })
       }

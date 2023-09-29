@@ -1,8 +1,8 @@
 import { LogLevel, SapphireClient } from "@sapphire/framework";
 import { Partials, GatewayIntentBits, ActivityType } from "discord.js";
-import { BotData } from "../data";
+import { Data } from "../data";
 import { Time } from "@sapphire/time-utilities";
-const filteredUsers = BotData.getInstance().getOwners || [];
+const filteredUsers = Data.getInstance().Owners || [];
 
 export class CattoClient extends SapphireClient {
   public constructor() {
@@ -22,7 +22,7 @@ export class CattoClient extends SapphireClient {
         Partials.Message,
         Partials.User,
       ],
-      defaultPrefix: BotData.getInstance().getPrefix,
+      defaultPrefix: Data.getInstance().Prefix,
       defaultCooldown: {
         delay: Time.Second * 5,
         filteredUsers: filteredUsers,
