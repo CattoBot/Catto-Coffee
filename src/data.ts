@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export class Data {
-    private static readonly instance = new Data();
+export class BotData {
+    private static readonly instance = new BotData();
     private readonly botToken: string;
     private readonly botOwners: string[];
     private readonly botPrefix: string;
@@ -20,19 +20,19 @@ export class Data {
         this.botOwners = BOT_OWNERS?.split(",") || [];
     }
 
-    public static getInstance(): Data {
-        return Data.instance;
+    public static getInstance(): BotData {
+        return BotData.instance;
     }
 
-    get Token(): string {
+    get getToken(): string {
         return this.botToken;
     }
 
-    get Owners(): string[] {
+    get getOwners(): string[] {
         return this.botOwners;
     }
 
-    get Prefix(): string {
+    get getPrefix(): string {
         return this.botPrefix;
     }
 }

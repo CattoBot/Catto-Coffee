@@ -1,8 +1,7 @@
 import { Precondition } from "@sapphire/framework";
 import { Database } from "../structures/Database";
 import { CommandInteraction } from "discord.js";
-import  { Utils } from '../util/utils'
-const { Emojis } = Utils
+import { Utils } from "../util/utils";
 
 
 export class VoiceMasterEnabled extends Precondition {
@@ -16,7 +15,7 @@ export class VoiceMasterEnabled extends Precondition {
       return this.ok();
     } else {
       return this.error({
-        message: `${Emojis.General.Error} Parece que en este servidor no se ha configurado el sistema de canales de voz temporales.`
+        message: `${Utils.getEmojis().General.Error} Parece que en este servidor no se ha configurado el sistema de canales de voz temporales.`
       });
     }
   }

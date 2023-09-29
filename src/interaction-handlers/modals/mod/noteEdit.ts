@@ -1,5 +1,5 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext, container } from '@sapphire/framework';
-import { CattoCoffee } from '../../../App';
+import { Catto_Coffee } from '../../../Catto';
 import { Database } from '../../../structures/Database';
 import { ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder, PermissionFlagsBits, GuildMember, ModalSubmitInteraction, User } from "discord.js";
 
@@ -66,7 +66,7 @@ export class ModalHandler extends InteractionHandler {
         ], ephemeral: true
       })
 
-    const note_perpetrator = await CattoCoffee.users.fetch(note.Perpetrator) as User;
+    const note_perpetrator = await Catto_Coffee.users.fetch(note.Perpetrator) as User;
 
     var permited = note_perpetrator.id == miembro.id || miembro.permissions.has(PermissionFlagsBits.ManageRoles)
 
@@ -125,7 +125,7 @@ export class ModalHandler extends InteractionHandler {
           )
           .setFooter({ text: `Nota #${noteId}` })
 
-        const notes_logs_channel: any = CattoCoffee.channels.resolve(this_guild_config_channels.NotesLogs)
+        const notes_logs_channel: any = Catto_Coffee.channels.resolve(this_guild_config_channels.NotesLogs)
         notes_logs_channel
           .send({ embeds: [new_note_log] })
       }

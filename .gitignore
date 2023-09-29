@@ -1,8 +1,6 @@
 node_modules
-.vscode
-# Keep environment variables out of version control
 .env
 package-lock.json
-src/commands/Owner/embed.ts
 dist
+prisma/migrations
 ```

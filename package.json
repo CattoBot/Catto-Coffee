@@ -1,47 +1,41 @@
 {
-  "name": "coffee",
+  "name": "catt",
   "version": "1.0.0",
-<<<<<<< Updated upstream
-  "description": "Nueva versión de Catto con prisma.",
-  "main": "src/index.ts",
-=======
   "description": "",
-  "main": "dist/App.js",
->>>>>>> Stashed changes
+  "main": "dist/Catto.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "nodemon --config nodemon.json src/index.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/1rainwall/Coffee.git"
+    "start": " npm run start:bot",
+    "build": "tsc --project tsconfig.json",
+    "start:bot": "npm run build && node --enable-source-maps dist/Catto.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/1rainwall/Coffee/issues"
-  },
-  "homepage": "https://github.com/1rainwall/Coffee#readme",
-  "devDependencies": {
-    "@prisma/client": "^4.16.1",
-    "@types/node": "^20.2.5",
-    "nodemon": "^2.0.22",
-    "prisma": "^4.16.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
-  },
   "dependencies": {
-    "@sapphire/decorators": "^6.0.1",
-    "@sapphire/framework": "^4.4.4",
-    "@sapphire/plugin-subcommands": "^4.0.1",
-    "@sapphire/time-utilities": "^1.7.9",
-    "canvacord": "^5.4.9",
-    "discord.js": "^14.11.0",
-    "dotenv": "^16.0.3",
+    "@sapphire/framework": "^4.5.3",
+    "@sapphire/plugin-subcommands": "^4.2.1",
+    "@sapphire/time-utilities": "^1.7.10",
+    "canvas": "^2.11.2",
+    "discord.js": "^14.13.0",
+    "dotenv": "^16.3.1",
     "kleur": "^4.1.5",
-    "moment": "^2.29.4",
-    "node-file-encrypt": "^0.0.8"
+    "signale": "^1.4.0"
+  },
+  "devDependencies": {
+    "@prisma/client": "^5.0.0",
+    "@types/node": "^20.4.5",
+    "@types/signale": "^1.4.4",
+    "prisma": "^5.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "signale": {
+    "displayScope": true,
+    "displayBadge": true,
+    "displayDate": true,
+    "displayFilename": false,
+    "displayLabel": true,
+    "displayTimestamp": true,
+    "underlineLabel": true
   }
 }

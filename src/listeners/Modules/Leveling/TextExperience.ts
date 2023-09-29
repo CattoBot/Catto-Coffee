@@ -2,10 +2,9 @@ import { Listener, Events } from "@sapphire/framework";
 import { Message, TextChannel } from "discord.js";
 import { Time } from "@sapphire/time-utilities";
 import { Database } from "../../../structures/Database";
-import { CattoCoffee } from "../../../App";
+import { Catto_Coffee } from "../../../Catto";
 import { XPCalculator, GetRandomXP } from "../../../util/utilities/index";
 import { Utils } from "../../../util/utils";
-const { Cooldowns } = Utils
 const cooldowns = new Set<string>();
 
 export class TextExperienceListener extends Listener {
@@ -42,7 +41,7 @@ export class TextExperienceListener extends Listener {
   }
 
   private async addMissingTextRoles(UserID: string, GuildID: string, userNivel: number) {
-    const guild = CattoCoffee.guilds.cache.get(GuildID);
+    const guild = Catto_Coffee.guilds.cache.get(GuildID);
     const member = guild?.members.cache.get(UserID);
 
     if (guild && member) {
@@ -125,6 +124,6 @@ export class TextExperienceListener extends Listener {
     cooldowns.add(message.author.id);
     setTimeout(() => {
       cooldowns.delete(message.author.id);
-    }, Time.Second * Cooldowns.Text);
+    }, Time.Second * Utils.getCooldowns().Text);
   }
 }

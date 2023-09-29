@@ -18,7 +18,7 @@ export async function verifyEnableVoice(Enabled: Guild, Interaction: Subcommand.
         });
       } else {
         return Interaction.reply({
-          content: `La experiencia de voz está desactivada en este servidor. ${Emojis.General.Error}`,
+          content: `La experiencia de voz está desactivada en este servidor. ${Utils.getEmojis().General.Error}`,
           ephemeral: true,
         });
       }

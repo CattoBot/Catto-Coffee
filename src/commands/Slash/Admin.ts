@@ -1,27 +1,18 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Time } from "@sapphire/time-utilities";
 import { ChatInputCommand } from "@sapphire/framework";
-<<<<<<< Updated upstream:src/commands/Slash/SubCommands/Admin.ts
-import { Database } from "../../../structures/Database";
-import { Utils } from "../../../util/utils";
-import { Catto_Coffee } from "../../../Catto";
-import { ChannelType, TextChannel, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
-import { CattoLogger } from "../../../structures/CattoLogger";
-=======
 import { Database } from "../../structures/Database";
 import { Utils } from "../../util/utils";
-import { CattoCoffee } from "../../App";
+import { Catto_Coffee } from "../../Catto";
 import { ChannelType, TextChannel, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { CattoLogger } from "../../structures/CattoLogger";
-const { Emojis } = Utils
->>>>>>> Stashed changes:src/commands/Slash/Admin.ts
 const Logger = new CattoLogger();
 export class AdminSubCommands extends Subcommand {
     public constructor(context: Subcommand.Context, options: Subcommand.Options) {
         super(context, {
             ...options,
             name: "admin",
-            fullCategory: ["SubCommands"],
+            fullCategory: ["Admin"],
             description: "Comandos de administración",
             requiredClientPermissions: ['Administrator'],
             preconditions: ["AdminOnly"],
@@ -365,7 +356,7 @@ export class AdminSubCommands extends Subcommand {
 
         if (getCategories.length >= 2) {
             return interaction.reply({
-                content: `${Emojis.General.Error} Parece que ya tienes 2 categorías de canales temporales, si deseas crear más, considera adquirir mi versión premium.`,
+                content: `${Utils.getEmojis().General.Error} Parece que ya tienes 2 categorías de canales temporales, si deseas crear más, considera adquirir mi versión premium.`,
                 ephemeral: true,
             });
         }
@@ -404,7 +395,7 @@ export class AdminSubCommands extends Subcommand {
         });
 
         await interaction.reply({
-            content: `Se ha configurado el sistema de canales voz temporales exitosamente ${Emojis.General.Success}. Puedes verificar en <#${Channel?.id}>.`,
+            content: `Se ha configurado el sistema de canales voz temporales exitosamente ${Utils.getEmojis().General.Success}. Puedes verificar en <#${Channel?.id}>.`,
         });
     }
 
@@ -418,8 +409,8 @@ export class AdminSubCommands extends Subcommand {
 
             const botond = new ActionRowBuilder<ButtonBuilder>
             const botone = new ActionRowBuilder<ButtonBuilder>
-            const module1 = await import('../../../interaction-handlers/buttons/general/cancel');
-            const module2 = await import('../../../interaction-handlers/buttons/admin/rsUrXp');
+            const module1 = await import('../../interaction-handlers/buttons/general/cancel');
+            const module2 = await import('../../interaction-handlers/buttons/admin/rsUrXp');
             await module1.build(botond, { disabled: true, author: interaction.user.id }, [])
             await module2.build(botond, { disabled: true, author: interaction.user.id }, [`${usuario.id}`, modulo])
             await module1.build(botone, { disabled: false, author: interaction.user.id }, [])
@@ -463,8 +454,22 @@ export class AdminSubCommands extends Subcommand {
 
                     if (getRoleAndLevel) {
                         await interaction.reply({
-                            content: `El rol \`${rol.name}\` se ha encontrado asignado al nivel: \`${getRoleAndLevel.Nivel}\`. Se ha actualizado a nivel: \`${nivel}\` en canales de texto. ${Emojis.General.Warning}`,
+                            content: `El rol \`${rol.name}\` se ha encontrado asignado al nivel: \`${getRoleAndLevel.Nivel}\`. Se ha actualizado a nivel: \`${nivel}\` en canales de texto. ${Utils.getEmojis().General.Warning}`,
                         });
+                        // const row = new ActionRowBuilder<ButtonBuilder>({
+                        //   components: [
+                        //     new ButtonBuilder({
+                        //       customId: "update-role",
+                        //       label: "Cambiar",
+                        //       style: ButtonStyle.Primary,
+                        //     }),
+                        //   ],
+                        // });
+
+                        // await interaction.reply({
+                        //   content: `El rol \`${rol.name}\` ya se encuentra asignado a otro nivel. ¿Quieres cambiarlo?`,
+                        //   components: [row],
+                        // });
 
                         await Database.textRoleRewards.update({
                             where: {
@@ -487,7 +492,7 @@ export class AdminSubCommands extends Subcommand {
                         });
                     }
                     await interaction.reply({
-                        content: `El rol \`${rol.name}\` se otorgará al subir a nivel \`${nivel}\` en canales de texto ${Emojis.General.Success}`,
+                        content: `El rol \`${rol.name}\` se otorgará al subir a nivel \`${nivel}\` en canales de texto ${Utils.getEmojis().General.Success}`,
                     });
                 }
             case "voice":
@@ -504,8 +509,22 @@ export class AdminSubCommands extends Subcommand {
 
                     if (getRoleAndLevel) {
                         await interaction.reply({
-                            content: `El rol \`${rol.name}\` se ha encontrado asignado a nivel: \`${getRoleAndLevel.Nivel}\`. Se ha actualizado a nivel: \`${nivel}\` en canales de voz. ${Emojis.General.Warning}`,
+                            content: `El rol \`${rol.name}\` se ha encontrado asignado a nivel: \`${getRoleAndLevel.Nivel}\`. Se ha actualizado a nivel: \`${nivel}\` en canales de voz. ${Utils.getEmojis().General.Warning}`,
                         });
+                        // const row = new ActionRowBuilder<ButtonBuilder>({
+                        //   components: [
+                        //     new ButtonBuilder({
+                        //       customId: "update-role",
+                        //       label: "Cambiar",
+                        //       style: ButtonStyle.Primary,
+                        //     }),
+                        //   ],
+                        // });
+
+                        // await interaction.reply({
+                        //   content: `El rol \`${rol.name}\` ya se encuentra asignado a otro nivel. ¿Quieres cambiarlo?`,
+                        //   components: [row],
+                        // });
 
                         await Database.voiceRoleRewards.update({
                             where: {
@@ -528,7 +547,7 @@ export class AdminSubCommands extends Subcommand {
                         });
                     }
                     await interaction.reply({
-                        content: `El rol ${rol.name} se otorgará al subir a nivel \`${nivel}\` en canales de voz ${Emojis.General.Success}`,
+                        content: `El rol ${rol.name} se otorgará al subir a nivel \`${nivel}\` en canales de voz ${Utils.getEmojis().General.Success}`,
                     });
                 }
 
@@ -574,7 +593,7 @@ export class AdminSubCommands extends Subcommand {
                 const text = new ActionRowBuilder<TextInputBuilder>().addComponents(textInput);
                 TextModal.addComponents(text);
                 await interaction.showModal(TextModal);
-
+            default:
                 break;
         }
     }
@@ -582,7 +601,7 @@ export class AdminSubCommands extends Subcommand {
     public async chatInputResetExp(interaction: Subcommand.ChatInputCommandInteraction) {
         const modulo = interaction.options.getString("modulo", true);
 
-        const modal = await import("../../../interaction-handlers/modals/admin/rsSvXp")
+        const modal = await import("../../interaction-handlers/modals/admin/rsSvXp")
         modal.build(interaction, modulo)
     }
 
@@ -594,46 +613,47 @@ export class AdminSubCommands extends Subcommand {
         switch (true) {
             case min > max:
                 return interaction.reply({
-                    content: `La experiencia mínima no puede ser mayor a la máxima ${Emojis.General.Error}`,
+                    content: `La experiencia mínima no puede ser mayor a la máxima ${Utils.getEmojis().General.Error}`,
                     ephemeral: true,
                 });
             case min > 100:
                 return interaction.reply({
-                    content: `La experiencia mínima no puede ser mayor a 100 ${Emojis.General.Error}`,
+                    content: `La experiencia mínima no puede ser mayor a 100 ${Utils.getEmojis().General.Error}`,
                     ephemeral: true,
                 });
             case min === 0:
                 return interaction.reply({
-                    content: `La experiencia mínima no puede ser 0 ${Emojis.General.Error}`,
+                    content: `La experiencia mínima no puede ser 0 ${Utils.getEmojis().General.Error}`,
                     ephemeral: true,
                 });
             case max < min:
                 return interaction.reply({
-                    content: `La experiencia máxima no puede ser menor a la mínima ${Emojis.General.Error}`,
+                    content: `La experiencia máxima no puede ser menor a la mínima ${Utils.getEmojis().General.Error}`,
                     ephemeral: true,
                 });
             case max === 0:
                 return interaction.reply({
-                    content: `La experiencia máxima no puede ser 0 ${Emojis.General.Error}`,
+                    content: `La experiencia máxima no puede ser 0 ${Utils.getEmojis().General.Error}`,
                     ephemeral: true,
                 });
             case max > 600:
                 return interaction.reply({
-                    content: `La experiencia máxima no puede ser mayor a 600 ${Emojis.General.Error}`,
+                    content: `La experiencia máxima no puede ser mayor a 600 ${Utils.getEmojis().General.Error}`,
                     ephemeral: true,
                 });
             case min < 0:
                 return interaction.reply({
-                    content: `La experiencia mínima no puede ser menor a 0 ${Emojis.General.Error}`,
+                    content: `La experiencia mínima no puede ser menor a 0 ${Utils.getEmojis().General.Error}`,
                     ephemeral: true,
                 })
 
             case max < 0:
                 return interaction.reply({
-                    content: `La experiencia máxima no puede ser menor a 0 ${Emojis.General.Error}`,
+                    content: `La experiencia máxima no puede ser menor a 0 ${Utils.getEmojis().General.Error}`,
                     ephemeral: true,
                 })
 
+            default:
                 break;
         }
 
@@ -666,7 +686,7 @@ export class AdminSubCommands extends Subcommand {
                 }
 
                 return interaction.reply({
-                    content: `La experiencia minima ahora es ${min} y la maxima es ${max} por mensaje. ${Emojis.General.Success}`,
+                    content: `La experiencia minima ahora es ${min} y la maxima es ${max} por mensaje. ${Utils.getEmojis().General.Success}`,
                 });
 
             case "voice":
@@ -697,7 +717,7 @@ export class AdminSubCommands extends Subcommand {
                 }
 
                 return interaction.reply({
-                    content: `La experiencia minima ahora es ${min} y la maxima es ${max} para canales de voz. ${Emojis.General.Success}`,
+                    content: `La experiencia minima ahora es ${min} y la maxima es ${max} para canales de voz. ${Utils.getEmojis().General.Success}`,
                 });
 
             default:
@@ -718,7 +738,7 @@ export class AdminSubCommands extends Subcommand {
 
                 if (isDisabledText?.TextExpEnabled === false) {
                     return interaction.reply({
-                        content: `El sistema de experiencia por texto ya está desactivado ${Emojis.General.Warning}`,
+                        content: `El sistema de experiencia por texto ya está desactivado ${Utils.getEmojis().General.Warning}`,
                         ephemeral: true,
                     });
                 } else {
@@ -732,7 +752,7 @@ export class AdminSubCommands extends Subcommand {
                     });
 
                     return interaction.reply({
-                        content: `El sistema de experiencia por texto ha sido desactivado ${Emojis.General.Success}`,
+                        content: `El sistema de experiencia por texto ha sido desactivado ${Utils.getEmojis().General.Success}`,
                     });
                 }
 
@@ -744,7 +764,7 @@ export class AdminSubCommands extends Subcommand {
                 });
                 if (isDisabledVoice?.VoiceExpEnabled === false) {
                     return interaction.reply({
-                        content: `El sistema de experiencia por voz ya está desactivado ${Emojis.General.Warning}`,
+                        content: `El sistema de experiencia por voz ya está desactivado ${Utils.getEmojis().General.Warning}`,
                         ephemeral: true,
                     });
                 }
@@ -758,7 +778,7 @@ export class AdminSubCommands extends Subcommand {
                 });
 
                 return interaction.reply({
-                    content: `El sistema de experiencia por voz ha sido desactivado ${Emojis.General.Success}`,
+                    content: `El sistema de experiencia por voz ha sido desactivado ${Utils.getEmojis().General.Success}`,
                 });
 
             default:
@@ -778,7 +798,7 @@ export class AdminSubCommands extends Subcommand {
 
                 if (isEnabledText?.TextExpEnabled === true) {
                     return interaction.reply({
-                        content: `El sistema de experiencia por texto ya está activado ${Emojis.General.Warning}`,
+                        content: `El sistema de experiencia por texto ya está activado ${Utils.getEmojis().General.Warning}`,
                         ephemeral: true,
                     });
                 } else {
@@ -792,7 +812,7 @@ export class AdminSubCommands extends Subcommand {
                     });
 
                     return interaction.reply({
-                        content: `El sistema de experiencia por texto ha sido activado ${Emojis.General.Success}`,
+                        content: `El sistema de experiencia por texto ha sido activado ${Utils.getEmojis().General.Success}`,
                     });
                 }
 
@@ -805,7 +825,7 @@ export class AdminSubCommands extends Subcommand {
 
                 if (isEnabledVoice?.VoiceExpEnabled === true) {
                     return interaction.reply({
-                        content: `El sistema de experiencia por voz ya está activado ${Emojis.General.Warning}`,
+                        content: `El sistema de experiencia por voz ya está activado ${Utils.getEmojis().General.Warning}`,
                         ephemeral: true,
                     });
                 } else {
@@ -819,7 +839,7 @@ export class AdminSubCommands extends Subcommand {
                     });
 
                     return interaction.reply({
-                        content: `El sistema de experiencia por voz ha sido activado ${Emojis.General.Success}`,
+                        content: `El sistema de experiencia por voz ha sido activado ${Utils.getEmojis().General.Success}`,
                     });
                 }
 
@@ -832,7 +852,7 @@ export class AdminSubCommands extends Subcommand {
 
         const modulo = interaction.options.getString("option", true);
         const channel = interaction.options.getChannel("canal", true);
-        const canal = CattoCoffee.channels.cache.get(channel.id) as TextChannel;
+        const canal = Catto_Coffee.channels.cache.get(channel.id) as TextChannel;
 
         try {
             switch (modulo) {
@@ -862,11 +882,11 @@ export class AdminSubCommands extends Subcommand {
                             });
                         }
                         return interaction.reply({
-                            content: `El canal <#${canal.id}> ha sido configurado para notificar niveles de canales de voz. ${Emojis.General.Success}`,
+                            content: `El canal <#${canal.id}> ha sido configurado para notificar niveles de canales de voz. ${Utils.getEmojis().General.Success}`,
                         });
                     } else {
                         return interaction.reply({
-                            content: `El canal debe ser de texto ${Emojis.General.Error}`,
+                            content: `El canal debe ser de texto ${Utils.getEmojis().General.Error}`,
                             ephemeral: true,
                         });
                     }
@@ -897,11 +917,11 @@ export class AdminSubCommands extends Subcommand {
                             });
                         }
                         return interaction.reply({
-                            content: `El canal <#${canal.id}> ha sido configurado para notificar niveles por texto. ${Emojis.General.Success}`,
+                            content: `El canal <#${canal.id}> ha sido configurado para notificar niveles por texto. ${Utils.getEmojis().General.Success}`,
                         });
                     } else {
                         return interaction.reply({
-                            content: `El canal debe ser de texto ${Emojis.General.Error}`,
+                            content: `El canal debe ser de texto ${Utils.getEmojis().General.Error}`,
                             ephemeral: true,
                         });
                     }
@@ -932,18 +952,18 @@ export class AdminSubCommands extends Subcommand {
                             });
                         }
                         return interaction.reply({
-                            content: `El canal <#${canal.id}> ha sido configurado para notificar logs de notas. ${Emojis.General.Success}`,
+                            content: `El canal <#${canal.id}> ha sido configurado para notificar logs de notas. ${Utils.getEmojis().General.Success}`,
                         });
                     } else {
                         return interaction.reply({
-                            content: `El canal debe ser de texto ${Emojis.General.Error}`,
+                            content: `El canal debe ser de texto ${Utils.getEmojis().General.Error}`,
                             ephemeral: true,
                         });
                     }
 
                 default:
                     return interaction.reply({
-                        content: `Opción no reconocida ${Emojis.General.Error}`,
+                        content: `Opción no reconocida ${Utils.getEmojis().General.Error}`,
                         ephemeral: true,
                     });
 

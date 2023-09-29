@@ -3,10 +3,10 @@ import { createCanvas, loadImage, registerFont } from 'canvas';
 import { Time } from "@sapphire/time-utilities";
 import { ChatInputCommand } from "@sapphire/framework";
 import { AttachmentBuilder, Guild } from "discord.js";
-import { Database } from "../../../structures/Database";
-import { Utils } from "../../../util/utils";
-import { XPCalculator, formatNumber, verifyEnableText, verifyEnableVoice } from "../../../util/utilities";
-import { CattoLogger } from "../../../structures/CattoLogger";
+import { Database } from "../../structures/Database";
+import { Utils } from "../../util/utils";
+import { XPCalculator, formatNumber, verifyEnableText, verifyEnableVoice } from "../../util/utilities";
+import { CattoLogger } from "../../structures/CattoLogger";
 const logger = new CattoLogger();
 
 export class LevelingSubcommand extends Subcommand {
@@ -14,7 +14,6 @@ export class LevelingSubcommand extends Subcommand {
     super(context, {
       ...options,
       preconditions: ["GuildOnly"],
-      fullCategory: ["SubCommands"],
       name: "level",
       description: "Comandos de experiencia",
       cooldownDelay: Time.Second * 10,
@@ -171,15 +170,15 @@ export class LevelingSubcommand extends Subcommand {
 
 
   public registeringFONT() {
-    (registerFont)('./assets/fonts/Poppins-SemiBold.ttf', { family: 'Poppins SemiBold' });
-    (registerFont)('./assets/fonts/Poppins-Bold.ttf', { family: 'Poppins Bold' });
-    (registerFont)('./assets/fonts/Bahnschrift.ttf', { family: 'Bahnschrift' });
+    (registerFont)('./dist/assets/fonts/Poppins-SemiBold.ttf', { family: 'Poppins SemiBold' });
+    (registerFont)('./dist/assets/fonts/Poppins-Bold.ttf', { family: 'Poppins Bold' });
+    (registerFont)('./dist/assets/fonts/Bahnschrift.ttf', { family: 'Bahnschrift' });
   }
 
   public async chatInputSetLevelXP(interaction: Subcommand.ChatInputCommandInteraction) {
     if (!interaction.memberPermissions?.has('ManageRoles')) {
       return interaction.reply({
-        content: `No tienes permisos para usar este comando. ${Emojis.General.Error} permiso requerido: \`Manage Roles\``,
+        content: `No tienes permisos para usar este comando. ${Utils.getEmojis().General.Error} permiso requerido: \`Manage Roles\``,
         ephemeral: true,
       });
     }
@@ -192,14 +191,14 @@ export class LevelingSubcommand extends Subcommand {
 
     if (nivelValue > 100) {
       return interaction.reply({
-        content: `El nivel no puede ser mayor a 100. ${Emojis.General.Error}`,
+        content: `El nivel no puede ser mayor a 100. ${Utils.getEmojis().General.Error}`,
         ephemeral: true,
       });
     }
 
     if (nivelValue < 0) {
       return interaction.reply({
-        content: `El nivel no puede ser menor a 0.  ${Emojis.General.Error}`,
+        content: `El nivel no puede ser menor a 0.  ${Utils.getEmojis().General.Error}`,
         ephemeral: true,
       });
     }
@@ -424,7 +423,7 @@ export class LevelingSubcommand extends Subcommand {
 
             if (TextLadderboard.length === 0) {
               return interaction.reply({
-                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`. ${Emojis.General.Error}`,
+                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`. ${Utils.getEmojis().General.Error}`,
                 ephemeral: true,
               });
             } else {
@@ -474,7 +473,7 @@ export class LevelingSubcommand extends Subcommand {
                 return `${member.username} \nNivel: ${u.Nivel} - XP: ${formattedXP}`;
               }));
 
-              const backgroundImage = './assets/img/Catto_Leader_TXT.png'; // URL de la imagen de fondo
+              const backgroundImage = './dist/assets/img/Catto_Leader_TXT.png'; // URL de la imagen de fondo
 
               // const backgroundImage = './assets/img/Catto_Leader_TXT.png';
               const imageWidth = 1024; // Ancho de la imagen de fondo
@@ -631,7 +630,7 @@ export class LevelingSubcommand extends Subcommand {
             });
             if (VoiceLeaderboard.length === 0) {
               return interaction.reply({
-                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`. ${Emojis.General.Error}`,
+                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`. ${Utils.getEmojis().General.Error}`,
                 ephemeral: true,
               });
             }
@@ -676,7 +675,7 @@ export class LevelingSubcommand extends Subcommand {
                 const formattedXP = formatNumber(u.VoiceExperience); // Formatear XP usando la función formatNumber
                 return `${member.username} \nNivel: ${u.Nivel} - XP: ${formattedXP}`;
               }));
-              const backgroundImage = './assets/img/Catto_Leader_TXT.png'; // URL de la imagen de fondo
+              const backgroundImage = './dist/assets/img/Catto_Leader_TXT.png'; // URL de la imagen de fondo
               const imageWidth = 1024; // Ancho de la imagen de fondo
               const imageHeight = 1440; // Alto de la imagen de fondo
               const background = await (loadImage)(backgroundImage);
@@ -830,7 +829,7 @@ export class LevelingSubcommand extends Subcommand {
     const user = interaction.options.getUser("user") ?? interaction.user;
     if (user.bot) {
       return interaction.reply({
-        content: `Los bots no pueden recibir experiencia ${Emojis.General.Error}`,
+        content: `Los bots no pueden recibir experiencia ${Utils.getEmojis().General.Error}`,
         ephemeral: true
       });
     }
@@ -849,7 +848,7 @@ export class LevelingSubcommand extends Subcommand {
             },
           });
           if (!TextUserExists) {
-            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Emojis.General.Error}`, ephemeral: true });
+            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Utils.getEmojis().General.Error}`, ephemeral: true });
           }
           else {
             await interaction.reply({
@@ -880,7 +879,7 @@ export class LevelingSubcommand extends Subcommand {
             const formattedXP = formatNumber(experience);
             const formattedLevel = formatNumber(level);
             const canvas = (createCanvas)(1000, 300);
-            const ctx = canvas.getContext('2d'), bar_width = 600, bg = await (loadImage)('./assets/img/White_Solid_Card.png'), avatar = await (loadImage)(user.displayAvatarURL({ extension: 'png', size: 512 }));
+            const ctx = canvas.getContext('2d'), bar_width = 600, bg = await (loadImage)('./dist/assets/img/White_Solid_Card.png'), avatar = await (loadImage)(user.displayAvatarURL({ extension: 'png', size: 512 }));
             const circleX = 120 + canvas.width * 0.03; // Ajuste del círculo en el eje X
             const avatarX = circleX - 110;
             const circleY = 170 - (canvas.height * 0.06); // Ajuste del círculo en el eje Y
@@ -946,7 +945,7 @@ export class LevelingSubcommand extends Subcommand {
             },
           });
           if (!VoiceuserExists) {
-            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Emojis.General.Error}`, ephemeral: true });
+            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Utils.getEmojis().General.Error}`, ephemeral: true });
           }
           else {
             await interaction.reply({
@@ -977,7 +976,7 @@ export class LevelingSubcommand extends Subcommand {
             const formattedXP = formatNumber(experience);
             const formattedLevel = formatNumber(level);
             const canvas = (createCanvas)(1000, 300);
-            const ctx = canvas.getContext('2d'), bar_width = 600, bg = await (loadImage)('./assets/img/White_Solid_Card.png'), avatar = await (loadImage)(user.displayAvatarURL({ extension: 'png', size: 512 }));
+            const ctx = canvas.getContext('2d'), bar_width = 600, bg = await (loadImage)('./dist/assets/img/White_Solid_Card.png'), avatar = await (loadImage)(user.displayAvatarURL({ extension: 'png', size: 512 }));
             const circleX = 120 + canvas.width * 0.03; // Ajuste del círculo en el eje X
             const avatarX = circleX - 110;
             const circleY = 170 - (canvas.height * 0.06); // Ajuste del círculo en el eje Y
