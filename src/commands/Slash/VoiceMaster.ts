@@ -4,7 +4,7 @@ import { Time } from "@sapphire/time-utilities";
 import { Database } from "../../structures/Database";
 import { Utils } from "../../util/utils";
 import { ActionRowBuilder, ModalBuilder, PermissionFlagsBits, TextInputBuilder, TextInputStyle } from "discord.js";
-
+const { Emojis } = Utils;
 export class TempVoiceCommands extends Subcommand {
     public constructor(context: Subcommand.Context, options: Subcommand.Options) {
         super(context, {
@@ -200,7 +200,7 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -216,19 +216,19 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
                 ephemeral: true,
             });
         } else {
             if (getChannel.ChannelOwner === UserID) {
                 return interaction.reply({
-                    content: `${Utils.getEmojis().General.Warning} Ya eres el owner de este canal.`,
+                    content: `${Emojis.General.Warning} Ya eres el owner de este canal.`,
                     ephemeral: true,
                 });
             }
             if (VoiceChannel.members.has(getChannel.ChannelOwner)) {
                 return interaction.reply({
-                    content: `${Utils.getEmojis().General.Error} El owner de este canal se encuentra en el canal de voz.`,
+                    content: `${Emojis.General.Error} El owner de este canal se encuentra en el canal de voz.`,
                     ephemeral: true,
                 });
             } else {
@@ -245,7 +245,7 @@ export class TempVoiceCommands extends Subcommand {
                 });
 
                 return interaction.reply({
-                    content: `${Utils.getEmojis().General.Success} Has reclamado con éxito el canal de voz.`,
+                    content: `${Emojis.General.Success} Has reclamado con éxito el canal de voz.`,
                 });
             }
         }
@@ -258,7 +258,7 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -274,14 +274,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el owner de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el owner de este canal de voz.`,
                 ephemeral: true,
             });
         } else {
@@ -307,7 +307,7 @@ export class TempVoiceCommands extends Subcommand {
                 );
             }
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Success} Se ha ocultado el canal de voz éxitosamente.`,
+                content: `${Emojis.General.Success} Se ha ocultado el canal de voz éxitosamente.`,
             });
         }
     }
@@ -319,7 +319,7 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -335,14 +335,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el owner de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el owner de este canal de voz.`,
                 ephemeral: true,
             });
         } else {
@@ -368,7 +368,7 @@ export class TempVoiceCommands extends Subcommand {
                 );
             }
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Success} El canal ha vuelto a ser visible éxitosamente.`,
+                content: `${Emojis.General.Success} El canal ha vuelto a ser visible éxitosamente.`,
             });
         }
     }
@@ -381,7 +381,7 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -397,20 +397,20 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el owner de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el owner de este canal de voz.`,
                 ephemeral: true,
             });
         } else {
             if (VoiceChannelLimit > 99) {
                 return interaction.reply({
-                    content: `${Utils.getEmojis().General.Error} El límite de usuarios no puede ser mayor a 99.`,
+                    content: `${Emojis.General.Error} El límite de usuarios no puede ser mayor a 99.`,
                     ephemeral: true,
                 });
             } else {
@@ -418,7 +418,7 @@ export class TempVoiceCommands extends Subcommand {
             }
 
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Success} El límite de usuarios ha sido cambiado a \`${VoiceChannelLimit}\` éxitosamente.`,
+                content: `${Emojis.General.Success} El límite de usuarios ha sido cambiado a \`${VoiceChannelLimit}\` éxitosamente.`,
             });
         }
     }
@@ -430,7 +430,7 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -446,14 +446,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el owner de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el owner de este canal de voz.`,
                 ephemeral: true,
             });
         } else {
@@ -480,7 +480,7 @@ export class TempVoiceCommands extends Subcommand {
             }
 
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Success} El canal ha sido bloqueado éxitosamente.`,
+                content: `${Emojis.General.Success} El canal ha sido bloqueado éxitosamente.`,
             });
         }
     }
@@ -492,7 +492,7 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -508,14 +508,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el owner de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el owner de este canal de voz.`,
                 ephemeral: true,
             });
         } else {
@@ -542,7 +542,7 @@ export class TempVoiceCommands extends Subcommand {
             }
 
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Success} El canal ha sido desbloqueado éxitosamente.`,
+                content: `${Emojis.General.Success} El canal ha sido desbloqueado éxitosamente.`,
             });
         }
     }
@@ -556,14 +556,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (TargetUserID === UserID) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Success} No puedes habilitar el acceso al canal a ti mismo.`,
+                content: `${Emojis.General.Success} No puedes habilitar el acceso al canal a ti mismo.`,
                 ephemeral: true,
             });
         }
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -579,14 +579,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mi.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el owner de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el owner de este canal de voz.`,
                 ephemeral: true,
             });
         }
@@ -607,7 +607,7 @@ export class TempVoiceCommands extends Subcommand {
         }
 
         return interaction.reply({
-            content: `${Utils.getEmojis().General.Success} Se ha permitido el acceso a \`${TargetUser.username}\`.`,
+            content: `${Emojis.General.Success} Se ha permitido el acceso a \`${TargetUser.username}\`.`,
         });
     }
 
@@ -621,21 +621,21 @@ export class TempVoiceCommands extends Subcommand {
 
         if (TargetUserID === UserID) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Success} No puedes denegarte el acceso al canal a ti mismo.`,
+                content: `${Emojis.General.Success} No puedes denegarte el acceso al canal a ti mismo.`,
                 ephemeral: true,
             });
         }
 
         if (MemberTarget?.permissions.has("MuteMembers" || "ManageMessages")) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No puedes denegar el acceso a un miembro con permisos de moderación.`,
+                content: `${Emojis.General.Error} No puedes denegar el acceso a un miembro con permisos de moderación.`,
                 ephemeral: true,
             });
         }
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -651,14 +651,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el propietario de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el propietario de este canal de voz.`,
                 ephemeral: true,
             });
         }
@@ -698,7 +698,7 @@ export class TempVoiceCommands extends Subcommand {
         }
 
         return interaction.reply({
-            content: `${Utils.getEmojis().General.Success} Se ha denegado el acceso a \`${TargetUser.username}\`.`,
+            content: `${Emojis.General.Success} Se ha denegado el acceso a \`${TargetUser.username}\`.`,
         });
     }
 
@@ -711,14 +711,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (TargetUserID === UserID) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Warning} No puedes transferirte el owner del canal a ti mismo.`,
+                content: `${Emojis.General.Warning} No puedes transferirte el owner del canal a ti mismo.`,
                 ephemeral: true,
             });
         }
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -734,14 +734,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el propietario de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el propietario de este canal de voz.`,
                 ephemeral: true,
             });
         } else {
@@ -758,7 +758,7 @@ export class TempVoiceCommands extends Subcommand {
             });
 
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Success} Has transferido el owner del canal a \`${TargetUser.username}\`.`,
+                content: `${Emojis.General.Success} Has transferido el owner del canal a \`${TargetUser.username}\`.`,
             });
         }
     }
@@ -771,14 +771,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (TargetUserID === UserID) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Warning} No puedes invitarte al canal a ti mismo.`,
+                content: `${Emojis.General.Warning} No puedes invitarte al canal a ti mismo.`,
                 ephemeral: true,
             });
         }
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -794,14 +794,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el propietario de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el propietario de este canal de voz.`,
                 ephemeral: true,
             });
         } else {
@@ -818,13 +818,13 @@ export class TempVoiceCommands extends Subcommand {
                 content: `Has sido invitado al canal de voz \`${VoiceChannel.name}\`(${VoiceChannel.url}) en el servidor \`${interaction.guild?.name}\`.`,
             }).catch(async () => {
                 return interaction.reply({
-                    content: `${Utils.getEmojis().General.Error} No se le ha podido enviar la invitación a \`${TargetUser.username}\` verifica que tenga sus DM disponibles.`,
+                    content: `${Emojis.General.Error} No se le ha podido enviar la invitación a \`${TargetUser.username}\` verifica que tenga sus DM disponibles.`,
                     ephemeral: true,
                 })
             });
             await interaction
                 .reply({
-                    content: `${Utils.getEmojis().General.Success} Se le ha enviado la invitación a \`${TargetUser.username}\` éxitosamente.`,
+                    content: `${Emojis.General.Success} Se le ha enviado la invitación a \`${TargetUser.username}\` éxitosamente.`,
                 })
                 .catch(() => { });
         }
@@ -842,7 +842,7 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -858,14 +858,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el propietario de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el propietario de este canal de voz.`,
                 ephemeral: true,
             });
         } else {
@@ -874,7 +874,7 @@ export class TempVoiceCommands extends Subcommand {
             });
 
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Success} Se ha cambiado el bitrate del canal de voz a \`${Bitrate}\`kbps.`,
+                content: `${Emojis.General.Success} Se ha cambiado el bitrate del canal de voz a \`${Bitrate}\`kbps.`,
             });
         }
     }
@@ -887,7 +887,7 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -903,14 +903,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el propietario de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el propietario de este canal de voz.`,
                 ephemeral: true,
             });
         } else {
@@ -943,7 +943,7 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!VoiceChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Necesitas estar en un canal de voz para usar este comando.`,
+                content: `${Emojis.General.Error} Necesitas estar en un canal de voz para usar este comando.`,
                 ephemeral: true,
             });
         }
@@ -959,14 +959,14 @@ export class TempVoiceCommands extends Subcommand {
 
         if (!getChannel) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
+                content: `${Emojis.General.Error} Este canal de voz no se encuentra disponible. Asegúrate de que ha sido creado por mí.`,
                 ephemeral: true,
             });
         }
 
         if (UserID !== getChannel.ChannelOwner) {
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Error} No eres el propietario de este canal de voz.`,
+                content: `${Emojis.General.Error} No eres el propietario de este canal de voz.`,
                 ephemeral: true,
             });
         } else {
@@ -988,7 +988,7 @@ export class TempVoiceCommands extends Subcommand {
             await VoiceChannel.permissionOverwrites.set(channelOverwrites.concat(userPermission))
 
             return interaction.reply({
-                content: `${Utils.getEmojis().General.Success} Se han reseteado los permisos canal de voz.`,
+                content: `${Emojis.General.Success} Se han reseteado los permisos canal de voz.`,
             });
         }
     }

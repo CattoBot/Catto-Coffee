@@ -3,10 +3,9 @@ import { Time } from "@sapphire/time-utilities";
 import { ChatInputCommand } from "@sapphire/framework";
 import { Database } from "../../structures/Database";
 import { Utils } from "../../util/utils";
-import { Catto_Coffee } from "../../Catto";
+import { Catto_Coffee } from "../../App";
 import { ActionRowBuilder, EmbedBuilder, PermissionFlagsBits, GuildMember, StringSelectMenuBuilder, ButtonBuilder, User } from "discord.js";
-const emojis = Utils.getEmojis().VoiceMod
-
+const { Emojis } = Utils;
 export class AdminSubCommands extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
     super(context, {
@@ -309,19 +308,19 @@ export class AdminSubCommands extends Subcommand {
         members.forEach((user: any) => {
           users.push(
             `${user.voice.mute
-              ? `${user.voice.serverMute ? Utils.getEmojis().VoiceMod.serverMuted : Utils.getEmojis().VoiceMod.selfMuted
+              ? `${user.voice.serverMute ? Emojis.VoiceMod.serverMuted : Emojis.VoiceMod.selfMuted
               }`
-              : Utils.getEmojis().VoiceMod.unmute
+              : Emojis.VoiceMod.unmute
             }${user.voice.deaf
               ? `${user.voice.serverDeaf
-                ? Utils.getEmojis().VoiceMod.serverDeafen
-                : Utils.getEmojis().VoiceMod.selfDeafen
+                ? Emojis.VoiceMod.serverDeafen
+                : Emojis.VoiceMod.selfDeafen
               } `
-              : Utils.getEmojis().VoiceMod.undeafen
+              : Emojis.VoiceMod.undeafen
             } <@${user.id}> ${user.permissions.has(PermissionFlagsBits.MuteMembers)
               ? `${user.permissions.has(PermissionFlagsBits.ManageGuild)
-                ? `${Utils.getEmojis().VoiceMod.admin}`
-                : `${Utils.getEmojis().VoiceMod.mod}`
+                ? `${Emojis.VoiceMod.admin}`
+                : `${Emojis.VoiceMod.mod}`
               }`
               : ""
             }`
@@ -413,19 +412,19 @@ export class AdminSubCommands extends Subcommand {
         members.forEach((user: any) => {
           users.push(
             `${user.voice.mute
-              ? `${user.voice.serverMute ? emojis.serverMuted : emojis.selfMuted
+              ? `${user.voice.serverMute ? Emojis.VoiceMod.serverMuted : Emojis.VoiceMod.selfMuted
               }`
-              : emojis.unmute
+              : Emojis.VoiceMod.unmute
             }${user.voice.deaf
               ? `${user.voice.serverDeaf
-                ? emojis.serverDeafen
-                : emojis.selfDeafen
+                ? Emojis.VoiceMod.serverDeafen
+                : Emojis.VoiceMod.selfDeafen
               } `
-              : emojis.undeafen
+              : Emojis.VoiceMod.undeafen
             } <@${user.id}> ${user.permissions.has(PermissionFlagsBits.MuteMembers)
               ? `${user.permissions.has(PermissionFlagsBits.ManageGuild)
-                ? `${emojis.admin}`
-                : `${emojis.mod}`
+                ? `${Emojis.VoiceMod.admin}`
+                : `${Emojis.VoiceMod.mod}`
               }`
               : ""
             }`
@@ -763,7 +762,7 @@ export class AdminSubCommands extends Subcommand {
     const week = that_user_notes.filter(callback7)
 
     // Una vez finalizado, indicamos que la nota ha sido creada exitosamente
-    embed.setDescription(`¡Nota \`#${new_note_id}\` creada exitosamente!\n${today.length>0?`\n${Utils.getEmojis().General.Error} \`|\` Esta es la ${today.length +1}ª nota de este usuario hoy.`:`${week.length>0?`\n${Utils.getEmojis().General.Warning} \`|\` Esta es la ${today.length +1}ª nota de este usuario esta semana.`:""}`}${that_user_notes.length > 2?`\n${Utils.getEmojis().General.Warning} \`|\`Esta es la ${that_user_notes.length + 1}ª nota del usuario.`:""}`)
+    embed.setDescription(`¡Nota \`#${new_note_id}\` creada exitosamente!\n${today.length>0?`\n${Emojis.General.Error} \`|\` Esta es la ${today.length +1}ª nota de este usuario hoy.`:`${week.length>0?`\n${Emojis.General.Warning} \`|\` Esta es la ${today.length +1}ª nota de este usuario esta semana.`:""}`}${that_user_notes.length > 2?`\n${Emojis.General.Warning} \`|\`Esta es la ${that_user_notes.length + 1}ª nota del usuario.`:""}`)
     if (!interaction.deferred) {
       await interaction.reply({ embeds: [embed], ephemeral: true })
     }

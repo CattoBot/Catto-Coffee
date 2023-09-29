@@ -1,5 +1,5 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
-import { Catto_Coffee } from '../../../Catto';
+import { Catto_Coffee } from '../../../App';
 import { Utils } from '../../../util/utils';
 import { Database } from '../../../structures/Database';
 import {
@@ -18,6 +18,7 @@ interface optionsObject {
   author: string | undefined,
   emoji: string
 }
+const { Messages } = Utils;
 
 export const build = async (actionRowBuilder: ActionRowBuilder, options: optionsObject, data: String[] | undefined) => {
   return new Promise(resolve => {
@@ -53,7 +54,7 @@ export class ButtonHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(Utils.getMessages().InteractionOwner.Button)
+          .setDescription(Messages.InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();

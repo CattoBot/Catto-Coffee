@@ -1,9 +1,9 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
 import { ActionRowBuilder, EmbedBuilder, PermissionFlagsBits, ButtonInteraction, ButtonBuilder, ButtonStyle, GuildMember } from "discord.js";
 import { Database } from '../../../structures/Database';
-import { Catto_Coffee } from '../../../Catto';
+import { Catto_Coffee } from '../../../App';
 import { Utils } from '../../../util/utils';
-
+const { Messages, Emojis } = Utils;
 interface optionsObject {
   disabled: boolean | undefined,
   author: string | undefined,
@@ -43,7 +43,7 @@ export class ButtonHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(Utils.getMessages().InteractionOwner.Button)
+          .setDescription(Messages.InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();
@@ -102,7 +102,7 @@ export class ButtonHandler extends InteractionHandler {
               },
             });
             await interaction.update({
-              content: `Se ha restablecido el nivel del usuario \`${user?.username}\` en el modulo de texto. ${Utils.getEmojis().General.Success}`,
+              content: `Se ha restablecido el nivel del usuario \`${user?.username}\` en el modulo de texto. ${Emojis.General.Success}`,
               embeds: [],
               components: []
             });
@@ -135,7 +135,7 @@ export class ButtonHandler extends InteractionHandler {
               },
             });
             await interaction.update({
-              content: `Se ha restablecido el nivel del usuario \`${user?.username}\` en el modulo de voz. ${Utils.getEmojis().General.Success}`,
+              content: `Se ha restablecido el nivel del usuario \`${user?.username}\` en el modulo de voz. ${Emojis.General.Success}`,
               embeds: [],
               components: []
             });

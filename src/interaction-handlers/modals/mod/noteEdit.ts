@@ -1,5 +1,5 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext, container } from '@sapphire/framework';
-import { Catto_Coffee } from '../../../Catto';
+import { Catto_Coffee } from '../../../App';
 import { Database } from '../../../structures/Database';
 import { ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder, PermissionFlagsBits, GuildMember, ModalSubmitInteraction, User } from "discord.js";
 

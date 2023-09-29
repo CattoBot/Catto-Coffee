@@ -5,10 +5,12 @@ import { ChatInputCommand } from "@sapphire/framework";
 import { AttachmentBuilder, Guild } from "discord.js";
 import { Database } from "../../structures/Database";
 import { Utils } from "../../util/utils";
-import { XPCalculator, formatNumber, verifyEnableText, verifyEnableVoice } from "../../util/utilities";
+import { XPCalculator, formatNumber } from "../../util/utilities";
+import { Verify } from "../../util/utilities/Classes/Verify";
 import { CattoLogger } from "../../structures/CattoLogger";
 const logger = new CattoLogger();
-
+const Verification = new Verify()
+const { Emojis } = Utils;
 export class LevelingSubcommand extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
     super(context, {
@@ -169,6 +171,7 @@ export class LevelingSubcommand extends Subcommand {
   }
 
 
+
   public registeringFONT() {
     (registerFont)('./dist/assets/fonts/Poppins-SemiBold.ttf', { family: 'Poppins SemiBold' });
     (registerFont)('./dist/assets/fonts/Poppins-Bold.ttf', { family: 'Poppins Bold' });
@@ -178,7 +181,7 @@ export class LevelingSubcommand extends Subcommand {
   public async chatInputSetLevelXP(interaction: Subcommand.ChatInputCommandInteraction) {
     if (!interaction.memberPermissions?.has('ManageRoles')) {
       return interaction.reply({
-        content: `No tienes permisos para usar este comando. ${Utils.getEmojis().General.Error} permiso requerido: \`Manage Roles\``,
+        content: `No tienes permisos para usar este comando. ${Emojis.General.Error} permiso requerido: \`Manage Roles\``,
         ephemeral: true,
       });
     }
@@ -191,14 +194,14 @@ export class LevelingSubcommand extends Subcommand {
 
     if (nivelValue > 100) {
       return interaction.reply({
-        content: `El nivel no puede ser mayor a 100. ${Utils.getEmojis().General.Error}`,
+        content: `El nivel no puede ser mayor a 100. ${Emojis.General.Error}`,
         ephemeral: true,
       });
     }
 
     if (nivelValue < 0) {
       return interaction.reply({
-        content: `El nivel no puede ser menor a 0.  ${Utils.getEmojis().General.Error}`,
+        content: `El nivel no puede ser menor a 0.  ${Emojis.General.Error}`,
         ephemeral: true,
       });
     }
@@ -210,7 +213,7 @@ export class LevelingSubcommand extends Subcommand {
 
     switch (tipo) {
       case "text":
-        if (await verifyEnableText(interaction.guild as Guild, interaction)) {
+        if (await Verification.verifyEnableText(interaction.guild as Guild, interaction)) {
           return;
         } else {
           await interaction.reply({
@@ -275,7 +278,7 @@ export class LevelingSubcommand extends Subcommand {
         }
 
       case "voice":
-        if (await verifyEnableVoice(interaction.guild!, interaction)) {
+        if (await Verification.verifyEnableVoice(interaction.guild!, interaction)) {
           return;
         } else {
           await interaction.reply({
@@ -348,7 +351,7 @@ export class LevelingSubcommand extends Subcommand {
     const tipo = interaction.options.getString("tipo") ?? "text";
     switch (tipo) {
       case "text":
-        if (await verifyEnableText(interaction.guild as Guild, interaction)) {
+        if (await Verification.verifyEnableText(interaction.guild as Guild, interaction)) {
           return;
         } else {
           const TextRewards = await Database.textRoleRewards.findMany({
@@ -374,7 +377,7 @@ export class LevelingSubcommand extends Subcommand {
         }
 
       case "voice":
-        if (await verifyEnableVoice(interaction.guild!, interaction)) {
+        if (await Verification.verifyEnableVoice(interaction.guild!, interaction)) {
           return;
         } else {
           const VoiceRewards = await Database.voiceRoleRewards.findMany({
@@ -411,7 +414,7 @@ export class LevelingSubcommand extends Subcommand {
       switch (tipo) {
         case "text":
 
-          if (await verifyEnableText(interaction.guild as Guild, interaction)) {
+          if (await Verification.verifyEnableText(interaction.guild as Guild, interaction)) {
             return;
           } else {
             const TextLadderboard = await Database.usersTextExperienceData.findMany({
@@ -423,7 +426,7 @@ export class LevelingSubcommand extends Subcommand {
 
             if (TextLadderboard.length === 0) {
               return interaction.reply({
-                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`. ${Utils.getEmojis().General.Error}`,
+                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Texto\`. ${Emojis.General.Error}`,
                 ephemeral: true,
               });
             } else {
@@ -619,7 +622,7 @@ export class LevelingSubcommand extends Subcommand {
 
 
         case "voice":
-          if (await verifyEnableVoice(interaction.guild, interaction)) {
+          if (await Verification.verifyEnableVoice(interaction.guild, interaction)) {
             return;
           }
           else {
@@ -630,7 +633,7 @@ export class LevelingSubcommand extends Subcommand {
             });
             if (VoiceLeaderboard.length === 0) {
               return interaction.reply({
-                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`. ${Utils.getEmojis().General.Error}`,
+                content: `Parece que en este servidor no hay usuarios con experiencia registrada en \`Canales de Voz\`. ${Emojis.General.Error}`,
                 ephemeral: true,
               });
             }
@@ -829,13 +832,13 @@ export class LevelingSubcommand extends Subcommand {
     const user = interaction.options.getUser("user") ?? interaction.user;
     if (user.bot) {
       return interaction.reply({
-        content: `Los bots no pueden recibir experiencia ${Utils.getEmojis().General.Error}`,
+        content: `Los bots no pueden recibir experiencia ${Emojis.General.Error}`,
         ephemeral: true
       });
     }
     switch (tipo) {
       case "text":
-        if (await verifyEnableText(interaction.guild, interaction)) {
+        if (await Verification.verifyEnableText(interaction.guild, interaction)) {
           return;
         }
         else {
@@ -848,7 +851,7 @@ export class LevelingSubcommand extends Subcommand {
             },
           });
           if (!TextUserExists) {
-            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Utils.getEmojis().General.Error}`, ephemeral: true });
+            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Emojis.General.Error}`, ephemeral: true });
           }
           else {
             await interaction.reply({
@@ -932,7 +935,7 @@ export class LevelingSubcommand extends Subcommand {
           }
         }
       case "voice":
-        if (await verifyEnableVoice(interaction.guild, interaction)) {
+        if (await Verification.verifyEnableVoice(interaction.guild, interaction)) {
           return;
         }
         else {
@@ -945,7 +948,7 @@ export class LevelingSubcommand extends Subcommand {
             },
           });
           if (!VoiceuserExists) {
-            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Utils.getEmojis().General.Error}`, ephemeral: true });
+            return interaction.reply({ content: `El usuario \`${user.username}\` no tiene experiencia registrada. ${Emojis.General.Error}`, ephemeral: true });
           }
           else {
             await interaction.reply({

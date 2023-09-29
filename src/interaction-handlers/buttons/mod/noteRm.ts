@@ -1,5 +1,5 @@
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
-import { Catto_Coffee } from '../../../Catto';
+import { Catto_Coffee } from '../../../App';
 import { Database } from '../../../structures/Database';
 import { Utils } from '../../../util/utils';
 import { container } from "@sapphire/framework";
@@ -13,7 +13,7 @@ import {
   GuildMember,
   User
 } from "discord.js";
-
+const { Messages } = Utils;
 interface optionsObject {
   disabled: boolean | undefined,
   author: string | undefined,
@@ -53,7 +53,7 @@ export class ButtonHandler extends InteractionHandler {
         return this.some();
       } else {
         let embed = new EmbedBuilder()
-          .setDescription(Utils.getMessages().InteractionOwner.Button)
+          .setDescription(Messages.InteractionOwner.Button)
           .setColor("#ed4245")
         await interaction.reply({ embeds: [embed] })
         return this.none();

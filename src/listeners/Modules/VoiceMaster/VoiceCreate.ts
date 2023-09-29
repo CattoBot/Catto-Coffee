@@ -2,7 +2,7 @@ import { Listener, Events } from "@sapphire/framework"
 import { VoiceState, CategoryChannel, ChannelType, PermissionFlagsBits } from "discord.js"
 import { Database } from "../../../structures/Database"
 import { Utils } from "../../../util/utils";
-
+const { Cooldowns } = Utils
 let Cooldown = new Map<string, number>();
 
 export class VoiceCreateListener extends Listener {
@@ -41,7 +41,7 @@ export class VoiceCreateListener extends Listener {
                     return;
                 }
 
-                Cooldown.set(UserID, Date.now() + Utils.getCooldowns().VoiceCreate);
+                Cooldown.set(UserID, Date.now() + Cooldowns.VoiceCreate);
 
                 const ChannelOverwrites = CategoryChannel.permissionOverwrites.cache.map((overwrite) => {
                     return {
