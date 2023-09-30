@@ -1,5 +1,5 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
-import { createCanvas, loadImage, registerFont } from 'canvas';
+import { createCanvas, loadImage, registerFont  } from 'canvas';
 import { Time } from "@sapphire/time-utilities";
 import { ChatInputCommand } from "@sapphire/framework";
 import { AttachmentBuilder, Guild } from "discord.js";
@@ -8,9 +8,12 @@ import { Utils } from "../../util/utils";
 import { XPCalculator, formatNumber } from "../../util/utilities";
 import { Verify } from "../../util/utilities/Classes/Verify";
 import { CattoLogger } from "../../structures/CattoLogger";
+import { Draw } from "../../util/utilities/Classes/draw";
+const { Emojis } = Utils;
 const logger = new CattoLogger();
 const Verification = new Verify()
-const { Emojis } = Utils;
+const Drawing = new Draw();
+
 export class LevelingSubcommand extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
     super(context, {
@@ -173,9 +176,9 @@ export class LevelingSubcommand extends Subcommand {
 
 
   public registeringFONT() {
-    (registerFont)('./dist/assets/fonts/Poppins-SemiBold.ttf', { family: 'Poppins SemiBold' });
-    (registerFont)('./dist/assets/fonts/Poppins-Bold.ttf', { family: 'Poppins Bold' });
-    (registerFont)('./dist/assets/fonts/Bahnschrift.ttf', { family: 'Bahnschrift' });
+    (registerFont)('./assets/fonts/Poppins-SemiBold.ttf', { family: 'Poppins SemiBold' });
+    (registerFont)('./assets/fonts/Poppins-Bold.ttf', { family: 'Poppins Bold' });
+    (registerFont)('./assets/fonts/Bahnschrift.ttf', { family: 'Bahnschrift' });
   }
 
   public async chatInputSetLevelXP(interaction: Subcommand.ChatInputCommandInteraction) {
@@ -465,7 +468,6 @@ export class LevelingSubcommand extends Subcommand {
                 };
               }
 
-
               // Obtén los valores de Nivel y XP del usuario actual
               const currentUserLevel = currentUserData.Nivel;
               const currentUserXP = currentUserData.TextExperience;
@@ -476,7 +478,7 @@ export class LevelingSubcommand extends Subcommand {
                 return `${member.username} \nNivel: ${u.Nivel} - XP: ${formattedXP}`;
               }));
 
-              const backgroundImage = './dist/assets/img/Catto_Leader_TXT.png'; // URL de la imagen de fondo
+              const backgroundImage = './assets/img/Catto_Leader_TXT.png'; 
 
               // const backgroundImage = './assets/img/Catto_Leader_TXT.png';
               const imageWidth = 1024; // Ancho de la imagen de fondo
@@ -496,87 +498,16 @@ export class LevelingSubcommand extends Subcommand {
                 return (loadImage)(avatarURL);
               }));
 
-              function drawRoundedImage(context, image, x, y, size) {
-                context.save();
-                context.beginPath();
-                context.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2, true);
-                context.closePath();
-                context.clip();
-                context.drawImage(image, x, y, size, size);
-                context.restore();
-              }
-
-              function isMultipleDigits(num) {
-                return num >= 10 || num <= -10;
-              }
-
-              function drawFormattedRank(context, rank, x, y) {
-                context.font = '30px Bahnschrift';
-                context.fillStyle = '#A8A8A8';
-                context.textAlign = 'left';
-                if (isMultipleDigits(rank)) {
-                  // Ajustar la posición si el rango tiene varios dígitos
-                  x -= 1.5;
-                }
-                else if (rank.includes('K')) {
-                  // Ajustar la posición si el rango está en miles
-                  x -= 3;
-                }
-                context.fillText(rank, x, y);
-              }
-              // Obtén el avatar del usuario que usa el comando
               const userAvatarURL = interaction.user.displayAvatarURL({ extension: 'png', size: 128 });
               const userAvatar = await (loadImage)(userAvatarURL);
-              // Función para dibujar el avatar del usuario
-              function drawUserAvatar(context, image, x, y, size) {
-                context.save();
-                context.beginPath();
-                context.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2, true);
-                context.closePath();
-                context.clip();
-                context.drawImage(image, x, y, size, size);
-                context.restore();
-              }
-              // Función para dibujar los datos del usuario
-              function drawUserData(context, username, level, xp, x, y) {
-                context.font = '16px Poppins SemiBold';
-                context.fillStyle = '#000000';
-                context.textAlign = 'left';
-                context.fillText(username + ' (Tú)', x, y + 12);
-                context.fillText(`Nivel: ${level}`, x, y + 32);
-                context.fillText(`XP: ${xp}`, x + 650, y + 10);
-              }
               const avatarSize = Math.floor(imageHeight / 15);
               const avatarSpacing = Math.floor(imageHeight / 20);
-              function drawProgressBar(context, x, y, width, height, progress) {
-                // Empty bar
-                context.fillStyle = '#BEBEBE';
-                context.fillRect(x, y, width, height);
-                // Filled bar
-                const gradient = context.createLinearGradient(x, y, x + width, y);
-                gradient.addColorStop(0, '#12D6DF');
-                gradient.addColorStop(1, '#F70FFF');
-                context.lineJoin = 'round';
-                context.fillStyle = gradient;
-                context.fillRect(x, y, width * progress, height);
-              }
-              function drawProgressBarForUser(context, progress, x, y, width, height) {
-                // Empty bar
-                context.fillStyle = '#BEBEBE';
-                context.fillRect(x, y, width, height);
-                // Filled bar
-                const gradient = context.createLinearGradient(x, y, x + width, y);
-                gradient.addColorStop(0, '#12D6DF');
-                gradient.addColorStop(1, '#F70FFF');
-                context.lineJoin = 'round';
-                context.fillStyle = gradient;
-                context.fillRect(x, y, width * progress, height);
-              }
+
               text.forEach((line, i) => {
                 const avatar = avatars[i];
                 const avatarX = imageWidth * 0.06 + imageWidth * 0.06;
                 const avatarY = y + lineHeight / 2 - avatarSize / 2;
-                drawRoundedImage(context, avatar, avatarX, avatarY, avatarSize);
+                Drawing.drawRoundedImage(context, avatar, avatarX, avatarY, avatarSize);
                 const textX = avatarX + avatarSize + Math.floor(imageWidth * 0.03);
                 const textY = avatarY + avatarSize / 2 + 6 - Math.floor(imageHeight * 0.02);
                 const [username, xp] = line.split(' - XP: ');
@@ -592,25 +523,25 @@ export class LevelingSubcommand extends Subcommand {
                 const progressBarY = textY + 30; // Ajustar la posición Y de la barra de progreso
                 const progressBarWidth = 720;
                 const progressBarHeight = 20;
-                drawProgressBar(context, progressBarX, progressBarY, progressBarWidth, progressBarHeight, progress);
+                Drawing.drawProgressBar(context, progressBarX, progressBarY, progressBarWidth, progressBarHeight, progress);
                 y += lineHeight + avatarSpacing - avatarSize;
               });
               const userAvatarSize = Math.floor(imageHeight / 15);
               const userAvatarX = imageWidth * 0.06 + imageWidth * 0.06;
               const userAvatarY = y + lineHeight / 2 - userAvatarSize / 2;
-              drawUserAvatar(context, userAvatar, userAvatarX, userAvatarY, userAvatarSize);
+              Drawing.drawUserAvatar(context, userAvatar, userAvatarX, userAvatarY, userAvatarSize);
               const rankX = userAvatarX - Math.floor(imageWidth * 0.04) - context.measureText(formattedRank).width - 2;
               const rankY = userAvatarY + userAvatarSize / 2 + 6 + 4;
-              drawFormattedRank(context, formattedRank, rankX, rankY);
+              Drawing.drawFormattedRank(context, formattedRank, rankX, rankY);
               const userDataX = userAvatarX + userAvatarSize + Math.floor(imageWidth * 0.03);
               const userDataY = userAvatarY + 20;
-              drawUserData(context, interaction.user.username, formatNumber(currentUserLevel), formatNumber(currentUserXP), userDataX, userDataY);
+              Drawing.drawUserData(context, interaction.user.username, formatNumber(currentUserLevel), formatNumber(currentUserXP), userDataX, userDataY);
               const progressForUser = currentUserXP / (XPCalculator)(currentUserLevel);
               const progressBarForUserX = userDataX; // Ajustar la posición X de la barra de progreso para el usuario que invoca la interacción
               const progressBarForUserY = userDataY + 40; // Ajustar la posición Y de la barra de progreso para el usuario que invoca la interacción
               const progressBarForUserWidth = 720; // Ajustar el ancho de la barra de progreso para el usuario que invoca la interacción
               const progressBarForUserHeight = 20; // Ajustar la altura de la barra de progreso para el usuario que invoca la interacción
-              drawProgressBarForUser(context, progressForUser, progressBarForUserX, progressBarForUserY, progressBarForUserWidth, progressBarForUserHeight);
+              Drawing.drawProgressBarForUser(context, progressForUser, progressBarForUserX, progressBarForUserY, progressBarForUserWidth, progressBarForUserHeight);
               const buffer = canvas.toBuffer('image/png');
 
               return interaction.editReply({
@@ -661,7 +592,6 @@ export class LevelingSubcommand extends Subcommand {
               let formattedRank = formatNumber(currentRank);
               let currentUserData = rank.find((u) => u.UserID === interaction.user.id);
               if (!currentUserData) {
-                // Establecer los valores predeterminados como 0 si no se encuentra el usuario en la lista
                 currentUserData = {
                   UserID: interaction.user.id,
                   GuildID: interaction.guildId,
@@ -678,7 +608,7 @@ export class LevelingSubcommand extends Subcommand {
                 const formattedXP = formatNumber(u.VoiceExperience); // Formatear XP usando la función formatNumber
                 return `${member.username} \nNivel: ${u.Nivel} - XP: ${formattedXP}`;
               }));
-              const backgroundImage = './dist/assets/img/Catto_Leader_TXT.png'; // URL de la imagen de fondo
+              const backgroundImage = './assets/img/Catto_Leader_TXT.png'; 
               const imageWidth = 1024; // Ancho de la imagen de fondo
               const imageHeight = 1440; // Alto de la imagen de fondo
               const background = await (loadImage)(backgroundImage);
@@ -693,88 +623,18 @@ export class LevelingSubcommand extends Subcommand {
                 const avatarURL = member.displayAvatarURL({ extension: 'png', size: 128 });
                 return (loadImage)(avatarURL);
               }));
-              // Función para dibujar una imagen redondeada (avatar)
-              function drawRoundedImage(context, image, x, y, size) {
-                context.save();
-                context.beginPath();
-                context.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2, true);
-                context.closePath();
-                context.clip();
-                context.drawImage(image, x, y, size, size);
-                context.restore();
-              }
-              // Función para verificar si un número tiene más de un dígito
-              function isMultipleDigits(num) {
-                return num >= 10 || num <= -10;
-              }
-              // Función para dibujar el texto del rango
-              function drawFormattedRank(context, rank, x, y) {
-                context.font = '30px Bahnschrift';
-                context.fillStyle = '#A8A8A8';
-                context.textAlign = 'left';
-                if (isMultipleDigits(rank)) {
-                  // Ajustar la posición si el rango tiene varios dígitos
-                  x -= 1.5;
-                }
-                else if (rank.includes('K')) {
-                  // Ajustar la posición si el rango está en miles
-                  x -= 3;
-                }
-                context.fillText(rank, x, y);
-              }
-              // Obtén el avatar del usuario que usa el comando
+
               const userAvatarURL = interaction.user.displayAvatarURL({ extension: 'png', size: 128 });
               const userAvatar = await (loadImage)(userAvatarURL);
-              // Función para dibujar el avatar del usuario
-              function drawUserAvatar(context, image, x, y, size) {
-                context.save();
-                context.beginPath();
-                context.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2, true);
-                context.closePath();
-                context.clip();
-                context.drawImage(image, x, y, size, size);
-                context.restore();
-              }
-              // Función para dibujar los datos del usuario
-              function drawUserData(context, username, level, xp, x, y) {
-                context.font = '16px Poppins SemiBold';
-                context.fillStyle = '#000000';
-                context.textAlign = 'left';
-                context.fillText(username + ' (Tú)', x, y + 12);
-                context.fillText(`Nivel: ${level}`, x, y + 32);
-                context.fillText(`XP: ${xp}`, x + 650, y + 10);
-              }
               const avatarSize = Math.floor(imageHeight / 15);
               const avatarSpacing = Math.floor(imageHeight / 20);
-              function drawProgressBar(context, x, y, width, height, progress) {
-                // Empty bar
-                context.fillStyle = '#BEBEBE';
-                context.fillRect(x, y, width, height);
-                // Filled bar
-                const gradient = context.createLinearGradient(x, y, x + width, y);
-                gradient.addColorStop(0, '#12D6DF');
-                gradient.addColorStop(1, '#F70FFF');
-                context.lineJoin = 'round';
-                context.fillStyle = gradient;
-                context.fillRect(x, y, width * progress, height);
-              }
-              function drawProgressBarForUser(context, progress, x, y, width, height) {
-                // Empty bar
-                context.fillStyle = '#BEBEBE';
-                context.fillRect(x, y, width, height);
-                // Filled bar
-                const gradient = context.createLinearGradient(x, y, x + width, y);
-                gradient.addColorStop(0, '#12D6DF');
-                gradient.addColorStop(1, '#F70FFF');
-                context.lineJoin = 'round';
-                context.fillStyle = gradient;
-                context.fillRect(x, y, width * progress, height);
-              }
+
+              
               text.forEach((line, i) => {
                 const avatar = avatars[i];
                 const avatarX = imageWidth * 0.06 + imageWidth * 0.06;
                 const avatarY = y + lineHeight / 2 - avatarSize / 2;
-                drawRoundedImage(context, avatar, avatarX, avatarY, avatarSize);
+                Drawing.drawRoundedImage(context, avatar, avatarX, avatarY, avatarSize);
                 const textX = avatarX + avatarSize + Math.floor(imageWidth * 0.03);
                 const textY = avatarY + avatarSize / 2 + 6 - Math.floor(imageHeight * 0.02);
                 const [username, xp] = line.split(' - XP: ');
@@ -786,29 +646,29 @@ export class LevelingSubcommand extends Subcommand {
                 const xpX = imageWidth - Math.floor(imageWidth * 0.09) - xpTextWidth;
                 context.fillText('XP: ' + xp, xpX, textY);
                 const progress = ladderboard[i].VoiceExperience / (XPCalculator)(ladderboard[i].Nivel);
-                const progressBarX = textX; // Ajustar la posición X de la barra de progreso
-                const progressBarY = textY + 30; // Ajustar la posición Y de la barra de progreso
+                const progressBarX = textX; 
+                const progressBarY = textY + 30; 
                 const progressBarWidth = 720;
                 const progressBarHeight = 20;
-                drawProgressBar(context, progressBarX, progressBarY, progressBarWidth, progressBarHeight, progress);
+                Drawing.drawProgressBar(context, progressBarX, progressBarY, progressBarWidth, progressBarHeight, progress);
                 y += lineHeight + avatarSpacing - avatarSize;
               });
               const userAvatarSize = Math.floor(imageHeight / 15);
               const userAvatarX = imageWidth * 0.06 + imageWidth * 0.06;
               const userAvatarY = y + lineHeight / 2 - userAvatarSize / 2;
-              drawUserAvatar(context, userAvatar, userAvatarX, userAvatarY, userAvatarSize);
+              Drawing.drawUserAvatar(context, userAvatar, userAvatarX, userAvatarY, userAvatarSize);
               const rankX = userAvatarX - Math.floor(imageWidth * 0.04) - context.measureText(formattedRank).width - 2;
               const rankY = userAvatarY + userAvatarSize / 2 + 6 + 4;
-              drawFormattedRank(context, formattedRank, rankX, rankY);
+              Drawing.drawFormattedRank(context, formattedRank, rankX, rankY);
               const userDataX = userAvatarX + userAvatarSize + Math.floor(imageWidth * 0.03);
               const userDataY = userAvatarY + 20;
-              drawUserData(context, interaction.user.username, formatNumber(currentUserLevel), formatNumber(currentUserXP), userDataX, userDataY);
+              Drawing.drawUserData(context, interaction.user.username, formatNumber(currentUserLevel), formatNumber(currentUserXP), userDataX, userDataY);
               const progressForUser = currentUserXP / (XPCalculator)(currentUserLevel);
               const progressBarForUserX = userDataX; // Ajustar la posición X de la barra de progreso para el usuario que invoca la interacción
               const progressBarForUserY = userDataY + 40; // Ajustar la posición Y de la barra de progreso para el usuario que invoca la interacción
               const progressBarForUserWidth = 720; // Ajustar el ancho de la barra de progreso para el usuario que invoca la interacción
               const progressBarForUserHeight = 20; // Ajustar la altura de la barra de progreso para el usuario que invoca la interacción
-              drawProgressBarForUser(context, progressForUser, progressBarForUserX, progressBarForUserY, progressBarForUserWidth, progressBarForUserHeight);
+              Drawing.drawProgressBarForUser(context, progressForUser, progressBarForUserX, progressBarForUserY, progressBarForUserWidth, progressBarForUserHeight);
               const buffer = canvas.toBuffer('image/png');
               return interaction.editReply({
                 files: [buffer],
@@ -816,8 +676,7 @@ export class LevelingSubcommand extends Subcommand {
               });
             }
           }
-
-        default:
+          
           break;
       }
     } catch (error) {
@@ -882,7 +741,7 @@ export class LevelingSubcommand extends Subcommand {
             const formattedXP = formatNumber(experience);
             const formattedLevel = formatNumber(level);
             const canvas = (createCanvas)(1000, 300);
-            const ctx = canvas.getContext('2d'), bar_width = 600, bg = await (loadImage)('./dist/assets/img/White_Solid_Card.png'), avatar = await (loadImage)(user.displayAvatarURL({ extension: 'png', size: 512 }));
+            const ctx = canvas.getContext('2d'), bar_width = 600, bg = await (loadImage)('./assets/img/White_Solid_Card.png'), avatar = await (loadImage)(user.displayAvatarURL({ extension: 'png', size: 512 }));
             const circleX = 120 + canvas.width * 0.03; // Ajuste del círculo en el eje X
             const avatarX = circleX - 110;
             const circleY = 170 - (canvas.height * 0.06); // Ajuste del círculo en el eje Y
@@ -979,7 +838,7 @@ export class LevelingSubcommand extends Subcommand {
             const formattedXP = formatNumber(experience);
             const formattedLevel = formatNumber(level);
             const canvas = (createCanvas)(1000, 300);
-            const ctx = canvas.getContext('2d'), bar_width = 600, bg = await (loadImage)('./dist/assets/img/White_Solid_Card.png'), avatar = await (loadImage)(user.displayAvatarURL({ extension: 'png', size: 512 }));
+            const ctx = canvas.getContext('2d'), bar_width = 600, bg = await (loadImage)('./assets/img/White_Solid_Card.png'), avatar = await (loadImage)(user.displayAvatarURL({ extension: 'png', size: 512 }));
             const circleX = 120 + canvas.width * 0.03; // Ajuste del círculo en el eje X
             const avatarX = circleX - 110;
             const circleY = 170 - (canvas.height * 0.06); // Ajuste del círculo en el eje Y
