@@ -20,10 +20,6 @@
             "error",
             "tab"
         ],
-        "linebreak-style": [
-            "error",
-            "windows"
-        ],
         "quotes": [
             "error",
             "double"
@@ -31,6 +27,32 @@
         "semi": [
             "error",
             "always"
-        ]
+        ],
+		"max-params":
+		[
+			"error",
+			{
+				"max": 4
+			}
+		],
+		"no-mixed-spaces-and-tabs": [
+			"error",
+			"smart-tabs"
+		],
+		"max-depth": [
+			"error",
+			{
+				"max": 3
+			}
+		],
+		"max-len": [
+			"error",
+			{
+				"code": 100,
+				"tabWidth": 4,
+				"ignoreUrls": true,
+				"ignorePattern": "^import\\s.+\\sfrom\\s.+;$"
+			}
+		]
     }
 }
