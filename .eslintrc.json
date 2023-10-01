@@ -51,8 +51,7 @@
 				"code": 120,
 				"tabWidth": 4,
 				"ignoreUrls": true,
-				"ignorePattern": "^import\\s.+\\sfrom\\s.+;$",
-				"ignoreString": true
+				"ignorePattern": "^import\\s.+\\sfrom\\s.+;$"
 			}
 		],
 		"max-statements-per-line": [
@@ -84,7 +83,9 @@
 				"position": "above"
 			}
 		],
-		"no-inline-comments": "error",
+		"no-inline-comments": [
+			"error"
+		],
 		"no-trailing-spaces": [
 			"error",
 			{
