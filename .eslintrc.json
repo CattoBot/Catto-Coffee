@@ -48,10 +48,47 @@
 		"max-len": [
 			"error",
 			{
-				"code": 100,
+				"code": 120,
 				"tabWidth": 4,
 				"ignoreUrls": true,
-				"ignorePattern": "^import\\s.+\\sfrom\\s.+;$"
+				"ignorePattern": "^import\\s.+\\sfrom\\s.+;$",
+				"ignoreString": true
+			}
+		],
+		"max-statements-per-line": [
+			"error",
+			{
+				"max": 1
+			}
+		],
+		"no-multi-spaces": [
+			"error",
+			{
+				"ignoreEOLComments": true
+			}
+		],
+		"no-multiple-empty-lines": [
+			"error",
+			{
+				"max": 1,
+				"maxEOF": 1
+			}
+		],
+		"spaced-comment": [
+			"error",
+			"always"
+		],
+		"line-comment-position": [
+			"error",
+			{
+				"position": "above"
+			}
+		],
+		"no-inline-comments": "error",
+		"no-trailing-spaces": [
+			"error",
+			{
+				"ignoreComments": true
 			}
 		]
     }
