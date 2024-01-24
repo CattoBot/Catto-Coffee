@@ -1,10 +1,8 @@
-import { Data } from "./config";
-import { CattoClient } from "./structures/BotClient";
-import { CattoLogger } from "./structures/CattoLogger";
-const Catto_Data = Data.getInstance();
-const Catto_Coffee = new CattoClient();
-const CattoLog = new CattoLogger();
+import { CattoClient } from "./core/client.main";
+import { LoadConfigHelper } from "./helpers/client/load.helper";
 
-Catto_Coffee.login(Catto_Data.getToken).then(() => { CattoLog.info(`✅`)})
+async function main() {
+    await LoadConfigHelper.mount(new CattoClient());
+}
 
-export { Catto_Coffee }
+main();

@@ -1,26 +1,31 @@
 {
-    "compilerOptions": {
-      "target": "ESNext",                                
-      "module": "commonjs",                                
-       "outDir": "dist",
-       "lib": [
-        "ESNext",
-        "ESNext.Array",
-        "ESNext.AsyncIterable",
-        "ESNext.Intl",
-        "ESNext.Symbol",
-        "DOM"
-       ],
-       "sourceMap": false,
-       "inlineSourceMap": true,
-       "incremental": true,
-       "inlineSources": true,
-       "experimentalDecorators": true,
-       "emitDecoratorMetadata": true,
-       "skipDefaultLibCheck": true,                                                                  
-      "esModuleInterop": true,                                                                 
-      "skipLibCheck": true                                 
-    },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules"]
-  }
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "commonjs",
+    "outDir": "dist",
+    "lib": [
+      "ESNext",
+      "ESNext.Array",
+      "ESNext.AsyncIterable",
+      "ESNext.Intl",
+      "ESNext.Symbol",
+      "DOM"
+    ],
+    "sourceMap": false,
+    "inlineSourceMap": true,
+    "incremental": true,
+    "inlineSources": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipDefaultLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
