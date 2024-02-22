@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,6 +7,112 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  id Int @id @default(autoincrement())
+model Guild {
+  id                        String                   @id @map("GuildID")
+  prefix                    String?                  @map("GuildPrefix")
+  lang                      String?                  @map("GuildLang")
+  textExperienceSettings    TextExperienceSettings?  @relation(fields: [textExperienceSettingsId], references: [id])
+  voiceExperienceSettings   VoiceExperienceSettings? @relation(fields: [voiceExperienceSettingsId], references: [id])
+  notesLogsChannel          String?                  @map("NotesLogsChannel")
+  modLogChannel             String?                  @map("ModLogChannel")
+  experienceNotifications   ExperienceNotifications? @relation(fields: [experienceNotificationsId], references: [id])
+  voiceLogsChannel          String?                  @map("VoiceLogsChannel")
+  tempChannels              TempChannel[]
+  experiences               Experience[]
+  textExperienceSettingsId  Int?
+  voiceExperienceSettingsId Int?
+  experienceNotificationsId Int?
+  Moderation                Moderation[]
+  ActiveTempVoice           ActiveTempVoice[]
+
+  @@index([prefix])
+}
+
+model TextExperienceSettings {
+  id             Int     @id @map("GuildID")
+  min            Int?    @map("TextExperienceMin")
+  max            Int?    @map("TextExperienceMax")
+  isEnabled      Boolean @map("TextExpEnabled")
+  defaultMessage String? @map("TextDefaultMessage")
+  Guild          Guild[]
+
+  @@index([id])
+}
+
+model VoiceExperienceSettings {
+  id             Int     @id @map("GuildID")
+  min            Int?    @map("VoiceExperienceMin")
+  max            Int?    @map("VoiceExperienceMax")
+  isEnabled      Boolean @map("VoiceExpEnabled")
+  defaultMessage String? @map("VoiceDefaultMessage")
+  Guild          Guild[]
+
+  @@index([id])
+}
+
+model ExperienceNotifications {
+  id              Int     @id @map("GuildID")
+  textExperience  String? @map("TextExperienceNotification")
+  voiceExperience String? @map("VoiceExperienceNotification")
+  Guild           Guild[]
+
+  @@index([id])
+}
+
+model TempChannel {
+  id              String            @map("TempVoiceChannelCreate")
+  guildId         String            @map("GuildID")
+  categoryId      String            @map("TempVoiceCategory")
+  guild           Guild             @relation(fields: [guildId], references: [id])
+  ActiveTempVoice ActiveTempVoice[]
+
+  @@id([id, guildId, categoryId])
+  @@unique([guildId, categoryId])
+  @@index([guildId])
+}
+
+model Experience {
+  id              Int    @map("UserID")
+  guildId         String @map("GuildID")
+  voiceExperience Int    @map("VoiceExperience")
+  textExperience  Int    @map("TextExperience")
+  voiceLevel      Int    @map("VoiceLevel")
+  textLevel       Int    @map("TextLevel")
+  totalExperience Int    @map("TotalExperience")
+  guild           Guild  @relation(fields: [guildId], references: [id])
+
+  @@id([id, guildId])
+  @@index([guildId])
+}
+
+model Moderation {
+  id          Int      @id @map("CaseID")
+  guildId     String   @map("GuildID")
+  userId      String   @map("UserID")
+  moderatorId String   @map("ModeratorID")
+  type        String   @map("Type")
+  reason      String   @map("Reason")
+  date        DateTime @map("Date")
+  guild       Guild    @relation(fields: [guildId], references: [id])
+
+  @@index([guildId])
+}
+
+model ActiveTempVoice {
+  id                String      @map("ChannelID")
+  guildId           String      @map("GuildID")
+  channelOwner      String      @map("ChannelOwner")
+  channelCategoryId String      @map("ChannelCategory")
+  guild             Guild       @relation(fields: [guildId], references: [id])
+  tempChannel       TempChannel @relation(fields: [guildId, channelCategoryId], references: [guildId, categoryId])
+
+  @@id([id, guildId])
+  @@index([guildId, channelOwner, channelCategoryId])
+}
+
+model UsersTempVoiceConfiguration {
+  id           String   @id @map("UserID")
+  channelName  String?  @map("ChannelName")
+  channelLimit Int?     @map("ChannelLimit")
+  isLocked     Boolean? @map("IsLocked")
 }

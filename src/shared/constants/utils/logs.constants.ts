@@ -1,8 +1,8 @@
-import { LogType } from "../../enum/logs.enum";
-import { CustomSignaleOptions } from "../../interfaces/logs.interface";
+import { LogType } from "@shared/enum/misc/logs.enum";
+import { SignaleOptions } from "@shared/interfaces/logs.interface";
 
 export class LogTypeOptions {
-    private options: Record<LogType, CustomSignaleOptions>;
+    private options: Record<LogType, SignaleOptions>;
     constructor() {
         this.options = {
             [LogType.INFO]: {
@@ -48,7 +48,7 @@ export class LogTypeOptions {
         };
     }
 
-    public getOptions(logType: LogType): CustomSignaleOptions {
+    public getOptions(logType: LogType): SignaleOptions {
         return this.options[logType];
     }
 }

@@ -1,0 +1,16 @@
+{
+    "limit_name": "límite",
+    "limit_description": "Número máximo de usuarios que deseas en tu canal de voz",
+    "permit_name": "usuario",
+    "permit_description": "Usuario al que quieres permitir el acceso",
+    "reject_name": "usuario",
+    "reject_description": "Usuario al que quieres rechazar de unirse a tu canal de voz",
+    "transfer_name": "usuario",
+    "transfer_description": "Usuario al que quieres transferir la propiedad",
+    "invite_name": "usuario",
+    "invite_description": "Usuario al que quieres invitar a tu canal de voz",
+    "bitrate_name": "bitrate",
+    "bitrate_description": "Bitrate que deseas establecer para tu canal de voz",
+    "trust_name": "usuario",
+    "trust_description": "Usuario al que también te gustaría gestionar tu canal de voz"
+}

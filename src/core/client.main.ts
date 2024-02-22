@@ -1,17 +1,18 @@
 import { ApplicationCommandRegistries, LogLevel, RegisterBehavior, SapphireClient } from "@sapphire/framework";
-import { Time } from "@sapphire/time-utilities";
-import { Gateway } from "../shared/constants/core/gateway.constants";
-import { Properties } from "../shared/constants/client/properties.constants";
+import { Gateway } from "@shared/constants/core/gateway.constants";
+import { Config } from "@core/config";
+import { I18nConfig } from "@shared/constants/core/i18n";
 
-export class CattoClient extends SapphireClient {
-	constructor() {
+export class Client extends SapphireClient {
+	constructor(i18nConfig: typeof I18nConfig) {
 		super({
 			intents: [Gateway.Intents],
 			partials: [Gateway.Partials],
-			defaultPrefix: Properties.Prefix,
-			defaultCooldown: { delay: Time.Second * 5, filteredUsers: Properties.Owners },
+			i18n: { fetchLanguage: I18nConfig.fetchLanguage.bind(i18nConfig) },
+			defaultPrefix: Config.DefaultPrefix,
+			defaultCooldown: { filteredUsers: Config.Owners },
 			failIfNotExists: false,
-			shards: Properties.Shards,
+			shards: Config.Shards,
 			logger: { level: LogLevel.Info },
 			loadMessageCommandListeners: true,
 		});

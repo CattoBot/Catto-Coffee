@@ -1,11 +1,11 @@
 import { ActivityType } from "discord.js";
-import { Config } from "../../../config/core.config";
+import { Config } from "@core/config";
 
 export class Messages {
     public static Success = {
         BotReady: (name: string) => `${name} is ready to rumble.`,
         DatabaseSuccess: (ping: string) => `Successfully connected to database with ${ping} .`,
-        ClientSuccess: (client: string) => `Successfully connected to the Discord Gateway with ${client}.`
+        ClientSuccess: (client: string) => `Successfully connected to Discord Gateway with ${client}.`
     };
 
     public static Errors = {

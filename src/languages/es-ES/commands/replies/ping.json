@@ -1,0 +1,4 @@
+{
+    "success": "Pong!",
+    "success_with_args": "Pong! La latencia es {{latency}}ms"
+  }

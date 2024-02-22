@@ -1,13 +1,10 @@
 import { ChatInputCommand, Command, CommandOptions } from "@sapphire/framework";
 import { Colors, EmbedBuilder } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
-
-@ApplyOptions<CommandOptions>({
-    name: 'ping', description: 'Check bot latency',
-    fullCategory: ['public'], requiredClientPermissions: ["SendMessages"],
-    requiredUserPermissions: ["SendMessages"], cooldownLimit: 2
-})
-
+import { Commands } from "@shared/commands/options/commands/commands.options";
+import { resolveKey } from "@sapphire/plugin-i18next";
+import { Cooldown } from "@lib/decorators/cooldown";
+@ApplyOptions<CommandOptions>(Commands.PingCommand)
 export class PingCommand extends Command {
     public constructor(context: Command.LoaderContext, options: Command.Options) {
         super(context, {
@@ -21,12 +18,13 @@ export class PingCommand extends Command {
         );
     }
 
+    @Cooldown({ minutes: 1, executionLimit: 2 })
     public override async chatInputRun(interaction: ChatInputCommand.Interaction) {
-        return interaction.reply({
+        await interaction.reply({
             embeds: [
                 new EmbedBuilder()
-                    .setDescription(`\`🟢\` Latency: \`${Math.round(this.container.client.ws.ping)}\`ms.`)
-                    .setColor(Colors.Green)
+                    .setColor(Colors.Aqua)
+                    .setDescription(await resolveKey(interaction, 'commands/replies/ping:success_with_args', { latency: this.container.client.ws.ping }))
             ]
         })
     }

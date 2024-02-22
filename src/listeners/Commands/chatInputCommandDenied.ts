@@ -1,5 +1,6 @@
 import { Events, Listener, ChatInputCommandDeniedPayload, UserError } from '@sapphire/framework';
-import { Emojis } from '../../shared/enum/emojis.enum';
+import { Emojis } from '@shared/enum/misc/emojis.enum';
+import { resolveKey } from '@sapphire/plugin-i18next';
 
 export class ChatInputCommandDeniedListener extends Listener<typeof Events.ChatInputCommandDenied> {
     public async run(error: UserError, { interaction, context }: ChatInputCommandDeniedPayload) {
@@ -9,7 +10,7 @@ export class ChatInputCommandDeniedListener extends Listener<typeof Events.ChatI
                 const plural = seconds > 1 ? 's' : '';
 
                 return interaction.reply({
-                    content: `${Emojis.ERROR} Debes esperar \`${seconds}\` segundo${plural} antes de poder volver a usar este comando.`,
+                    content: (await resolveKey(interaction, 'commands/replies/commandDenied:command_deied', { emoji: Emojis.ERROR, seconds: seconds, plural: plural })),
                     allowedMentions: { users: [interaction.user.id], roles: [] },
                     ephemeral: true
                 });

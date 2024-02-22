@@ -1,5 +1,7 @@
-export interface CustomSignaleOptions {
+interface CustomSignaleOptions {
     badge: string;
     color: string;
     label: string;
 }
+
+export type SignaleOptions = CustomSignaleOptions;

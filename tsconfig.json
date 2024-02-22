@@ -20,7 +20,23 @@
     "skipDefaultLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": [
+        "src/core/*"
+      ],
+      "@commands/*": [
+        "src/commands/*"
+      ],
+      "@lib/*": [
+        "src/lib/*"
+      ],
+      "@shared/*": [
+        "src/shared/*"
+      ],
+      "@logger":["src/lib/helpers/misc/logger.helper"]
+    }
   },
   "include": [
     "src/**/*"
