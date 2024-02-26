@@ -1,6 +1,6 @@
 import { ActivityType } from "discord.js";
-import { Presence } from "@shared/constants/utils/utils.constants";
-import { Client } from "@core/client.main";
+import { Presence } from "@shared/constants/utils/presence.constants";
+import { Client } from "@core/client.core";
 import { Config } from "@core/config";
 
 export class PresenceHelper extends Presence {
@@ -14,7 +14,7 @@ export class PresenceHelper extends Presence {
         };
     }
 
-    public static async setRandomActivity(client: Client) {
+    public static async setPresence(client: Client) {
         setInterval(() => {
             const { name, type } = this.getRandomActivity();
             client.user?.setPresence({

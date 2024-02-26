@@ -42,7 +42,7 @@ export class LogTypeOptions {
             },
             [LogType.START]: {
                 badge: '▶',
-                color: 'green',
+                color: 'magenta',
                 label: 'start',
             },
         };

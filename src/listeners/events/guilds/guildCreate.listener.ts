@@ -1,22 +1,20 @@
 import { Events, Listener, ListenerOptions } from "@sapphire/framework";
 import { ApplyOptions } from "@sapphire/decorators";
-import { ServerLogger } from "@lib/helpers/misc/logger.helper";
 import { Guild } from "discord.js";
-import { Prisma } from "@lib/services/prisma.service";
-
+import { PrismaClient } from "@prisma/client";
 
 @ApplyOptions<ListenerOptions>({ once: false, event: Events.GuildCreate })
 export class GuildCreateListener extends Listener {
-    public log: ServerLogger = ServerLogger.getInstance();
-    public db = Prisma.getPrisma();
+    public prisma: PrismaClient
     constructor(context: Listener.LoaderContext, options: Listener.Options) {
         super(context, {
             ...options
         });
+        this.prisma = new PrismaClient();
     }
 
     public async run(guild: Guild) {
-        return this.db.guild.create({
+        return this.prisma.guild.create({
             data: {
                 id: guild.id
             }

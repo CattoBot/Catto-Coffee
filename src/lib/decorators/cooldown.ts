@@ -1,12 +1,12 @@
-import { Subcommand } from "@sapphire/plugin-subcommands";
+import { Command } from "@sapphire/framework";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { Emojis } from "@shared/enum/misc/emojis.enum";
-import { ServerLogger } from "@lib/helpers/misc/logger.helper";
+import { ServerLogger } from "@logger";
 import { Time } from "@sapphire/time-utilities";
 import { CooldownOptions } from "@shared/interfaces/cooldown.interface";
-const cooldowns: Map<string, { lastExecutionTime: number; executions: number }> = new Map();
-const logger = ServerLogger.getInstance();
 
+const cooldowns: Map<string, { lastExecutionTime: number; executions: number }> = new Map();
+const logger = new ServerLogger();
 /**
  * Decorator used to set a cooldown for a command based on the user's ID and the guild's ID.
  * @param {CooldownOptions} options The options for the cooldown.
@@ -21,11 +21,11 @@ const logger = ServerLogger.getInstance();
  */
 
 export function Cooldown(options: CooldownOptions = {}): MethodDecorator {
-    return function (_target: Object, _propertyKey: string, descriptor: PropertyDescriptor) {
+    return function (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
 
-        descriptor.value = async function (interaction: Subcommand.ChatInputCommandInteraction, ...rest: any[]) {
-            const userKey = getUserKey(interaction.guild.id, interaction.user.id);
+        descriptor.value = async function (interaction: Command.ChatInputCommandInteraction, ...rest: any[]) {
+            const userKey = getUserKey(interaction.guild.id, interaction.user.id, propertyKey);
             const currentTime = Date.now();
             const cooldownInterval = calculateTotalCooldown(options);
             const { lastExecutionTime, executions } = cooldowns.get(userKey) || { lastExecutionTime: 0, executions: 0 };
@@ -57,8 +57,8 @@ export function Cooldown(options: CooldownOptions = {}): MethodDecorator {
     };
 }
 
-function getUserKey(guildId: string, userId: string): string {
-    return `${guildId}:${userId}`;
+function getUserKey(guildId: string, userId: string, methodName: string): string {
+    return `${guildId}:${userId}:${methodName}`;
 }
 
 function calculateTotalCooldown(options: CooldownOptions): number {

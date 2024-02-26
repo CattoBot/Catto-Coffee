@@ -1,8 +1,34 @@
-import { GatewayIntentBits, Partials } from "discord.js";
+import { ClientOptions, GatewayIntentBits, Partials } from "discord.js";
+import { I18nConfig } from "./i18n";
+import { Config } from "@core/config";
 
 export class Gateway {
-    public static Intents: number = Object.values(GatewayIntentBits).reduce((acc: number, value: number) => acc | value, 0);
-    public static Partials: number = (Object.values(Partials).filter((value) => typeof value === "number") as number[]).reduce((acc, value) => acc | value, 0);
+    public static ClientOptions: ClientOptions = {
+        intents: [
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildMembers,
+            GatewayIntentBits.GuildModeration,
+            GatewayIntentBits.GuildEmojisAndStickers,
+            GatewayIntentBits.GuildVoiceStates,
+            GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.GuildMessageReactions,
+            GatewayIntentBits.DirectMessages,
+            GatewayIntentBits.DirectMessageReactions,
+            GatewayIntentBits.MessageContent
+        ],
+        partials: [
+            Partials.Channel,
+            Partials.GuildMember,
+            Partials.Message,
+            Partials.Reaction,
+            Partials.User,
+        ],
+        allowedMentions: { users: [], roles: [] },
+        i18n: { fetchLanguage: I18nConfig.fetchLanguage.bind(I18nConfig) },
+        defaultPrefix: Config.DefaultPrefix,
+        defaultCooldown: { filteredUsers: Config.Owners },
+        failIfNotExists: false,
+        shards: Config.Shards,
+        loadMessageCommandListeners: true,
+    }
 }
-
-

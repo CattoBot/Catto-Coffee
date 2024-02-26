@@ -1,8 +1,9 @@
 import { Guild, GuildChannel, PermissionFlagsBits } from "discord.js";
-import { Prisma } from "@lib/services/prisma.service";
+import { PrismaClient } from "@prisma/client";
 
 export class VoiceSetupHelper {
-    public static db = Prisma.getPrisma()
+    public static prisma: PrismaClient = new PrismaClient();
+
     public static async createCategory(guild: Guild): Promise<GuildChannel> {
         return await guild?.channels.create({
             name: 'Crea tu canal',
@@ -23,12 +24,16 @@ export class VoiceSetupHelper {
     }
 
     public static async createDatabaseEntry(guild: Guild, channel: GuildChannel, category: GuildChannel): Promise<void> {
-        await VoiceSetupHelper.db.tempChannel.create({
-            data: {
-                guildId: guild?.id,
-                id: channel?.id,
-                categoryId: category?.id
-            },
-        });
+        try {
+            await this.prisma.tempChannel.create({
+                data: {
+                    id: channel.id,
+                    guildId: guild.id,
+                    categoryId: category.id,
+                }
+            })
+        } catch (error) {
+            console.error(error);
+        }
     }
 }

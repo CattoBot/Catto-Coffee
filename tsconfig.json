@@ -3,6 +3,7 @@
     "target": "ESNext",
     "module": "commonjs",
     "outDir": "dist",
+    "allowJs": true,
     "lib": [
       "ESNext",
       "ESNext.Array",
@@ -21,6 +22,7 @@
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
       "@core/*": [
@@ -35,11 +37,14 @@
       "@shared/*": [
         "src/shared/*"
       ],
-      "@logger":["src/lib/helpers/misc/logger.helper"]
+      "@logger": [
+        "src/lib/helpers/misc/logger.helper"
+      ]
     }
   },
   "include": [
-    "src/**/*"
+    "src/",
+    "src/**/*.json"
   ],
   "exclude": [
     "node_modules"

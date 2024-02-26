@@ -1,3 +1,4 @@
+import { SubcommandCategories } from "@shared/enum/commands/categories.enum";
 import { CommandPermissions } from "@shared/enum/commands/permissions.enum";
 
 export class VoiceSubCommands {
@@ -5,6 +6,7 @@ export class VoiceSubCommands {
         name: 'voice',
         requiredClientPermissions: [CommandPermissions.ManageChannels],
         requiredUserPermissions: [CommandPermissions.SendMessages],
+        fullCategory: [SubcommandCategories.Voice],
         subcommands: [
             {
                 name: "name",

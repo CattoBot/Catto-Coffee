@@ -1,15 +1,34 @@
-version: '3'
+version: '3.8'
 
 services:
-  mysql:
+  database:
     image: mysql:5.7
     environment:
+      - MYSQL_PASSWORD=password
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=catto
+    ports:
+      - '3310:3306'
     volumes:
-      - mysql_data:/var/lib/mysql
-    ports: 
-      - '3306:3306'
+      - database_data:/var/lib/mysql
+
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+      - redis
+    links:
+      - database
+      - redis
+    ports:
+      - '3000:3000'
 
 volumes:
-  mysql_data:
+  database_data:

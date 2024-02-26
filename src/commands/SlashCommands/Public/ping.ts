@@ -4,6 +4,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Commands } from "@shared/commands/options/commands/commands.options";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { Cooldown } from "@lib/decorators/cooldown";
+
 @ApplyOptions<CommandOptions>(Commands.PingCommand)
 export class PingCommand extends Command {
     public constructor(context: Command.LoaderContext, options: Command.Options) {
