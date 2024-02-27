@@ -1,8 +1,8 @@
 export class Messages {
     public static Success = {
         BotReady: (name: string) => `${name} is ready to rumble.`,
-        DatabaseSuccess: (ping: string) => `Successfully connected to \x1b[36mMySQL\x1b[0m database with ${ping}.`,
-        RedisDatabaseSuccess: `Successfully connected to \x1b[31mRedis\x1b[0m database.`,
+        DatabaseSuccess: (ping?: string) => `Successfully connected to \x1b[36mMySQL\x1b[0m database ${ping}ms.`,
+        RedisDatabaseSuccess: (ping?: string) => `Successfully connected to \x1b[31mRedis\x1b[0m database ${ping}ms.`,
         ClientSuccess: (client: string) => `Successfully connected to \x1b[33mDiscord Gateway\x1b[0m with ${client}.`
     };
 

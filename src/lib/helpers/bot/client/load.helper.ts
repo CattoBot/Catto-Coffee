@@ -2,28 +2,22 @@ import { Client } from '@core/client.core';
 import { Config } from '@core/config';
 import { Messages } from '@shared/constants/utils/messages.constants';
 import { ServerLogger } from '@logger';
-import { PresenceHelper } from './presence.helper';
 
-export class LoadConfigHelper {
-  public static token: string = Config.Token;
-  public static log: ServerLogger;
+export class LoadHelper {
+  private static token: string = Config.Token;
+  private static log: ServerLogger;
 
-  constructor() {
-    LoadConfigHelper.log = new ServerLogger();
+  private constructor() {
+    LoadHelper.log = new ServerLogger();
   }
 
-  public static async init(client: Client) {
+  public static async run(client: Client) {
     try {
-      await client.login(LoadConfigHelper.token);
-      await this.setPresence(client);
+      await client.login(LoadHelper.token);
     } catch (error) {
-      LoadConfigHelper.log.error(Messages.Errors.BotClientError, error.message);
       await client.destroy();
+      this.log.error(Messages.Errors.BotClientError, error.message);
       process.exit(1);
     }
-  }
-
-  private static async setPresence(client: Client) {
-    await PresenceHelper.setPresence(client);
   }
 }

@@ -1,10 +1,10 @@
 import { Events, Listener, ListenerOptions } from "@sapphire/framework";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Client } from "@core/client.core";
-import { LogConnections as boot } from "@lib/helpers/misc/connections.helper";
+import { PresenceHelper } from "@lib/helpers/bot/client/presence.helper";
 
-@ApplyOptions<ListenerOptions>({ once: true, event: Events.ClientReady })
-export class ReadyListener extends Listener {
+@ApplyOptions<ListenerOptions>({ once: false, event: Events.ClientReady })
+export class PresenceListener extends Listener {
     constructor(context: Listener.LoaderContext, options: Listener.Options) {
         super(context, {
             ...options
@@ -12,6 +12,11 @@ export class ReadyListener extends Listener {
     }
 
     public async run(client: Client) {
-        await boot.log(client);
+        await this.setPresence(client);
+    }
+
+
+    private async setPresence(client: Client) {
+        await PresenceHelper.setPresence(client);
     }
 }

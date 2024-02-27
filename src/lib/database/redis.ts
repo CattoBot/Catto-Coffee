@@ -6,7 +6,8 @@ export class RedisInstance extends Redis {
         super({
             host: Config.Redis.Host,
             port: Config.Redis.Port,
-            password: Config.Redis.Password
+            password: Config.Redis.Password,
+            lazyConnect: true
         });
     }
 }
