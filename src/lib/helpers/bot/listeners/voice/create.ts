@@ -8,12 +8,23 @@ let cooldown = new Map<string, number>();
 export class VoiceCreateHelper {
     private readonly prisma: PrismaClient;
     private readonly Logger: ServerLogger;
-    constructor() {
+    
+    public constructor() {
         this.prisma = new PrismaClient();
         this.Logger = new ServerLogger();
     }
 
-    public async createChannel(guild: Guild, parent: CategoryChannel, user_id: string, newState: VoiceState) {
+    public async initChannel(newState: VoiceState, oldState: VoiceState) {
+        const channels = await this.getChannel(newState.guild.id);
+        await Promise.all(channels.map(async ({ channel_id, parent_id }) => {
+            const parent = newState.guild.channels.resolve(parent_id) as CategoryChannel;
+            if (this.shouldCreateChannel(oldState, newState, channel_id)) {
+                await this.createChannel(newState.guild, parent, newState.member.id, newState);
+            }
+        }));
+    }
+
+    private async createChannel(guild: Guild, parent: CategoryChannel, user_id: string, newState: VoiceState) {
         const user_cooldown = await this.getUserCooldown(user_id);
         if (user_cooldown && user_cooldown > Date.now()) {
             return;
@@ -30,7 +41,7 @@ export class VoiceCreateHelper {
         }
     }
 
-    public async getChannel(id: string) {
+    private async getChannel(id: string) {
         const data = await this.prisma.tempChannel.findMany({
             where: {
                 guildId: id
@@ -77,14 +88,14 @@ export class VoiceCreateHelper {
     }
 
 
-    public shouldCreateChannel(OldState: VoiceState, NewState: VoiceState, channel_id: string): boolean {
+    private shouldCreateChannel(OldState: VoiceState, NewState: VoiceState, channel_id: string): boolean {
         return (
             (NewState.channelId === channel_id && OldState.channelId !== channel_id) ||
             (NewState.channelId === channel_id && !OldState.channelId)
         );
     }
 
-    public async buildChannel(guild: Guild, name: string, userLimit: number, parent: CategoryChannel, permissions: OverwriteResolvable[]) {
+    private async buildChannel(guild: Guild, name: string, userLimit: number, parent: CategoryChannel, permissions: OverwriteResolvable[]) {
         try {
             const createdChannel = await guild.channels.create({
                 name: name,

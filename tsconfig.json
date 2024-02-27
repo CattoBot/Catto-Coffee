@@ -4,6 +4,7 @@
     "module": "commonjs",
     "outDir": "dist",
     "allowJs": true,
+    "strict": true,
     "lib": [
       "ESNext",
       "ESNext.Array",

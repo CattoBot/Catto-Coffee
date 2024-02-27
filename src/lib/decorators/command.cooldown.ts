@@ -2,11 +2,11 @@ import { Command } from "@sapphire/framework";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { Emojis } from "@shared/enum/misc/emojis.enum";
 import { ServerLogger } from "@logger";
-import { Time } from "@sapphire/time-utilities";
 import { CooldownOptions } from "@shared/interfaces/cooldown.interface";
-
+import { getUserKey, calculateTotalCooldown, getRemainingTime, getFormattedTimeString } from "@shared/functions/cooldown.funct";
 const cooldowns: Map<string, { lastExecutionTime: number; executions: number }> = new Map();
 const logger = new ServerLogger();
+
 /**
  * Decorator used to set a cooldown for a command based on the user's ID and the guild's ID.
  * @param {CooldownOptions} options The options for the cooldown.
@@ -20,26 +20,23 @@ const logger = new ServerLogger();
  * @returns {MethodDecorator} Decorator response.
  */
 
-export function Cooldown(options: CooldownOptions = {}): MethodDecorator {
+export function CommandCooldown(options: CooldownOptions = {}): MethodDecorator {
     return function (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
 
         descriptor.value = async function (interaction: Command.ChatInputCommandInteraction, ...rest: any[]) {
-            const userKey = getUserKey(interaction.guild.id, interaction.user.id, propertyKey);
+            const userKey = getUserKey(interaction.guild?.id, interaction.user.id, propertyKey);
+
             const currentTime = Date.now();
             const cooldownInterval = calculateTotalCooldown(options);
             const { lastExecutionTime, executions } = cooldowns.get(userKey) || { lastExecutionTime: 0, executions: 0 };
 
             if (currentTime - lastExecutionTime < cooldownInterval && executions >= (options.executionLimit || 1)) {
                 const remainingCooldownTime = getRemainingTime(currentTime, lastExecutionTime, cooldownInterval);
-                try {
-                    return interaction.reply({
-                        content: (await resolveKey(interaction, 'commands/replies/commandDenied:command_denied', { emoji: Emojis.ERROR, seconds: getFormattedTimeString(currentTime, remainingCooldownTime) })),
-                        ephemeral: true,
-                    });
-                } catch (error) {
-                    logger.error(`Error while resolving key: ${error}`);
-                }
+                return interaction.reply({
+                    content: (await resolveKey(interaction, 'commands/replies/commandDenied:command_denied', { emoji: Emojis.ERROR, seconds: getFormattedTimeString(currentTime, remainingCooldownTime) })),
+                    ephemeral: true,
+                });
             }
 
             if (currentTime - lastExecutionTime >= cooldownInterval) {
@@ -57,23 +54,3 @@ export function Cooldown(options: CooldownOptions = {}): MethodDecorator {
     };
 }
 
-function getUserKey(guildId: string, userId: string, methodName: string): string {
-    return `${guildId}:${userId}:${methodName}`;
-}
-
-function calculateTotalCooldown(options: CooldownOptions): number {
-    return (
-        (options.seconds || 0) * Time.Second +
-        (options.minutes || 0) * Time.Minute +
-        (options.hours || 0) * Time.Hour +
-        (options.days || 0) * Time.Day
-    );
-}
-
-function getRemainingTime(currentTime: number, lastExecutionTime: number, totalCooldownTime: number): number {
-    return Math.ceil((lastExecutionTime + totalCooldownTime - currentTime) / 1000);
-}
-
-function getFormattedTimeString(currentTime: number, remainingTime: number): string {
-    return `<t:${Math.floor((currentTime + remainingTime * 1000) / 1000)}:R>`;
-}

@@ -3,7 +3,7 @@ import { Colors, EmbedBuilder } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Commands } from "@shared/commands/options/commands/commands.options";
 import { resolveKey } from "@sapphire/plugin-i18next";
-import { Cooldown } from "@lib/decorators/cooldown";
+import { CommandCooldown } from "@lib/decorators/command.cooldown";
 
 @ApplyOptions<CommandOptions>(Commands.PingCommand)
 export class PingCommand extends Command {
@@ -19,7 +19,7 @@ export class PingCommand extends Command {
         );
     }
 
-    @Cooldown({ minutes: 1, executionLimit: 2 })
+    @CommandCooldown({ minutes: 1, executionLimit: 2 })
     public override async chatInputRun(interaction: ChatInputCommand.Interaction) {
         await interaction.reply({
             embeds: [

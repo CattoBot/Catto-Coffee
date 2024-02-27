@@ -8,61 +8,51 @@ datasource db {
 }
 
 model Guild {
-  id                        String                   @id @map("GuildID")
-  prefix                    String?                  @map("GuildPrefix")
-  lang                      String?                  @map("GuildLang")
-  textExperienceSettings    TextExperienceSettings?  @relation(fields: [textExperienceSettingsId], references: [id])
-  voiceExperienceSettings   VoiceExperienceSettings? @relation(fields: [voiceExperienceSettingsId], references: [id])
-  notesLogsChannel          String?                  @map("NotesLogsChannel")
-  modLogChannel             String?                  @map("ModLogChannel")
-  experienceNotifications   ExperienceNotifications? @relation(fields: [experienceNotificationsId], references: [id])
-  voiceLogsChannel          String?                  @map("VoiceLogsChannel")
+  id                        String                   @id @map("guild_id")
+  prefix                    String?                  @map("guild_prefix")
+  lang                      String?                  @map("guild_lang")
+  notesLogsChannel          String?                  @map("notes_log_channel")
+  modLogChannel             String?                  @map("mod_log_channel")
+  voiceLogsChannel          String?                  @map("voice_logs_channel")
   tempChannels              TempChannel[]
-  experiences               Experience[]
-  textExperienceSettingsId  Int?
-  voiceExperienceSettingsId Int?
-  experienceNotificationsId Int?
+  experiences               UsersExperience[]
+  textExperienceSettingsId  Int?                     @map("txt_exp_settings_id")
+  voiceExperienceSettingsId Int?                     @map("vc_exp_settings_id")
+  experienceNotificationsId Int?                     @map("exp_notify_id")
   Moderation                Moderation[]
   ActiveTempVoice           ActiveTempVoice[]
+  textExperienceSettings    TextExperienceSettings?  @relation(fields: [textExperienceSettingsId], references: [id])
+  voiceExperienceSettings   VoiceExperienceSettings? @relation(fields: [voiceExperienceSettingsId], references: [id])
 
-  @@index([prefix])
+  @@index([id])
 }
 
 model TextExperienceSettings {
-  id             Int     @id @map("GuildID")
-  min            Int?    @map("TextExperienceMin")
-  max            Int?    @map("TextExperienceMax")
-  isEnabled      Boolean @map("TextExpEnabled")
-  defaultMessage String? @map("TextDefaultMessage")
-  Guild          Guild[]
+  id             Int     @id @map("guild_id")
+  min            Int?    @map("text_experience_min")
+  max            Int?    @map("text_experience_max")
+  isEnabled      Boolean @map("is_text_exp_enabled")
+  defaultMessage String? @map("text_default_levelup_message")
+  guild          Guild[]
 
   @@index([id])
 }
 
 model VoiceExperienceSettings {
-  id             Int     @id @map("GuildID")
-  min            Int?    @map("VoiceExperienceMin")
-  max            Int?    @map("VoiceExperienceMax")
-  isEnabled      Boolean @map("VoiceExpEnabled")
-  defaultMessage String? @map("VoiceDefaultMessage")
-  Guild          Guild[]
-
-  @@index([id])
-}
-
-model ExperienceNotifications {
-  id              Int     @id @map("GuildID")
-  textExperience  String? @map("TextExperienceNotification")
-  voiceExperience String? @map("VoiceExperienceNotification")
-  Guild           Guild[]
+  id             Int     @id @map("guild_id")
+  min            Int?    @map("voice_experience_min")
+  max            Int?    @map("voice_experience_max")
+  isEnabled      Boolean @map("is_voice_exp_enabled")
+  defaultMessage String? @map("voice_default_levelup_message")
+  guild          Guild[]
 
   @@index([id])
 }
 
 model TempChannel {
-  id              String            @map("TempVoiceChannelCreate")
-  guildId         String            @map("GuildID")
-  categoryId      String            @map("TempVoiceCategory")
+  id              String            @map("channel_create_id")
+  guildId         String            @map("guild_id")
+  categoryId      String            @map("channel_category_id")
   guild           Guild             @relation(fields: [guildId], references: [id])
   ActiveTempVoice ActiveTempVoice[]
 
@@ -71,38 +61,24 @@ model TempChannel {
   @@index([guildId])
 }
 
-model Experience {
-  id              Int    @map("UserID")
-  guildId         String @map("GuildID")
-  voiceExperience Int    @map("VoiceExperience")
-  textExperience  Int    @map("TextExperience")
-  voiceLevel      Int    @map("VoiceLevel")
-  textLevel       Int    @map("TextLevel")
-  totalExperience Int    @map("TotalExperience")
-  guild           Guild  @relation(fields: [guildId], references: [id])
-
-  @@id([id, guildId])
-  @@index([guildId])
-}
-
 model Moderation {
-  id          Int      @id @map("CaseID")
-  guildId     String   @map("GuildID")
-  userId      String   @map("UserID")
-  moderatorId String   @map("ModeratorID")
-  type        String   @map("Type")
-  reason      String   @map("Reason")
-  date        DateTime @map("Date")
+  id          Int      @id @map("case_id")
+  guildId     String   @map("guild_id")
+  userId      String   @map("user_id")
+  moderatorId String   @map("mod_id")
+  type        String   @map("case_type")
+  reason      String   @map("case_reason")
+  date        DateTime @map("case_date")
   guild       Guild    @relation(fields: [guildId], references: [id])
 
   @@index([guildId])
 }
 
 model ActiveTempVoice {
-  id                String      @map("ChannelID")
-  guildId           String      @map("GuildID")
-  channelOwner      String      @map("ChannelOwner")
-  channelCategoryId String      @map("ChannelCategory")
+  id                String      @map("channel_id")
+  guildId           String      @map("guild_id")
+  channelOwner      String      @map("channel_owner_id")
+  channelCategoryId String      @map("channel_category_id")
   guild             Guild       @relation(fields: [guildId], references: [id])
   tempChannel       TempChannel @relation(fields: [guildId, channelCategoryId], references: [guildId, categoryId])
 
@@ -111,8 +87,31 @@ model ActiveTempVoice {
 }
 
 model UsersTempVoiceConfiguration {
-  id           String   @id @map("UserID")
-  channelName  String?  @map("ChannelName")
-  channelLimit Int?     @map("ChannelLimit")
-  isLocked     Boolean? @map("IsLocked")
+  id           String   @map("user_id")
+  channelName  String?  @map("channel_name")
+  channelLimit Int?     @map("channel_limit")
+  isLocked     Boolean? @map("is_channel_locked")
+  user         Users    @relation(fields: [id], references: [id])
+
+  @@id([id])
+}
+
+model Users {
+  id                          String                        @id @map("user_id")
+  totalUsedCommands           Int                           @map("total_used_commands")
+  UsersTempVoiceConfiguration UsersTempVoiceConfiguration[]
+}
+
+model UsersExperience {
+  id              String @map("user_id")
+  guildId         String @map("guild_id")
+  voiceExperience Int    @map("vc_exp")
+  textExperience  Int    @map("text_exp")
+  voiceLevel      Int    @map("vc_level")
+  textLevel       Int    @map("text_level")
+  totalExperience Int    @map("total_exp")
+  guild           Guild  @relation(fields: [guildId], references: [id])
+
+  @@id([id, guildId])
+  @@index([guildId])
 }

@@ -7,7 +7,7 @@ import { VoiceSetupHelper } from '@lib/helpers/bot/commands/voice/setup';
 import { Emojis } from '@shared/enum/misc/emojis.enum';
 import { VoiceCommandsRegistration } from '@shared/commands/build/subcommands/voice';
 import { CommandPermissions } from '@shared/enum/commands/permissions.enum';
-import { Cooldown } from '@lib/decorators/cooldown';
+import { CommandCooldown } from '@lib/decorators/command.cooldown';
 
 @ApplyOptions<SubcommandOptions>(VoiceSubCommands.Options)
 export class VoiceCommands extends Subcommand {
@@ -23,7 +23,7 @@ export class VoiceCommands extends Subcommand {
 
     @RequiresClientPermissions(CommandPermissions.ManageGuild)
     @RequiresUserPermissions(CommandPermissions.ManageGuild)
-    @Cooldown({ seconds: 60, executionLimit: 1 })
+    @CommandCooldown({ seconds: 60, executionLimit: 1 })
     public async chatInputSetup(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse> {
         const guild: Guild = interaction.guild;
         const category = await VoiceSetupHelper.createCategory(guild);
