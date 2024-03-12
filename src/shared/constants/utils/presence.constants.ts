@@ -1,7 +1,7 @@
 import { Config } from "@core/config";
 import { ActivityType } from "discord.js";
 
-export class Presence {
+export abstract class Presence {
     public static ActivityType = {
         Playing: ActivityType.Playing,
         Listening: ActivityType.Listening,

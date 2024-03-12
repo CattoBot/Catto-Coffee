@@ -7,6 +7,7 @@ export class VoiceCommandsRegistration {
             applyLocalizedBuilder(builder, 'commands/names:voice', 'commands/descriptions:voice')
                 .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:voice_setup', 'commands/descriptions/voice:voice_setup'))
                 .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:name', 'commands/descriptions/voice:name'))
+                .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:claim', 'commands/descriptions/voice:claim'))
                 .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:ghost', 'commands/descriptions/voice:ghost'))
                 .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:unghost', 'commands/descriptions/voice:unghost'))
                 .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:reset', 'commands/descriptions/voice:reset'))

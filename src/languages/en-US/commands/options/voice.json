@@ -12,5 +12,7 @@
     "bitrate_name": "bitrate",
     "bitrate_description": "Bitrate you want to set for your voice channel",
     "trust_name": "user",
-    "trust_description": "User you would like to also manage your voice channel"
+    "trust_description": "User you would like to also manage your voice channel",
+    "untrust_name": "user",
+    "untrust_description": "User you would like to remove from managing your voice channel"
 }

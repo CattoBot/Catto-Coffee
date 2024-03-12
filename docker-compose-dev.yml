@@ -1,6 +1,7 @@
 version: '3'
+
 services:
-  db:
+  mysql:
     image: mysql:5.7
     ports:
       - "3306:3306"
@@ -16,3 +17,8 @@ services:
       - "6379:6379"
     environment:
       REDIS_PASSWORD: password
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"

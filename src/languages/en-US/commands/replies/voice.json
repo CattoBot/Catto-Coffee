@@ -1,3 +1,19 @@
 {
-    "voice_setup_success": "The temporary voice channels system has been set up successfully {{emoji}}"
+    "voice_setup_success": "The temporary voice channels system has been set up successfully {{emoji}}",
+    "voice_name_success": "The voice channel name has been set to `{{name}}` {{emoji}}",
+    "invite_dm": "You have been invited to a voice channel in `{{guild}}`: {{channel}}",
+    "invite_success": "The invite has been sent successfully to `{{user}}` {{emoji}}",
+    "claim_success": "The voice channel has been claimed successfully {{emoji}}",
+    "ghost_success": "The voice channel has been ghosted successfully {{emoji}}",
+    "unghost_success": "The voice channel has been unghosted successfully {{emoji}}",
+    "limit_success": "The voice channel limit has been set to `{{limit}}` {{emoji}}",
+    "lock_success": "The voice channel has been locked successfully {{emoji}}",
+    "unlock_success": "The voice channel has been unlocked successfully {{emoji}}",
+    "reject_success": "The user `{{user}}` has been rejected successfully {{emoji}}",
+    "bitrate_success": "The voice channel bitrate has been set to `{{bitrate}}` {{emoji}}",
+    "reset_success": "The voice channel permissions have been reset successfully {{emoji}}",
+    "trasnfer_success": "The voice channel has been transferred to `{{user}}` successfully {{emoji}}",
+    "trust_success": "The user `{{user}}` has been added to your trusted users group successfully {{emoji}}",
+    "already_trusted": "The user `{{user}}` is already in your trusted users group {{emoji}}",
+    "claim_error": "Unable to claim the voice channel. The owner is still present in the channel {{emoji}}"
 }

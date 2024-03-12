@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import { Status } from '@shared/enum/misc/status.enum';
 dotenv.config();
 
-export class Config {
+export abstract class Config {
     public static readonly Token: string = process.env.BOT_TOKEN
     public static readonly Owners: string[] = process.env.BOT_OWNERS ? process.env.BOT_OWNERS.split(',') : [];
     public static readonly DefaultPrefix: string = process.env.DEFAULT_PREFIX;
@@ -16,6 +16,10 @@ export class Config {
             'catto.docs.com',
             'Made with 💕'
         ]
+    }
+
+    public static readonly Mongo = {
+        URI: process.env.MONGO_URI
     }
 
     public static readonly Redis = {

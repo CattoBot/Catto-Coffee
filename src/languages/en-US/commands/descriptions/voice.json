@@ -13,5 +13,7 @@
     "invite": "Invite a user to your voice channel.",
     "bitrate": "Change the bitrate of your voice channel.",
     "reset": "Reset all permissions of your voice channel.",
-    "trust": "Allow a specific user to also have the channel owner permissions."
+    "trust": "Allow a specific user to also have the channel owner permissions.",
+    "untrust": "Remove a user from the trusted list.",
+    "claim": "Claim a voice channel ownership"
 }

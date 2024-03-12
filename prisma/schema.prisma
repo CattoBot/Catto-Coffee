@@ -14,7 +14,7 @@ model Guild {
   notesLogsChannel          String?                  @map("notes_log_channel")
   modLogChannel             String?                  @map("mod_log_channel")
   voiceLogsChannel          String?                  @map("voice_logs_channel")
-  tempChannels              TempChannel[]
+  tempChannels              TempChannelSettings[]
   experiences               UsersExperience[]
   textExperienceSettingsId  Int?                     @map("txt_exp_settings_id")
   voiceExperienceSettingsId Int?                     @map("vc_exp_settings_id")
@@ -23,6 +23,8 @@ model Guild {
   ActiveTempVoice           ActiveTempVoice[]
   textExperienceSettings    TextExperienceSettings?  @relation(fields: [textExperienceSettingsId], references: [id])
   voiceExperienceSettings   VoiceExperienceSettings? @relation(fields: [voiceExperienceSettingsId], references: [id])
+  createdAt                 DateTime                 @default(now()) @map("created_at")
+  updatedAt                 DateTime?                 @updatedAt @map("updated_at")
 
   @@index([id])
 }
@@ -49,10 +51,13 @@ model VoiceExperienceSettings {
   @@index([id])
 }
 
-model TempChannel {
+model TempChannelSettings {
   id              String            @map("channel_create_id")
   guildId         String            @map("guild_id")
   categoryId      String            @map("channel_category_id")
+  categoryName    String?           @map("category_name")
+  channelLimit    Int?              @map("channel_limit")
+  channelName     String?           @map("channel_name")
   guild           Guild             @relation(fields: [guildId], references: [id])
   ActiveTempVoice ActiveTempVoice[]
 
@@ -70,20 +75,35 @@ model Moderation {
   reason      String   @map("case_reason")
   date        DateTime @map("case_date")
   guild       Guild    @relation(fields: [guildId], references: [id])
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
 
-  @@index([guildId])
+  @@index([id])
 }
 
 model ActiveTempVoice {
-  id                String      @map("channel_id")
-  guildId           String      @map("guild_id")
-  channelOwner      String      @map("channel_owner_id")
-  channelCategoryId String      @map("channel_category_id")
-  guild             Guild       @relation(fields: [guildId], references: [id])
-  tempChannel       TempChannel @relation(fields: [guildId, channelCategoryId], references: [guildId, categoryId])
+  id                         String                       @map("channel_id")
+  guildId                    String                       @map("guild_id")
+  channelOwner               String                       @map("channel_owner_id")
+  channelCategoryId          String                       @map("channel_category_id")
+  guild                      Guild                        @relation(fields: [guildId], references: [id])
+  tempChannel                TempChannelSettings          @relation(fields: [guildId, channelCategoryId], references: [guildId, categoryId])
+  TrustedVoiceChannelMembers TrustedVoiceChannelMembers[]
+  createdAt                  DateTime                     @default(now()) @map("created_at")
+  updatedAt                  DateTime?                     @updatedAt @map("updated_at")
 
   @@id([id, guildId])
-  @@index([guildId, channelOwner, channelCategoryId])
+  @@index([id, guildId])
+}
+
+model TrustedVoiceChannelMembers {
+  id             String          @map("channel_id")
+  guildId        String          @map("guild_id")
+  userId         String          @id @map("user_id")
+  channelOwnerId String          @map("channel_owner_id")
+  channelId      ActiveTempVoice @relation(fields: [id, guildId], references: [id, guildId])
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime?        @updatedAt @map("updated_at")
 }
 
 model UsersTempVoiceConfiguration {
@@ -91,15 +111,9 @@ model UsersTempVoiceConfiguration {
   channelName  String?  @map("channel_name")
   channelLimit Int?     @map("channel_limit")
   isLocked     Boolean? @map("is_channel_locked")
-  user         Users    @relation(fields: [id], references: [id])
 
   @@id([id])
-}
-
-model Users {
-  id                          String                        @id @map("user_id")
-  totalUsedCommands           Int                           @map("total_used_commands")
-  UsersTempVoiceConfiguration UsersTempVoiceConfiguration[]
+  @@index([id])
 }
 
 model UsersExperience {
@@ -113,5 +127,5 @@ model UsersExperience {
   guild           Guild  @relation(fields: [guildId], references: [id])
 
   @@id([id, guildId])
-  @@index([guildId])
+  @@index([id, guildId])
 }

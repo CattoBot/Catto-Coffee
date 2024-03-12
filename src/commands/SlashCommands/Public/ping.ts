@@ -3,7 +3,7 @@ import { Colors, EmbedBuilder } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Commands } from "@shared/commands/options/commands/commands.options";
 import { resolveKey } from "@sapphire/plugin-i18next";
-import { CommandCooldown } from "@lib/decorators/command.cooldown";
+import { CommandCooldown } from "@lib/decorators/cmd-cooldown.decorator";
 
 @ApplyOptions<CommandOptions>(Commands.PingCommand)
 export class PingCommand extends Command {

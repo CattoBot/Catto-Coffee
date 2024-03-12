@@ -1,5 +1,5 @@
 import { Time } from "@sapphire/time-utilities";
-import { CooldownOptions } from "@shared/interfaces/cooldown.interface";
+import { CooldownOptions } from "@shared/interfaces/utils/cooldown.interface";
 
 export function getUserKey(guildId: string, userId: string, methodName: string): string {
     return `${guildId}:${userId}:${methodName}`;

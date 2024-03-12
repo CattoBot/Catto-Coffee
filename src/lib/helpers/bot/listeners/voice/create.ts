@@ -3,15 +3,14 @@ import { PrismaClient } from '@prisma/client';
 import { Config } from '@core/config';
 import { ServerLogger } from '@logger';
 import { Time } from '@sapphire/time-utilities';
+import { Prisma } from '@lib/database/prisma';
 let cooldown = new Map<string, number>();
 
-export class VoiceCreateHelper {
-    private readonly prisma: PrismaClient;
-    private readonly Logger: ServerLogger;
+export class VoiceCreateHelper extends Prisma {
+    private readonly Logger: ServerLogger = new ServerLogger();
     
     public constructor() {
-        this.prisma = new PrismaClient();
-        this.Logger = new ServerLogger();
+        super();
     }
 
     public async initChannel(newState: VoiceState, oldState: VoiceState) {
@@ -42,7 +41,7 @@ export class VoiceCreateHelper {
     }
 
     private async getChannel(id: string) {
-        const data = await this.prisma.tempChannel.findMany({
+        const data = await this.tempChannelSettings.findMany({
             where: {
                 guildId: id
             }
@@ -55,7 +54,7 @@ export class VoiceCreateHelper {
     }
 
     private async getUserChannelInfo(user_id: string) {
-        return this.prisma.usersTempVoiceConfiguration.findUnique({
+        return this.usersTempVoiceConfiguration.findUnique({
             where: {
                 id: user_id
             }
@@ -130,7 +129,7 @@ export class VoiceCreateHelper {
     }
 
     private async storeChannelInDatabase(guildId: string, channelId: string, categoryId: string, userId: string) {
-        await this.prisma.activeTempVoice.create({
+        await this.activeTempVoice.create({
             data: {
                 id: channelId,
                 guildId: guildId,

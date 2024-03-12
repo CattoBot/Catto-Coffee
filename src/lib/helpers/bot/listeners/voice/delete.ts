@@ -1,13 +1,13 @@
 import { VoiceState, VoiceChannel } from "discord.js";
 import { PrismaClient } from "@prisma/client";
 import { ServerLogger } from "@logger";
+import { Prisma } from "@lib/database/prisma";
 
-export class VoiceDeleteHelper {
-    private readonly prisma: PrismaClient;
+export class VoiceDeleteHelper extends Prisma {
     private readonly Logger: ServerLogger;
+
     constructor() {
-        this.prisma = new PrismaClient();
-        this.Logger = new ServerLogger();
+        super();
     }
 
     public async deleteChannel(voiceChannel: VoiceChannel, guildId: string) {
@@ -17,7 +17,7 @@ export class VoiceDeleteHelper {
             }
             const existingRecord = await this.findExistingChannel(guildId, voiceChannel);
             if (existingRecord) {
-                await this.prisma.activeTempVoice.delete({
+                await this.activeTempVoice.delete({
                     where: {
                         id_guildId: {
                             guildId: guildId,
@@ -32,7 +32,7 @@ export class VoiceDeleteHelper {
     }
 
     public async findExistingChannel(guildId: string, voiceChannel: VoiceChannel) {
-        return this.prisma.activeTempVoice.findUnique({
+        return this.activeTempVoice.findUnique({
             where: {
                 id_guildId: {
                     guildId: guildId,
