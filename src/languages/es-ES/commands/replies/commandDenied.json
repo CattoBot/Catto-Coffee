@@ -1,3 +1,9 @@
 {
-    "command_denied": "{{emoji}} - {{seconds}} podrás usar de nuevo este comando."
+    "command_denied": "{{emoji}} - Podrás usar este comando nuevamente en {{seconds}} segundos.",
+    "not_in_voice_channel": "Necesitas estar en un canal de voz para usar este comando. {{emoji}}",
+    "voice_not_found_in_db": "Parece que este canal no se puede modificar. Por favor, verifica si yo lo creé. {{emoji}}",
+    "not_voice_channel_owner": "Parece que no eres el propietario de este canal de voz. {{emoji}}",
+    "self_voice_command": "No puedes usar este comando contigo mismo. {{emoji}}",
+    "invite_dm_failed": "No pude enviar el mensaje directo. Verifica si el usuario tiene sus mensajes directos abiertos. {{emoji}}",
+    "voice_user_not_found": "No pude encontrar al usuario que estás intentando invitar a tu canal de voz. {{emoji}}"
 }

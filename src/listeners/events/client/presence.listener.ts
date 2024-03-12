@@ -1,7 +1,7 @@
 import { Events, Listener, ListenerOptions } from "@sapphire/framework";
-import { ApplyOptions } from "@sapphire/decorators";
 import { Client } from "@core/client.core";
 import { PresenceHelper } from "@lib/helpers/bot/client/presence.helper";
+import { ApplyOptions } from "@sapphire/decorators";
 
 @ApplyOptions<ListenerOptions>({ once: false, event: Events.ClientReady })
 export class PresenceListener extends Listener {

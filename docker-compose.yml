@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  database:
-    image: mysql:5.7
+  mysql:
+    image: mysql:latest
     environment:
       - MYSQL_PASSWORD=password
       - MYSQL_ROOT_PASSWORD=password
@@ -13,9 +13,14 @@ services:
       - database_data:/var/lib/mysql
 
   redis:
-    image: redis
+    image: redis:latest
     ports:
       - '6379:6379'
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
 
   node:
     build:
@@ -24,9 +29,11 @@ services:
     depends_on:
       - database
       - redis
+      - mongo
     links:
       - database
       - redis
+      - mongo
     ports:
       - '3000:3000'
 

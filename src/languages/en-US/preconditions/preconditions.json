@@ -1,0 +1,3 @@
+{
+    "voice_sysem_enabled": "{{emoji}} Looks like the voice channel system is not enabled. Please run `/voice setup`."
+}

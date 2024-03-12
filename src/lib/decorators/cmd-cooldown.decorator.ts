@@ -2,8 +2,9 @@ import { Command } from "@sapphire/framework";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { Emojis } from "@shared/enum/misc/emojis.enum";
 import { ServerLogger } from "@logger";
-import { CooldownOptions } from "@shared/interfaces/cooldown.interface";
+import { CooldownOptions } from "@shared/interfaces/utils/cooldown.interface";
 import { getUserKey, calculateTotalCooldown, getRemainingTime, getFormattedTimeString } from "@shared/functions/cooldown.funct";
+import { CacheType, ChatInputCommandInteraction } from "discord.js";
 const cooldowns: Map<string, { lastExecutionTime: number; executions: number }> = new Map();
 const logger = new ServerLogger();
 
@@ -24,7 +25,7 @@ export function CommandCooldown(options: CooldownOptions = {}): MethodDecorator 
     return function (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
 
-        descriptor.value = async function (interaction: Command.ChatInputCommandInteraction, ...rest: any[]) {
+        descriptor.value = async function (interaction: Command.ChatInputCommandInteraction, ...rest: ChatInputCommandInteraction<CacheType>[]) {
             const userKey = getUserKey(interaction.guild?.id, interaction.user.id, propertyKey);
 
             const currentTime = Date.now();

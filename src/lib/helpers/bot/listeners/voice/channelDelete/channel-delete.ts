@@ -1,19 +1,18 @@
 import { VoiceChannel } from "discord.js";
 import { PrismaClient } from "@prisma/client";
 import { ServerLogger } from "@logger";
+import { Prisma } from "@lib/database/prisma";
 
-export class VoiceChannelDeleteHelper {
-
-    private readonly prisma: PrismaClient;
+export class VoiceChannelDeleteHelper extends Prisma {
     public readonly Logger: ServerLogger;
 
     public constructor() {
+        super();
         this.Logger = new ServerLogger();
-        this.prisma = new PrismaClient();
     }
 
     public async findExistingChannel(guildId: string, voiceChannel: VoiceChannel) {
-        return this.prisma.activeTempVoice.findUnique({
+        return this.activeTempVoice.findUnique({
             where: {
                 id_guildId: {
                     guildId: guildId,
@@ -25,7 +24,7 @@ export class VoiceChannelDeleteHelper {
 
     public async deleteChannel(voiceChannel: VoiceChannel, guildId: string) {
         try {
-            await this.prisma.activeTempVoice.delete({
+            await this.activeTempVoice.delete({
                 where: {
                     id_guildId: {
                         guildId: guildId,

@@ -1,44 +1,61 @@
-import { RedisInstance } from "@lib/database/redis";
+import { Redis } from "@lib/database/redis";
 import { ServerLogger } from "@lib/helpers/misc/logger.helper";
-import { PrismaClient } from "@prisma/client";
 import { Client } from "./client.core";
 import { Messages } from "@shared/constants/utils/messages.constants";
-import { ICore } from "@shared/interfaces/core.interface";
+import { Logging } from "@shared/interfaces/utils/logging.interface";
+import { Prisma } from "@lib/database/prisma";
+import { Mongo } from "@lib/database/mongo";
+import { Config } from "./config";
 
-export class Init implements ICore {
+export class Init implements Logging {
+
     private readonly log: ServerLogger
-    private readonly redis: RedisInstance
-    private readonly prisma: PrismaClient
+    private readonly redis: Redis
+    private readonly prisma: Prisma
+    private readonly mongo: Mongo
 
-    constructor() {
-        this.prisma = new PrismaClient();
+    public constructor() {
+        this.prisma = new Prisma();
         this.log = new ServerLogger();
-        this.redis = new RedisInstance();
+        this.redis = new Redis();
+        this.mongo = new Mongo();
     }
 
-    public InitBot(client: Client) {
+    public Bot(client: Client) {
         try {
-            this.log.watch(Messages.Success.ClientSuccess(`${client.ws.ping}ms`));
+            this.log.success(Messages.Success.ClientSuccess(`${client.ws.ping}ms`));
         } catch (error) {
             this.log.error(Messages.Errors.BotClientError, error);
         }
     }
 
-    public async InitMySQL() {
+    public async Prisma() {
         try {
-            await this.prisma.$connect();
-            this.log.success(Messages.Success.DatabaseSuccess());
+            await this.prisma.load().then(() => {
+                this.log.success(Messages.Success.DatabaseSuccess());
+            });
         } catch (error) {
             this.log.error(Messages.Errors.DatabaseError, error);
         }
     }
 
-    public async InitRedis() {
+    public async Redis() {
         try {
-            await this.redis.connect();
-            this.log.success(Messages.Success.RedisDatabaseSuccess);
+            const ping = await this.redis.ping()
+            if (ping) {
+                return this.log.success(Messages.Success.RedisDatabaseSuccess);
+            }
         } catch (error) {
             this.log.error(Messages.Errors.RedisError, error);
+        }
+    }
+
+    public async Mongo() {
+        try {
+            await this.mongo.fetch(Config.Mongo.URI);
+            this.log.success(Messages.Success.MongoDatabaseSuccess);
+        } catch (error) {
+            this.log.error(Messages.Errors.MongoError, error);
         }
     }
 }

@@ -40,7 +40,10 @@
       ],
       "@logger": [
         "src/lib/helpers/misc/logger.helper"
-      ]
+      ],
+      "@VoiceCommands": [
+        "src/lib/helpers/bot/commands/voice/index"
+      ],
     }
   },
   "include": [

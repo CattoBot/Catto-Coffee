@@ -1,5 +1,5 @@
 import { LogType } from "@shared/enum/misc/logs.enum";
-import { SignaleOptions } from "@shared/interfaces/logs.interface";
+import { SignaleOptions } from "@shared/interfaces/utils/logs.interface";
 
 export class LogTypeOptions {
     private options: Record<LogType, SignaleOptions>;
