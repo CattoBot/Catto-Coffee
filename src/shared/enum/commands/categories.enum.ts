@@ -4,4 +4,7 @@ export enum CommandCategories {
 
 export enum SubcommandCategories {
     Voice = "Voice",
+    Admin = "Admin",
+    Owner = "Owner",
+    Level = "Level",
 }

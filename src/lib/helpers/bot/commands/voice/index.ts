@@ -11,7 +11,6 @@ import { VoiceUnlockCommand } from "./unlock";
 import { VoiceRejectCommand } from "./reject";
 import { VoiceInviteCommand } from "./invite";
 import { VoiceClaimCommand } from "./claim";
-import { VoiceSetupCommand } from "./setup";
 import { VoiceUntrustCommand } from "./untrust";
 
 export {
@@ -28,6 +27,5 @@ export {
     VoiceRejectCommand,
     VoiceInviteCommand,
     VoiceClaimCommand,
-    VoiceSetupCommand,
     VoiceUntrustCommand
 }

@@ -1,0 +1,9 @@
+{
+    "admin": "Admin only commands.",
+    "setup": "Set up the bot for this server.",
+    "setup_logs": "Set up the logs for this server.",
+    "setup_voices": "Set up the temporary voice channels for this server.",
+    "blacklist": "Blacklist a user from using the bot.",
+    "bl_add": "Add a user to the blacklist.",
+    "bl_remove": "Remove a user from the blacklist."
+}

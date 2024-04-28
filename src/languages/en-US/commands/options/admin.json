@@ -1,0 +1,7 @@
+{
+    "channel_logs": "channel",
+    "channel_description": "Channel where the webhook should be created.",
+    "bl_user_description": "User to add to the blacklist.",
+    "bl_user_description_remove": "User to remove from the blacklist.",
+    "bl_user": "user"
+}

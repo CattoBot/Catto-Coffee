@@ -13,5 +13,6 @@
     "invite": "invite",
     "bitrate": "bitrate",
     "reset": "reset",
-    "trust": "trust"
+    "trust": "trust",
+    "untrust": "untrust"
 }

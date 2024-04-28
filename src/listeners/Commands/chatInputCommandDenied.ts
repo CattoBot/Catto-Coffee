@@ -1,24 +1,14 @@
-import { Events, Listener, ChatInputCommandDeniedPayload, UserError } from '@sapphire/framework';
-import { Emojis } from '@shared/enum/misc/emojis.enum';
-import { resolveKey } from '@sapphire/plugin-i18next';
+import { ChatInputDeniedCommandHelper } from '@lib/helpers/bot/listeners/commands/chatInputDeniedCommandHelper';
+import { Events, Listener, UserError, type ChatInputCommandDeniedPayload } from '@sapphire/framework';
 
 export class ChatInputCommandDeniedListener extends Listener<typeof Events.ChatInputCommandDenied> {
-    public async run(error: UserError, { interaction, context }: ChatInputCommandDeniedPayload) {
-        if (!context?.silent) {
-            if (context?.remaining) {
-                const seconds = Math.floor(context?.remaining as number / 1000);
-                const plural = seconds > 1 ? 's' : '';
-
-                return interaction.reply({
-                    content: (await resolveKey(interaction, 'commands/replies/commandDenied:command_deied', { emoji: Emojis.ERROR, seconds: seconds, plural: plural })),
-                    allowedMentions: { users: [interaction.user.id], roles: [] },
-                    ephemeral: true
-                });
-            }
-
-            return interaction.reply({
-                content: error.message, embeds: [], components: [], allowedMentions: { users: [interaction.user.id], roles: [] }, ephemeral: true
-            });
-        }
+  private helper: ChatInputDeniedCommandHelper = new ChatInputDeniedCommandHelper();
+  public async run({ context, message: content }: UserError, { interaction }: ChatInputCommandDeniedPayload) {
+    if (this.helper.shouldBeSilent(context)) return;
+    if (this.helper.hasRemainingTime(context)) {
+      await this.helper.handleCooldownReply(interaction, context);
+    } else {
+      await this.helper.handleReply(interaction, content);
     }
+  }
 }

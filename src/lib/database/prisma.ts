@@ -1,19 +1,23 @@
+import { Config } from "@app/config";
 import { PrismaClient } from "@prisma/client";
 
-export class Prisma extends PrismaClient {
+export class PrismaCoreModule extends PrismaClient {
+
     constructor() {
         super(
             {
                 datasources: {
                     db: {
-                        url: process.env.DATABASE_URL,
+                        url: Config.Database.MySQL.URI,
                     },
-                },
+                }
             }
         );
     }
 
     public async load(): Promise<void> {
-        return await super.$connect();
+        return await this.$connect();
     }
 }
+
+export const Prisma = new PrismaCoreModule();

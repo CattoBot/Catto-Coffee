@@ -44,6 +44,21 @@
       "@VoiceCommands": [
         "src/lib/helpers/bot/commands/voice/index"
       ],
+      "@AdminCommands": [
+        "src/lib/helpers/bot/commands/admin/index"
+      ],
+      "@app/*": [
+        "src/app/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@logs/*": [
+        "src/utils/logs/*"
+      ],
+      "@main/*": [
+        "src/*"
+      ],
     }
   },
   "include": [

@@ -1,0 +1,9 @@
+{
+    "admin": "manage",
+    "setup": "set-up",
+    "setup_logs": "logs",
+    "setup_voices": "voices",
+    "blacklist": "blacklist",
+    "bl_add": "add",
+    "bl_remove": "remove"
+}

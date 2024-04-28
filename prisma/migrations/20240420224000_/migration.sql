@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE `BotBlackListedGuilds` ADD COLUMN `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
+
+-- AlterTable
+ALTER TABLE `BotBlackListedUsers` ADD COLUMN `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
+
+-- AlterTable
+ALTER TABLE `GuildBlacklistedUsers` ADD COLUMN `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);

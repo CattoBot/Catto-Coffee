@@ -1,4 +1,4 @@
-import { Client } from "@core/client.core";
+import { Client } from "@app/client";
 
 export interface Logging {
     /**
@@ -16,9 +16,4 @@ export interface Logging {
      * Log the Redis connection
      */
     Redis(): void;
-
-    /**
-     * Log the MongoDB connection
-     */
-    Mongo(): void;
 }

@@ -1,9 +1,13 @@
 declare module '@sapphire/framework' {
     interface Preconditions {
-        VoiceModulePrecondition: never;
+        GuildExistsPrecondition: never;
+        GuildBlacklistPrecondition: never;
+        UserBlacklistPrecondition: never;
+        GuildUserBlacklistPrecondition: never;
+        ChannelOwnerPrecondition: never;
+        ChannelClaimPrecondition: never;
+        RolePermitCommandPrecondition: never;
     }
 }
-
-
 
 export default undefined;

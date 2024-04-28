@@ -1,4 +1,4 @@
-import { ServerLogger } from "@lib/helpers/misc/logger.helper";
+import { logger, ServerLogger } from "@lib/helpers/misc/logger.helper";
 import { fetchT, resolveKey } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "@shared/enum/misc/emojis.enum";
@@ -6,7 +6,7 @@ import { GuildMember, InteractionResponse } from "discord.js";
 import { ConvertBitrateToMillions } from "@shared/functions/bitrate.funct";
 
 export class VoiceBitrateCommand {
-    private static logger: ServerLogger = new ServerLogger();
+    private static logger: ServerLogger = logger;
     private static translateKey = fetchT;
 
     public static async run(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse> {

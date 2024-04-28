@@ -19,7 +19,7 @@ export class VoiceRejectCommand {
 
         const user_permissions = member_interaction?.voice.channel.permissionOverwrites.resolve(user?.id);
 
-        if (member.voice.channel.id !== member_interaction.voice.channelId) {
+        if (!member.voice.channel || member.voice.channel.id !== member_interaction.voice.channelId) {
             await member.voice.channel.permissionOverwrites.edit(user.id, {
                 ...user_permissions,
                 Connect: false,

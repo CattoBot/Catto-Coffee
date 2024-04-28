@@ -1,8 +1,8 @@
 import pkg from 'signale';
-import { CustomMethods } from 'logger';
-import { LogTypeOptions } from '@shared/constants/utils/logs.constants';
+import { CustomMethods } from '@shared/types/logger';
+import { LogTypeOptions } from '@shared/constants/logs.constants';
 import { LogType } from '@shared/enum/misc/logs.enum';
-import { Config } from '@core/config';
+import { Config } from '@app/config';
 
 export class ServerLogger extends pkg.Signale<CustomMethods> {
     constructor() {
@@ -18,3 +18,5 @@ export class ServerLogger extends pkg.Signale<CustomMethods> {
         });
     }
 }
+
+export const logger = new ServerLogger();

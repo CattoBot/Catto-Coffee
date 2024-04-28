@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=catto
+    ports:
+      - '3310:3306'
+    volumes:
+      - database_data:/var/lib/mysql
+
+  redis:
+    image: redis:latest
+    ports:
+      - '6379:6379'
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+      - redis
+      - mongo
+    links:
+      - database
+      - redis
+      - mongo
+    ports:
+      - '3000:3000'
+
+volumes:
+  database_data:

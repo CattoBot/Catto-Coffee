@@ -1,31 +1,50 @@
 import { Guild, CategoryChannel, VoiceState, ChannelType, PermissionFlagsBits, OverwriteResolvable } from 'discord.js';
-import { PrismaClient } from '@prisma/client';
-import { Config } from '@core/config';
-import { ServerLogger } from '@logger';
-import { Time } from '@sapphire/time-utilities';
-import { Prisma } from '@lib/database/prisma';
-let cooldown = new Map<string, number>();
+import { Config } from '@app/config';
+import { logger, ServerLogger } from '@logger';
+import { Prisma, PrismaCoreModule } from '@lib/database/prisma';
+import { seconds } from '@shared/functions/time.funct';
+import { Redis, RedisCoreModule } from '@lib/database/redis';
 
-export class VoiceCreateHelper extends Prisma {
-    private readonly Logger: ServerLogger = new ServerLogger();
-    
-    public constructor() {
-        super();
+export class VoiceCreateHelper {
+    private readonly logger: ServerLogger;
+    private readonly prisma: PrismaCoreModule;
+    private readonly redis: RedisCoreModule
+
+    constructor() {
+        this.prisma = Prisma;
+        this.logger = logger;
+        this.redis = Redis;
     }
 
     public async initChannel(newState: VoiceState, oldState: VoiceState) {
-        const channels = await this.getChannel(newState.guild.id);
-        await Promise.all(channels.map(async ({ channel_id, parent_id }) => {
-            const parent = newState.guild.channels.resolve(parent_id) as CategoryChannel;
-            if (this.shouldCreateChannel(oldState, newState, channel_id)) {
-                await this.createChannel(newState.guild, parent, newState.member.id, newState);
+        if (!newState.guild) return;
+        try {
+            const channels = await this.getChannel(newState.guild.id);
+            for (const channel of channels) {
+                await this.attemptChannelCreation(channel, newState, oldState);
             }
-        }));
+        } catch (error) {
+            this.logger.error(`Error in initializing channels: ${error.message}`, { guildId: newState.guild.id });
+        }
+    }
+
+    private async attemptChannelCreation(channelConfig, newState: VoiceState, oldState: VoiceState) {
+        const { channel_id, parent_id } = channelConfig;
+        const parent = newState.guild.channels.resolve(parent_id) as CategoryChannel;
+        if (!parent) {
+            this.logger.warn(`Parent category does not exist: ${parent_id}`, { guildId: newState.guild.id });
+            return;
+        }
+        if (this.shouldCreateChannel(oldState, newState, channel_id)) {
+            await this.createChannel(newState.guild, parent, newState.member.id, newState);
+        }
     }
 
     private async createChannel(guild: Guild, parent: CategoryChannel, user_id: string, newState: VoiceState) {
+
         const user_cooldown = await this.getUserCooldown(user_id);
         if (user_cooldown && user_cooldown > Date.now()) {
+            this.logger.info(`User ${user_id} is still on cooldown.`, { userId: user_id });
             return;
         }
 
@@ -34,40 +53,45 @@ export class VoiceCreateHelper extends Prisma {
         const channel = await this.buildChannel(guild, channel_details.name, channel_details.userLimit, parent, channel_details.permissions);
         try {
             await newState.setChannel(channel);
-            await this.storeChannelInDatabase(guild.id, channel.id, parent.id, user_id);
         } catch (error) {
-            this.Logger.error(`Error while creating the channel: ${error}`);
+            this.logger.error(`Error while creating the channel for user ${user_id}: ${error}`, { userId: user_id });
+            throw new Error(`Failed to create channel: ${error.message}`);
+        }
+        await this.storeChannelInDatabase(guild.id, channel.id, parent.id, user_id);
+    }
+
+    private async getChannel(guildId: string) {
+        try {
+            const data = await this.prisma.iVoices.findMany({
+                where: {
+                    guildId: guildId
+                }
+            });
+            return data.map(({ channelId, categoryId }) => ({ channel_id: channelId, parent_id: categoryId }));
+        } catch (error) {
+            this.logger.error(`Failed to retrieve channels for guild ${guildId}: ${error}`, { guildId });
+            return [];
         }
     }
 
-    private async getChannel(id: string) {
-        const data = await this.tempChannelSettings.findMany({
-            where: {
-                guildId: id
-            }
-        });
-
-        return data.map((channel) => ({
-            channel_id: channel.id,
-            parent_id: channel.categoryId,
-        }));
-    }
-
-    private async getUserChannelInfo(user_id: string) {
-        return this.usersTempVoiceConfiguration.findUnique({
-            where: {
-                id: user_id
-            }
-        });
-    }
-
-
     private async getUserCooldown(user_id: string): Promise<number | undefined> {
-        return cooldown.get(user_id);
+        try {
+            const cooldown = await this.redis.get(`cooldown:${user_id}`);
+            return cooldown ? parseInt(cooldown) : undefined;
+        } catch (error) {
+            this.logger.error(`Error retrieving cooldown for user ${user_id}: ${error}`, { userId: user_id });
+            return undefined;
+        }
     }
 
     private setUserCooldown(user_id: string) {
-        cooldown.set(user_id, Date.now() + Time.Second * Config.ChannelCreateCooldown);
+        const cooldownPeriod = seconds(Config.Modules.Voice.CreateChannelCooldown);
+        try {
+            this.redis.set(`cooldown:${user_id}`, Date.now() + cooldownPeriod, 'PX', cooldownPeriod);
+        } catch (error) {
+            this.logger.error(`Error setting cooldown for user ${user_id}: ${error}`, { userId: user_id });
+        }
+
     }
 
     private getUserPermissions(user_id: string) {
@@ -79,34 +103,30 @@ export class VoiceCreateHelper extends Prisma {
     }
 
     private getParentChannelPermissions(parent: CategoryChannel) {
-        return parent.permissionOverwrites.cache.map((overwrites) => ({
+        return parent.permissionOverwrites.cache.map(overwrites => ({
             id: overwrites.id,
             allow: overwrites.allow.bitfield,
             deny: overwrites.deny.bitfield,
         }));
     }
 
-
-    private shouldCreateChannel(OldState: VoiceState, NewState: VoiceState, channel_id: string): boolean {
-        return (
-            (NewState.channelId === channel_id && OldState.channelId !== channel_id) ||
-            (NewState.channelId === channel_id && !OldState.channelId)
-        );
+    private shouldCreateChannel(oldState: VoiceState, newState: VoiceState, channel_id: string): boolean {
+        return (newState.channelId === channel_id && oldState.channelId !== channel_id) ||
+            (newState.channelId === channel_id && !oldState.channelId);
     }
 
     private async buildChannel(guild: Guild, name: string, userLimit: number, parent: CategoryChannel, permissions: OverwriteResolvable[]) {
         try {
-            const createdChannel = await guild.channels.create({
+            return await guild.channels.create({
                 name: name,
                 type: ChannelType.GuildVoice,
                 userLimit: userLimit,
                 parent: parent,
                 permissionOverwrites: permissions
             });
-
-            return createdChannel;
         } catch (error) {
-            this.Logger.error(`Error while creating the channel: ${error}`);
+            this.logger.error(`Error while creating a channel: ${error}`, { guildId: guild.id });
+            return null;
         }
     }
 
@@ -117,25 +137,61 @@ export class VoiceCreateHelper extends Prisma {
         return parent_permissions;
     }
 
-
-    private async setChannelDetails(user_id: string, parent: CategoryChannel, NewState: VoiceState) {
-        const user_channel_info = await this.getUserChannelInfo(user_id);
-        return {
-            name: user_channel_info?.channelName || `${NewState.member?.user.username}'s Channel`,
-            type: ChannelType.GuildVoice,
-            userLimit: user_channel_info?.channelLimit || 0,
-            permissions: this.setChannelPermissions(parent, user_id),
+    private async setChannelDetails(user_id: string, parent: CategoryChannel, newState: VoiceState) {
+        try {
+            const user_channel_info = await this.getUserChannelInfo(user_id);
+            return {
+                name: user_channel_info?.channelName || `${newState.member?.user.username}'s Channel`,
+                type: ChannelType.GuildVoice,
+                userLimit: user_channel_info?.channelLimit || 0,
+                permissions: this.setChannelPermissions(parent, user_id),
+            };
+        } catch (error) {
+            this.logger.error(`Error fetching user channel info for user ${user_id}: ${error}`, { userId: user_id });
+            return null;
         }
     }
 
+    private async getUserChannelInfo(userId: string) {
+        try {
+            return await this.prisma.iUsersVoice.findUnique({
+                where: {
+                    userId: userId
+                }
+            });
+        } catch (error) {
+            this.logger.error(`Error fetching user channel info for user ${userId}: ${error}`, { userId: userId });
+            return null;
+        }
+
+    }
+
     private async storeChannelInDatabase(guildId: string, channelId: string, categoryId: string, userId: string) {
-        await this.activeTempVoice.create({
-            data: {
-                id: channelId,
-                guildId: guildId,
-                channelCategoryId: categoryId,
-                channelOwner: userId
+        try {
+            setTimeout(async () => {
+                await this.prisma.voices.create({
+                    data: {
+                        guildId: guildId,
+                        channelId: channelId,
+                        channelCategoryId: categoryId,
+                        channelOwnerId: userId
+                    }
+                });
+            }, 500);
+        } catch (error) {
+            this.logger.error(`Error storing channel in database: ${error}`, { guildId: guildId, channelId: channelId, userId: userId });
+        }
+    }
+
+    private async retreiveChannelsDataFromDatabase(channelId: string, guildId: string) {
+        const data = await this.prisma.iVoices.findUnique({
+            where: {
+                guildId_channelId: {
+                    guildId: guildId,
+                    channelId: channelId
+                }
             }
-        })
+        });
+        return data;
     }
 }

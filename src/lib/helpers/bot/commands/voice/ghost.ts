@@ -1,11 +1,11 @@
-import { ServerLogger } from "@lib/helpers/misc/logger.helper";
+import { logger, ServerLogger } from "@lib/helpers/misc/logger.helper";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "@shared/enum/misc/emojis.enum";
 import { InteractionResponse } from "discord.js";
 
 export class VoiceGhostCommand {
-    private static logger: ServerLogger = new ServerLogger();
+    private static logger: ServerLogger = logger;
 
     public static async run(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse> {
         const user = interaction.user.id;
@@ -17,7 +17,6 @@ export class VoiceGhostCommand {
             await channel.permissionOverwrites.edit(interaction.guild.roles.everyone, {
                 ...users_current_permissions,
                 ViewChannel: false,
-                Connect: false
             });
         } catch (error) {
             this.logger.error(error)

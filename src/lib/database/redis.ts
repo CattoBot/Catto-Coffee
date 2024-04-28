@@ -1,20 +1,22 @@
-import { Config } from "@core/config";
+import { Config } from "@app/config";
 import { Redis as RedisClient } from "ioredis";
 
-export class Redis extends RedisClient {
-    constructor() {
+export class RedisCoreModule extends RedisClient {
+    public constructor() {
         super({
-            host: Config.Redis.Host,
-            port: Config.Redis.Port
+            host: Config.Database.Redis.Host,
+            port: Config.Database.Redis.Port,
+            lazyConnect: true
         });
     }
 
     /**
      * 
-     * @returns Redis connection
+     * @returns Promise<void>
      */
-
     public override async connect(): Promise<void> {
         return await super.connect();
     }
 }
+
+export const Redis = new RedisCoreModule();

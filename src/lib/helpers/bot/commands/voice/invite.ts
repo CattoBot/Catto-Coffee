@@ -6,13 +6,17 @@ import { GuildMember, InteractionResponse } from "discord.js";
 export class VoiceInviteCommand {
     public static async run(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse> {
         const translateKey = await fetchT(interaction);
-        
+
         const user = interaction.options.getUser(translateKey('commands/options/voice:invite_name'));
         if (!user) {
             return interaction.reply({ content: translateKey('commands/replies/commandDenied:voice_user_not_found'), ephemeral: true });
         }
 
         const member = interaction.guild.members.resolve(interaction.user.id) as GuildMember;
+
+        if (member.voice.channel.members.has(interaction.user.id)) {
+            return await interaction.reply({ content: translateKey('commands/replies/voice:user_already_in_channel', { user: interaction.user.displayName, emoji: Emojis.WARN }), ephemeral: true });
+        }
 
         if (interaction.user.id === user.id) {
             return interaction.reply({ content: translateKey('commands/replies/commandDenied:self_voice_command', { emoji: Emojis.ERROR }), ephemeral: true });
@@ -27,7 +31,7 @@ export class VoiceInviteCommand {
                 ViewChannel: true
             }),
             await user?.send({ content: translateKey('commands/replies/voice:invite_dm', { guild: interaction.guild.name, channel: member?.voice.channel.url }) }).catch(error => {
-               return interaction.reply({ content: translateKey('commands/replies/commandDenied:invite_dm_failed', { emoji: Emojis.ERROR }), ephemeral: true });
+                return interaction.reply({ content: translateKey('commands/replies/commandDenied:invite_dm_failed', { emoji: Emojis.ERROR }), ephemeral: true });
             })
         ]);
 

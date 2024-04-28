@@ -1,4 +1,3 @@
-import { InteractionHandler } from "@sapphire/framework";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { CommandInteraction, InteractionResponse } from "discord.js";
 
@@ -81,9 +80,4 @@ export interface VoiceCommandInteraction {
 
     chatInputUntrust(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse<boolean>>;
 
-    /**
-     * Setup the voice channel
-     * @param interaction 
-     */
-    chatInputSetup(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse<boolean>>;
 }

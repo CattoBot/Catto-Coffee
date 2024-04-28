@@ -1,11 +1,10 @@
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import { applyLocalizedBuilder } from '@sapphire/plugin-i18next';
 
-export class VoiceCommandsRegistration {
+export class VoiceSubCommandsRegistration {
     public static registerCommands(registry: Subcommand.Registry): void {
-        registry.registerChatInputCommand((builder) =>
+        registry.registerChatInputCommand((builder) => 
             applyLocalizedBuilder(builder, 'commands/names:voice', 'commands/descriptions:voice')
-                .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:voice_setup', 'commands/descriptions/voice:voice_setup'))
                 .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:name', 'commands/descriptions/voice:name'))
                 .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:claim', 'commands/descriptions/voice:claim'))
                 .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:ghost', 'commands/descriptions/voice:ghost'))
@@ -34,6 +33,9 @@ export class VoiceCommandsRegistration {
                 .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:trust', 'commands/descriptions/voice:trust')
                     .addUserOption((option) => applyLocalizedBuilder(option, 'commands/options/voice:trust_name', 'commands/options/voice:trust_description').setRequired(true))
                 )
-        );
+                .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/voice:untrust', 'commands/descriptions/voice:untrust')
+                    .addUserOption((option) => applyLocalizedBuilder(option, 'commands/options/voice:untrust_name', 'commands/options/voice:untrust_description').setRequired(true))
+                )
+        )
     }
 }

@@ -17,25 +17,5 @@ services:
     ports:
       - '6379:6379'
 
-  mongo:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-
-  node:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - database
-      - redis
-      - mongo
-    links:
-      - database
-      - redis
-      - mongo
-    ports:
-      - '3000:3000'
-
 volumes:
   database_data:
