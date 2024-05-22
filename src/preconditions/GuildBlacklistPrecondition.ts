@@ -1,38 +1,47 @@
-import { Precondition } from "@sapphire/framework";
-import { CommandInteraction } from "discord.js";
-import { Prisma, PrismaCoreModule } from "@lib/database/prisma";
+import { Precondition, PreconditionResult } from "@sapphire/framework";
+import { CommandInteraction, Message } from "discord.js";
 import { resolveKey } from "@sapphire/plugin-i18next";
-import { Redis, RedisCoreModule } from "@lib/database/redis";
-import { Emojis } from "@shared/enum/misc/emojis.enum";
+import { Emojis } from "../shared/enum/Emojis";
 
 export class GuildBlacklistPrecondition extends Precondition {
-    private prisma: PrismaCoreModule = Prisma;
-    private redis: RedisCoreModule = Redis;
+    
+    private async checkBlacklist(guildId: string, context: CommandInteraction | Message): Promise<PreconditionResult> {
+        const key = `blacklisted:guild:${guildId}`;
+        const isBlacklistedInRedis = await this.container.redis.get(key);
 
-    public async chatInputRun(interaction: CommandInteraction) {
+        if (isBlacklistedInRedis) {
+            return this.error({
+                message: await resolveKey(context, 'preconditions/blacklist:server', { emoji: Emojis.ERROR }),
+            });
+        }
+
+        const guildBlacklist = await this.container.prisma.botBlackListedGuilds.findUnique({
+            where: { guildId }
+        });
+
+        if (guildBlacklist) {
+            await this.container.redis.set(key, 'true', 'EX', 3600);
+            return this.error({
+                message: await resolveKey(context, 'preconditions/blacklist:server', { emoji: Emojis.ERROR }),
+            });
+        }
+
+        return this.ok();
+    }
+
+    public override async chatInputRun(interaction: CommandInteraction) {
         if (!interaction.guild) {
             return this.ok();
         }
 
-        const key = `blacklisted:guild:${interaction.guild.id}`;
-        const isBlacklistedInRedis = await this.redis.get(key);
+        return this.checkBlacklist(interaction.guild.id, interaction);
+    }
 
-        if (isBlacklistedInRedis) {
-            return this.error({
-                message: await resolveKey(interaction, 'preconditions/blacklist:server', { emoji: Emojis.ERROR }),
-            });
+    public override async messageRun(message: Message) {
+        if (!message.guild) {
+            return this.ok();
         }
 
-        const guildBlacklist = await this.prisma.botBlackListedGuilds.findUnique({
-            where: { guildId: interaction.guild.id }
-        });
-
-        if (guildBlacklist) {
-            await this.redis.set(key, 'true', 'EX', 3600);
-            return this.error({
-                message: await resolveKey(interaction, 'preconditions/blacklist:server', { emoji: Emojis.ERROR }),
-            });
-        }
-        return this.ok();
+        return this.checkBlacklist(message.guild.id, message);
     }
 }

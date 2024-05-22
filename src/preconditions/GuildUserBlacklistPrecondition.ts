@@ -1,36 +1,38 @@
 import { Precondition } from "@sapphire/framework";
-import { CommandInteraction } from "discord.js";
-import { Emojis } from "@shared/enum/misc/emojis.enum";
-import { Prisma, PrismaCoreModule } from "@lib/database/prisma";
+import { CommandInteraction, Message } from "discord.js";
+import { Emojis } from "../shared/enum/Emojis";
 import { resolveKey } from "@sapphire/plugin-i18next";
-import { Redis, RedisCoreModule } from "@lib/database/redis";
 
 export class GuildUserBlacklistPrecondition extends Precondition {
-    private prisma: PrismaCoreModule = Prisma;
-    private redis: RedisCoreModule = Redis;
 
-    public async chatInputRun(interaction: CommandInteraction) {
-        const userId = interaction.user.id;
-        const guildId = interaction.guild?.id;
+    public override async chatInputRun(interaction: CommandInteraction) {
+        return this.checkBlacklist(interaction.user.id, interaction.guild?.id, interaction);
+    }
+
+    public override async messageRun(message: Message) {
+        return this.checkBlacklist(message.author.id, message.guild?.id, message);
+    }
+
+    private async checkBlacklist(userId: string, guildId: string | undefined, context: CommandInteraction | Message) {
         if (!guildId) {
             return this.ok();
         }
 
         const key = `user:guild:blacklist:${userId}:${guildId}`;
-        const isBlacklistedInRedis = await this.redis.get(key);
+        const isBlacklistedInRedis = await this.container.redis.get(key);
         if (isBlacklistedInRedis) {
             return this.error({
-                message: await resolveKey(interaction, 'preconditions/blacklist:user_server', { emoji: Emojis.ERROR }),
+                message: await resolveKey(context, 'preconditions/blacklist:server_user', { emoji: Emojis.ERROR }),
             });
         }
 
-        const isBlacklistedInDatabase = await this.prisma.guildBlacklistedUsers.findUnique({
+        const isBlacklistedInDatabase = await this.container.prisma.guildBlacklistedUsers.findUnique({
             where: { userId: userId, guildId: guildId }
         });
         if (isBlacklistedInDatabase) {
-            await this.redis.set(key, 'true', 'EX', 3600);
+            await this.container.redis.set(key, 'true', 'EX', 3600);
             return this.error({
-                message: await resolveKey(interaction, 'preconditions/blacklist:user_server', { emoji: Emojis.ERROR }),
+                message: await resolveKey(context, 'preconditions/blacklist:server_user', { emoji: Emojis.ERROR }),
             });
         }
 

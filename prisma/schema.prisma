@@ -1,3 +1,9 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,32 +17,248 @@ model Guilds {
   id                     Int                      @id @default(autoincrement())
   guildId                String                   @unique @map("guild_id")
   prefix                 String?                  @map("guild_prefix") @db.VarChar(5)
-  notesSettings          iNotes[]
-  iTextXP                iTextXP[]
-  notes                  Notes[]
-  iVoiceXP               iVoiceXP[]
-  iVoices                iVoices[]
-  Voices                 Voices[]
-  VoiceExperience        VocieExperience[]
+  language               String?                  @map("guild_language") @db.VarChar(5)
+  iTextXP                iTextExperience[]
+  iVoiceXP               iVoiceExperience[]
+  iVoices                iVoiceTempChannels[]
+  Voices                 VoiceTempChannels[]
+  VoiceExperience        VoiceExperience[]
   TextExperience         TextExperience[]
-  Moderation             Moderation[]
-  FilteredVoiceChannels  FilteredVoiceChannels[]
   Webhooks               Webhooks?
-  Users                  Users[]
   BlacklistedUsers       GuildBlacklistedUsers[]
   RestrictedCommandRoles RestrictedCommandRoles[]
-  RoleRewards            RoleRewards[]
+  RoleRewards            ExperienceRoleRewards[]
+  Channels               LeaderboardChannels[]
+  WeeklyTop              WeeklyTop?
+  DailyTop               DailyTop?
+  MonthlyTop             MonthlyTop?
+  BonusTXTChannels       BonusTXTChannels[]
+  BonusVoiceChannels     BonusVoiceChannels[]
+  filteredTextChannels   filteredTextChannels[]
+  filteredVoiceChannels  filteredVoiceChannels[]
+  RoleLeaderboardRewards RoleLeaderboardRewards[]
+  PremiumServers         PremiumServers?
+  EditableChannels       EditableChannels[]
+  BonusVoiceRoles        BonusVoiceRoles[]
+  BonusTextRoles         BonusTextRoles[]
+  DisabledCommands       DisabledCommands[]
+  DisabledModules        DisabledModules[]
+  GuildBadges            GuildBadges[]
   createdAt              DateTime?                @default(now()) @map("created_at")
-  updatedAt              DateTime?                @updatedAt @map("updated_at")
+  updatedAt              DateTime?                @default(now()) @updatedAt @map("updated_at")
+}
+
+model DisabledModules {
+  id        Int      @id @default(autoincrement())
+  guildId   String   @map("guild_id")
+  module    String   @map("module_name")
+  guild     Guilds   @relation(fields: [guildId], references: [guildId])
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([guildId, module])
+  @@index([guildId, module])
+}
+
+model DisabledCommands {
+  id        Int      @id @default(autoincrement())
+  guildId   String   @map("guild_id")
+  command   String   @map("command_name")
+  guild     Guilds   @relation(fields: [guildId], references: [guildId])
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([guildId, command])
+  @@index([guildId, command])
+}
+
+model PremiumServers {
+  id        Int      @id @default(autoincrement())
+  guildId   String   @unique @map("guild_id")
+  guild     Guilds   @relation(fields: [guildId], references: [guildId])
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model filteredVoiceChannels {
+  id        Int       @id @default(autoincrement())
+  guildId   String    @map("guild_id")
+  channelId String    @map("channel_id")
+  guild     Guilds    @relation(fields: [guildId], references: [guildId])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([guildId, channelId])
+  @@index([guildId, channelId])
+}
+
+model filteredTextChannels {
+  id        Int       @id @default(autoincrement())
+  guildId   String    @map("guild_id")
+  channelId String    @map("channel_id")
+  guild     Guilds    @relation(fields: [guildId], references: [guildId])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([guildId, channelId])
+  @@index([guildId, channelId])
+}
+
+model BonusTXTChannels {
+  id        Int       @id @default(autoincrement())
+  guildId   String    @map("guild_id")
+  channelId String    @map("channel_id")
+  guild     Guilds    @relation(fields: [guildId], references: [guildId])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([guildId, channelId])
+  @@index([guildId, channelId])
+}
+
+model BonusVoiceChannels {
+  id        Int       @id @default(autoincrement())
+  guildId   String    @map("guild_id")
+  channelId String    @map("channel_id")
+  guild     Guilds    @relation(fields: [guildId], references: [guildId])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([guildId, channelId])
+  @@index([guildId, channelId])
+}
+
+model BonusTextRoles {
+  id        Int       @id @default(autoincrement())
+  guildId   String    @map("guild_id")
+  roleId    String    @map("role_id")
+  guild     Guilds    @relation(fields: [guildId], references: [guildId])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([guildId, roleId])
+  @@index([guildId, roleId])
+}
+
+model BonusVoiceRoles {
+  id        Int       @id @default(autoincrement())
+  guildId   String    @map("guild_id")
+  roleId    String    @map("role_id")
+  bonus     Int?      @default(15)
+  guild     Guilds    @relation(fields: [guildId], references: [guildId])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([guildId, roleId])
+  @@index([guildId, roleId])
+}
+
+model MonthlyTop {
+  id                   Int       @id @default(autoincrement())
+  guildId              String    @unique @map("guild_id")
+  guild                Guilds    @relation(fields: [guildId], references: [guildId])
+  lastMonthlyMessageId String?   @map("last_monthly_message_id")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  @@index([guildId])
+}
+
+model WeeklyTop {
+  id                  Int       @id @default(autoincrement())
+  guildId             String    @unique @map("guild_id")
+  guild               Guilds    @relation(fields: [guildId], references: [guildId])
+  lastWeeklyMessageId String?   @map("last_weekly_message_id")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  @@index([guildId])
+}
+
+model DailyTop {
+  id                 Int       @id @default(autoincrement())
+  guildId            String    @unique @map("guild_id")
+  guild              Guilds    @relation(fields: [guildId], references: [guildId])
+  lastDailyMessageId String?   @map("last_daily_message_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  @@index([guildId])
+}
+
+model LeaderboardChannels {
+  id                         Int       @id @default(autoincrement())
+  guildId                    String    @unique @map("guild_id")
+  weeklyVoiceTop10channelId  String?   @map("weekly_vc_channel_id")
+  monthlyVoiceTop10channelId String?   @map("monthly_vc_channel_id")
+  dailyVoiceTop10channelId   String?   @map("daily_vc_cchannel_id")
+  guild                      Guilds    @relation(fields: [guildId], references: [guildId])
+  createdAt                  DateTime  @default(now()) @map("created_at")
+  updatedAt                  DateTime? @default(now()) @updatedAt @map("updated_at")
+
+  @@index([guildId])
 }
 
 model Users {
-  id        Int       @id @default(autoincrement())
-  userId    String    @unique @map("user_id")
-  guildId   String    @map("guild_id")
-  guild     Guilds    @relation(fields: [guildId], references: [guildId])
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
+  id                      Int                  @id @default(autoincrement())
+  userId                  String               @unique @map("user_id")
+  globalExperience        Int?                 @default(0) @map("global_xp")
+  globalLevel             Int?                 @default(1) @map("global_lvl")
+  totalGlobalExperience   Int?                 @default(0) @map("total_global_exp")
+  totalRegisteredMessages Int?                 @default(0) @map("total_registered_msgs")
+  totalTimeInVoiceChannel Int?                 @default(0) @map("total_vc_time")
+  aboutme                 String?              @map("about_me") @db.VarChar(255)
+  createdAt               DateTime             @default(now()) @map("created_at")
+  updatedAt               DateTime?            @updatedAt @map("updated_at")
+  userBadges              UserBadges[]
+  UsersRankCardConfig     UsersRankCardConfig?
+
+  @@index([userId])
+}
+
+model Badges {
+  id          Int           @id @default(autoincrement())
+  name        String
+  badgeUrl    String
+  createdAt   DateTime      @default(now()) @map("created_at")
+  userBadges  UserBadges[]
+  GuildBadges GuildBadges[]
+
+  @@unique([name, badgeUrl])
+  @@index([name, badgeUrl])
+}
+
+model GuildBadges {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  badgeId   Int
+  guild     Guilds   @relation(fields: [guildId], references: [guildId])
+  badge     Badges   @relation(fields: [badgeId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([guildId, badgeId])
+  @@index([guildId, badgeId])
+}
+
+model UserBadges {
+  id      Int    @unique @default(autoincrement())
+  userId  String
+  badgeId Int
+  user    Users  @relation(fields: [userId], references: [userId])
+  badge   Badges @relation(fields: [badgeId], references: [id])
+
+  @@id([userId, badgeId])
+  @@index([userId, badgeId])
+}
+
+model UsersRankCardConfig {
+  id                     Int      @id @default(autoincrement())
+  userId                 String   @unique @map("user_id")
+  background             String?  @map("background_url")
+  fontColor              String?  @map("font_color")
+  progressBarFirstColor  String?  @map("bar_first_color")
+  progressBarSecondColor String?  @map("bar_second_color")
+  user                   Users    @relation(fields: [userId], references: [userId])
+  createdAt              DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
 }
 
 model GuildBlacklistedUsers {
@@ -45,12 +267,16 @@ model GuildBlacklistedUsers {
   guildId   String   @map("guild_id")
   guild     Guilds   @relation(fields: [guildId], references: [guildId])
   createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
 }
 
 model BotBlackListedGuilds {
   id        Int      @id @default(autoincrement())
   guildId   String   @unique @map("guild_id")
   createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([guildId])
 }
 
 model BotBlackListedUsers {
@@ -59,128 +285,94 @@ model BotBlackListedUsers {
   createdAt DateTime @default(now()) @map("created_at")
 }
 
-model iNotes {
-  id                 Int       @id @default(autoincrement())
-  guildId            String    @unique @map("guild_id")
-  notesLogsChannelId String?   @map("notes_log_channel_id")
-  guild              Guilds?   @relation(fields: [guildId], references: [guildId])
-  notes              Notes[]
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime? @updatedAt @map("updated_at")
-}
-
-model iTextXP {
-  id        Int       @id @default(autoincrement())
-  guildId   String    @map("guild_id")
-  min       Int?      @map("txt_exp_amount_min")
-  max       Int?      @map("txt_exp_amount_max")
-  isEnabled Boolean?  @default(true) @map("is_enabled")
-  guild     Guilds?   @relation(fields: [guildId], references: [guildId])
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-
-  @@unique([id, guildId])
-}
-
-model iVoiceXP {
+model iTextExperience {
   id           Int       @id @default(autoincrement())
   guildId      String    @unique @map("guild_id")
-  min          Int?      @map("min_exp")
-  max          Int?      @map("max_exp")
+  min          Int?      @default(5) @map("min_exp")
+  max          Int?      @default(50) @map("max_exp")
   isEnabled    Boolean?  @default(true)
-  cooldown     Int?      @map("exp_cd")
+  cooldown     Int?      @default(60) @map("exp_cd")
   msgChannelId String?   @map("msg_channel_id")
   lvlUpMsg     String?   @map("lvlup_msg")
-  rewards      Reward[]  @relation("iVoiceXP_Reward")
   guild        Guilds    @relation(fields: [guildId], references: [guildId])
   createdAt    DateTime  @default(now())
   updatedAt    DateTime? @updatedAt
 }
 
-model Reward {
+model iVoiceExperience {
+  id           Int       @id @default(autoincrement())
+  guildId      String    @unique @map("guild_id")
+  min          Int?      @default(5) @map("min_exp")
+  max          Int?      @default(25) @map("max_exp")
+  isEnabled    Boolean?  @default(true)
+  cooldown     Int?      @default(60) @map("exp_cd")
+  msgChannelId String?   @map("msg_channel_id")
+  lvlUpMsg     String?   @map("lvlup_msg")
+  guild        Guilds    @relation(fields: [guildId], references: [guildId])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
+
+  @@index([guildId])
+}
+
+model iVoiceTempChannels {
+  id              Int       @id @default(autoincrement())
+  guildId         String    @map("guild_id")
+  channelId       String    @map("create_channel_id")
+  categoryId      String    @map("create_channel_parent_id")
+  editables       Boolean?  @map("is_editable")
+  channelLimit    Int?      @map("channel_limit")
+  channelName     String?   @map("default_channel_name")
+  shouldEnumerate Boolean?  @map("should_enumerate")
+  guild           Guilds    @relation(fields: [guildId], references: [guildId])
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime? @updatedAt @map("updated_at")
+
+  @@unique([guildId, channelId])
+  @@index([guildId, channelId])
+}
+
+model EditableChannels {
   id         Int      @id @default(autoincrement())
-  type       String
-  level      Int
-  rol        String
-  ivoiceXp   iVoiceXP @relation("iVoiceXP_Reward", fields: [iVoiceXpId], references: [id])
-  iVoiceXpId Int      @map("iVoiceXP_id")
+  guildId    String   @map("guild_id")
+  categoryId String   @map("category_id")
+  editable   Boolean  @default(true)
+  guild      Guilds   @relation(fields: [guildId], references: [guildId])
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([guildId, categoryId])
 }
 
-model iVoices {
-  id              Int               @id @default(autoincrement())
-  guildId         String            @map("guild_id")
-  channelId       String            @map("create_channel_id")
-  categoryId      String            @map("create_channel_parent_id")
-  editables       Boolean?          @map("is_editable")
-  channelLimit    Int?              @map("channel_limit")
-  channelName     String?           @map("default_channel_name")
-  shouldEnumerate Boolean?          @map("should_enumerate")
-  guild           Guilds            @relation(fields: [guildId], references: [guildId])
-  iTempVoiceUtils iTempVoiceUtils[]
-  createdAt       DateTime          @default(now()) @map("created_at")
-  updatedAt       DateTime?         @updatedAt @map("updated_at")
+model VoiceTempChannels {
+  id                Int                 @id @default(autoincrement())
+  guildId           String              @map("guild_id")
+  channelId         String              @map("channel_id")
+  channelOwnerId    String              @map("channel_owner_id")
+  channelCategoryId String              @map("channel_category_id")
+  guild             Guilds              @relation(fields: [guildId], references: [guildId])
+  VoiceTrustedUsers TrustedVoiceUsers[]
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime?           @updatedAt @map("updated_at")
 
   @@unique([guildId, channelId])
+  @@index([guildId, channelId])
 }
 
-model iTempVoiceUtils {
-  id                     Int       @id @default(autoincrement())
-  guildId                String    @map("guild_id")
-  channelId              String    @map("channel_id")
-  defaultChannelLimit    Int?      @map("channel_limit")
-  defaultChannelName     String?   @map("channel_name")
-  defaultCommandsChannel String?   @map("cmds_channel_id")
-  iVoices                iVoices   @relation(fields: [guildId, channelId], references: [guildId, channelId])
-  createdAt              DateTime  @default(now()) @map("created_at")
-  updatedAt              DateTime? @updatedAt @map("updated_at")
-
-  @@unique([guildId, channelId])
-}
-
-model Notes {
-  id            Int       @id @default(autoincrement())
-  guildId       String    @map("guild_id")
-  userId        String    @map("user_id")
-  note          String    @db.MediumText
-  noteId        Int       @unique @map("note_id")
-  perpetratorId String    @map("perpetrator_id")
-  allowedRoleId String?   @map("allowed_role_id")
-  attachmentUrl String?   @map("attachment_url") @db.MediumText
-  unix          String?   @map("time_unix")
-  iNotesId      Int?      @map("inotes_id")
-  guild         Guilds    @relation(fields: [guildId], references: [guildId])
-  iNotes        iNotes?   @relation(fields: [iNotesId], references: [id])
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime? @updatedAt @map("updated_at")
-}
-
-model Voices {
-  id                Int          @id @default(autoincrement())
-  guildId           String       @map("guild_id")
-  channelId         String       @map("channel_id")
-  channelOwnerId    String       @map("channel_owner_id")
-  channelCategoryId String       @map("channel_category_id")
-  guild             Guilds       @relation(fields: [guildId], references: [guildId])
-  VoiceTrustedUsers VoiceUsers[]
-  createdAt         DateTime     @default(now()) @map("created_at")
-  updatedAt         DateTime?    @updatedAt @map("updated_at")
-
-  @@unique([guildId, channelId])
-}
-
-model VoiceUsers {
-  id        Int       @id @default(autoincrement())
-  guildId   String    @map("guild_id")
-  channelId String    @map("channel_id")
-  userId    String    @map("user_id")
-  channel   Voices    @relation(fields: [guildId, channelId], references: [guildId, channelId])
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
+model TrustedVoiceUsers {
+  id        Int               @id @default(autoincrement())
+  guildId   String            @map("guild_id")
+  channelId String            @map("channel_id")
+  userId    String            @map("user_id")
+  channel   VoiceTempChannels @relation(fields: [guildId, channelId], references: [guildId, channelId])
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime?         @updatedAt @map("updated_at")
 
   @@unique([guildId, channelId, userId])
+  @@index([guildId, channelId, userId])
 }
 
-model iUsersVoice {
+model iUsersTempVoice {
   id           Int       @id @default(autoincrement())
   userId       String    @unique @map("user_id")
   channelName  String?   @map("channel_name")
@@ -188,58 +380,45 @@ model iUsersVoice {
   isLocked     Boolean?  @map("is_channel_locked")
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime? @updatedAt @map("updated_at")
+
+  @@index([userId])
 }
 
-model VocieExperience {
-  id                      Int      @id @default(autoincrement())
-  guildId                 String   @map("guild_id")
-  userId                  String   @map("user_id")
-  voiceExperience         Int?     @default(0) @map("vc_xp")
-  voiceLevel              Int?     @default(1) @map("vc_lvl")
-  totalVoiceExperience    Int?     @default(0) @map("total_vc_exp")
-  totalTimeInVoiceChannel Int?     @default(0) @map("total_vc_time")
-  guild                   Guilds?  @relation(fields: [guildId], references: [guildId])
-  createdAt               DateTime @default(now()) @map("created_at")
+model VoiceExperience {
+  id                        Int       @id @default(autoincrement())
+  guildId                   String    @map("guild_id")
+  userId                    String    @map("user_id")
+  voiceExperience           Int?      @default(0) @map("vc_xp")
+  voiceLevel                Int?      @default(1) @map("vc_lvl")
+  dailyTimeInVoiceChannel   Int?      @default(0) @map("daily_vc_time")
+  weeklyTimeInVoiceChannel  Int?      @default(0) @map("weekly_vc_time")
+  monthlyTimeInVoiceChannel Int?      @default(0) @map("monthly_vc_time")
+  totalVoiceExperience      Int?      @default(0) @map("total_vc_exp")
+  totalTimeInVoiceChannel   Int?      @default(0) @map("total_vc_time")
+  guild                     Guilds?   @relation(fields: [guildId], references: [guildId])
+  createdAt                 DateTime  @default(now()) @map("created_at")
+  updatedAt                 DateTime? @default(now()) @updatedAt @map("updated_at")
 
   @@unique([guildId, userId])
+  @@index([guildId, userId])
 }
 
 model TextExperience {
-  id                     Int      @id @default(autoincrement())
-  guildId                String   @map("guild_id")
-  userId                 String   @map("user_id")
-  textExperience         Int?     @default(0) @map("txt_xp")
-  textLevel              Int?     @default(1) @map("txt_lvl")
-  totalTextExperience    Int?     @default(0) @map("total_txt_exp")
-  totalTimeInTextChannel Int?     @default(0) @map("total_txt_time")
-  guild                  Guilds?  @relation(fields: [guildId], references: [guildId])
-  createdAt              DateTime @default(now()) @map("created_at")
+  id                   Int       @id @default(autoincrement())
+  guildId              String    @map("guild_id")
+  userId               String    @map("user_id")
+  textExperience       Int?      @default(0) @map("txt_xp")
+  textLevel            Int?      @default(1) @map("txt_lvl")
+  totalTextExperience  Int?      @default(0) @map("total_txt_exp")
+  totalMessagesDaily   Int?      @default(0) @map("total_daily_msgs")
+  totalMessagesWeekly  Int?      @default(0) @map("total_weekly_msgs")
+  totalMessagesMonthly Int?      @default(0) @map("total_monthly_msgs")
+  guild                Guilds?   @relation(fields: [guildId], references: [guildId])
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime? @default(now()) @updatedAt @map("updated_at")
 
   @@unique([guildId, userId])
-}
-
-model FilteredVoiceChannels {
-  id        Int     @id @default(autoincrement())
-  guildId   String  @map("guild_id")
-  channelId String  @map("channel_id")
-  guild     Guilds? @relation(fields: [guildId], references: [guildId])
-
-  @@unique([guildId, channelId])
-}
-
-model Moderation {
-  id          Int       @id @default(autoincrement()) @map("case_id")
-  caseId      Int       @map("case_guild_id")
-  guildId     String    @map("guild_id")
-  userId      String    @map("user_id")
-  moderatorId String    @map("mod_id")
-  type        String    @map("case_type")
-  reason      String    @map("case_reason") @db.MediumText
-  guild       Guilds    @relation(fields: [guildId], references: [guildId])
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime? @updatedAt @map("updated_at")
-
-  @@unique([caseId, guildId])
+  @@index([guildId, userId])
 }
 
 model Webhooks {
@@ -252,29 +431,47 @@ model Webhooks {
   guild        Guilds    @relation(fields: [guildId], references: [guildId])
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime? @updatedAt @map("updated_at")
+
+  @@index([guildId])
 }
 
 model RestrictedCommandRoles {
   id          Int      @id @default(autoincrement())
   guildId     String   @map("guild_id")
   roleId      String   @map("role_id")
-  commandId   String   @map("command_id")
   commandName String   @map("command_name")
   guild       Guilds   @relation(fields: [guildId], references: [guildId])
   createdAt   DateTime @default(now()) @map("created_at")
 
-  @@unique([guildId, commandId])
+  @@unique([guildId, roleId, commandName])
+  @@index([guildId, roleId, commandName])
 }
 
-model RoleRewards {
+model ExperienceRoleRewards {
   id        Int       @id @default(autoincrement())
   guildId   String    @map("guild_id")
-  roleId    String    @map("role_id")
-  roleType  String    @map("role_type")
-  level     Int
-  guild     Guilds    @relation(fields: [guildId], references: [guildId])
+  roleId    String?   @map("role_id")
+  roleType  String?   @map("role_type")
+  level     Int?
+  guild     Guilds?   @relation(fields: [guildId], references: [guildId])
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
 
-  @@unique([guildId, roleId])
+  @@unique([guildId, roleId, roleType])
+  @@index([guildId, roleId, roleType])
+}
+
+model RoleLeaderboardRewards {
+  id         Int       @id @default(autoincrement())
+  guildId    String    @map("guild_id")
+  roleId     String    @map("role_id")
+  roleType   String    @map("role_type")
+  level      Int
+  rewardType String    @map("reward_type")
+  guild      Guilds    @relation(fields: [guildId], references: [guildId])
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime? @updatedAt @map("updated_at")
+
+  @@unique([guildId, roleId, roleType])
+  @@index([guildId, roleId, roleType])
 }

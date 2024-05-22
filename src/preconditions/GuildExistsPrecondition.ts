@@ -1,27 +1,38 @@
-import { Prisma, PrismaCoreModule } from "@lib/database/prisma";
-import { Redis, RedisCoreModule } from "@lib/database/redis";
-import { Precondition } from "@sapphire/framework";
-import { CommandInteraction } from "discord.js";
+import { Precondition, PreconditionResult } from "@sapphire/framework";
+import { CommandInteraction, Message } from "discord.js";
 
 export class GuildExistsPrecondition extends Precondition {
-    private prisma: PrismaCoreModule = Prisma;
-    private redis: RedisCoreModule = Redis;
-
-    public async chatInputRun(interaction: CommandInteraction) {
-        const guildId = interaction.guildId;
+    
+    private async checkGuildExists(guildId: string): Promise<PreconditionResult> {
         const cacheKey = `guild:${guildId}`;
-        const cachedData = await this.redis.get(cacheKey);
+        const cachedData = await this.container.redis.get(cacheKey);
         let guild: unknown;
 
         if (cachedData) {
             guild = JSON.parse(cachedData);
         } else {
-            guild = await this.prisma.guilds.findUnique({ where: { guildId } });
+            guild = await this.container.prisma.guilds.findUnique({ where: { guildId } });
             if (!guild) {
-                guild = await this.prisma.guilds.create({ data: { guildId } });
+                guild = await this.container.prisma.guilds.create({ data: { guildId } });
             }
-            await this.redis.set(cacheKey, JSON.stringify(guild), 'EX', 3600);
+            await this.container.redis.set(cacheKey, JSON.stringify(guild), 'EX', 3600);
         }
         return this.ok();
+    }
+
+    public override async chatInputRun(interaction: CommandInteraction) {
+        if (!interaction.guild) {
+            return this.ok();
+        }
+
+        return this.checkGuildExists(interaction.guild.id);
+    }
+
+    public override async messageRun(message: Message) {
+        if (!message.guild) {
+            return this.ok();
+        }
+
+        return this.checkGuildExists(message.guild.id);
     }
 }

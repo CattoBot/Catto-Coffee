@@ -1,71 +1,16 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "commonjs",
-    "outDir": "dist",
-    "allowJs": true,
-    "strict": false,
-    "lib": [
-      "ESNext",
-      "ESNext.Array",
-      "ESNext.AsyncIterable",
-      "ESNext.Intl",
-      "ESNext.Symbol",
-      "DOM"
-    ],
-    "sourceMap": false,
-    "inlineSourceMap": true,
-    "incremental": true,
-    "inlineSources": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "skipDefaultLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "@core/*": [
-        "src/core/*"
-      ],
-      "@commands/*": [
-        "src/commands/*"
-      ],
-      "@lib/*": [
-        "src/lib/*"
-      ],
-      "@shared/*": [
-        "src/shared/*"
-      ],
-      "@logger": [
-        "src/lib/helpers/misc/logger.helper"
-      ],
-      "@VoiceCommands": [
-        "src/lib/helpers/bot/commands/voice/index"
-      ],
-      "@AdminCommands": [
-        "src/lib/helpers/bot/commands/admin/index"
-      ],
-      "@app/*": [
-        "src/app/*"
-      ],
-      "@utils/*": [
-        "src/utils/*"
-      ],
-      "@logs/*": [
-        "src/utils/logs/*"
-      ],
-      "@main/*": [
-        "src/*"
-      ],
-    }
-  },
-  "include": [
-    "src/",
-    "src/**/*.json"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+	"extends": [
+		"@sapphire/ts-config",
+		"@sapphire/ts-config/extra-strict",
+		"@sapphire/ts-config/decorators"
+	],
+	"compilerOptions": {
+		"rootDir": "src",
+		"outDir": "dist",
+		"tsBuildInfoFile": "dist/.tsbuildinfo",
+	},
+	"include": [
+		"src",
+		"src/**/*.json"
+	]
 }

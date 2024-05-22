@@ -1,1 +1,0 @@
-export const XPCalculator = (level: number) => Math.floor(100 * Math.pow(level, 1.5));

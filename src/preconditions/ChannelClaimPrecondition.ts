@@ -1,31 +1,60 @@
-import { Prisma, PrismaCoreModule } from "@lib/database/prisma";
 import { Precondition } from "@sapphire/framework";
 import { resolveKey } from "@sapphire/plugin-i18next";
-import { Emojis } from "@shared/enum/misc/emojis.enum";
-import { CommandInteraction, GuildMember } from "discord.js";
+import { Emojis } from "../shared/enum/Emojis";
+import { CommandInteraction, GuildMember, Message } from "discord.js";
 
 export class ChannelClaimPrecondition extends Precondition {
-    private prisma: PrismaCoreModule = Prisma;
-    public async chatInputRun(interaction: CommandInteraction) {
-        const member = interaction.guild.members.resolve(interaction.user.id) as GuildMember;
-        const ownerId = await this.getVoiceChannelOwner(member.voice.channel.id, interaction.guild.id);
+    public override async chatInputRun(interaction: CommandInteraction) {
+        return this.processInteraction(interaction);
+    }
 
-        if (member.voice.channel.members.has(ownerId)) {
+    public override async messageRun(message: Message) {
+        return this.processMessage(message);
+    }
+
+    private async processInteraction(interaction: CommandInteraction) {
+        const member = interaction.guild?.members.resolve(interaction.user.id) as GuildMember;
+        const voiceChannel = member.voice?.channel;
+
+        if (!voiceChannel) {
+            return this.error({ message: await resolveKey(interaction, `commands/replies/voice:user_not_in_voice_channel`, { emoji: Emojis.ERROR }) });
+        }
+
+        const ownerId = await this.getVoiceChannelOwner(voiceChannel.id, interaction.guild!.id);
+
+        if (voiceChannel.members.has(ownerId)) {
             return this.error({ message: await resolveKey(interaction, `commands/replies/voice:owner_in_voice_channel`, { emoji: Emojis.ERROR }) });
         }
 
         return this.ok();
     }
 
+    private async processMessage(message: Message) {
+        const member = message.guild?.members.resolve(message.author.id) as GuildMember;
+        const voiceChannel = member.voice?.channel;
+
+        if (!voiceChannel) {
+            return this.error({ message: await resolveKey(message, `commands/replies/voice:user_not_in_voice_channel`, { emoji: Emojis.ERROR }) });
+        }
+
+        const ownerId = await this.getVoiceChannelOwner(voiceChannel.id, message.guild!.id);
+
+        if (voiceChannel.members.has(ownerId)) {
+            return this.error({ message: await resolveKey(message, `commands/replies/voice:owner_in_voice_channel`, { emoji: Emojis.ERROR }) });
+        }
+
+        return this.ok();
+    }
+
     private async getVoiceChannelOwner(channelId: string, guildId: string) {
-        const owner = await this.prisma.voices.findUnique({
+        const owner = await this.container.prisma.voiceTempChannels.findUnique({
             where: {
                 guildId_channelId: {
                     guildId: guildId,
                     channelId: channelId,
                 }
             }
-        })
-        return owner.channelOwnerId;
+        });
+        return owner?.channelOwnerId ?? "";
     }
 }

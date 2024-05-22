@@ -1,13 +1,17 @@
-import '@sapphire/plugin-subcommands/register';
-import '@sapphire/plugin-i18next/register';
-import { Client } from "@app/client";
-import { ClientRunHelper as app } from "@lib/helpers/bot/client/client-run.helper";
-const client = new Client();
+import './lib/setup';
+import { ApplicationClient } from './app/client';
 
 async function main(): Promise<void> {
-   return app.run(client);
+	const client = new ApplicationClient();
+	try {
+		client.logger.info('Logging in');
+		await client.login();
+		client.logger.info('Logged in');
+	} catch (error) {
+		client.logger.fatal(error);
+		await client.destroy();
+		process.exit(1);
+	}
 }
 
-main();
-
-export { client as ApplicationClient };
+void main()
