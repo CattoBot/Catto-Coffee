@@ -1,11 +1,3 @@
-# TypeScript Complete Sapphire Bot example
-
-This is a more complete setup of a Discord bot using the [sapphire framework][sapphire] written in TypeScript.
-
-It is similar to the [starter setup](../with-typescript-starter/), but adds more data structures and a more complete setup.
-
-## How to use it?
-
 ### Prerequisite
 
 ```sh
