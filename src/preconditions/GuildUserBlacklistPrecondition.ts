@@ -26,7 +26,7 @@ export class GuildUserBlacklistPrecondition extends Precondition {
             });
         }
 
-        const isBlacklistedInDatabase = await this.container.prisma.guildBlacklistedUsers.findUnique({
+        const isBlacklistedInDatabase = await this.container.prisma.guild_blacklisted_users.findUnique({
             where: { userId: userId, guildId: guildId }
         });
         if (isBlacklistedInDatabase) {

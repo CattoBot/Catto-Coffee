@@ -3,9 +3,10 @@ import { createCanvas, loadImage } from 'canvas';
 import type { ButtonInteraction, User } from 'discord.js';
 import { join } from 'path';
 import { CheckVoiceExperienceEnabled } from '../../lib/decorators/InteractionVoiceExpEnabled';
-import { drawFormattedRank, drawProgressBar, drawProgressBarForUser, drawRoundedImage, drawUserAvatar, drawUserData, experienceFormula, formatNumber } from '../../lib/utils';
+import { drawFormattedRank, drawProgressBar, drawProgressBarForUser, drawRoundedImage, drawUserAvatar, drawUserData, experienceFormula, formatNumber, registeringFONT } from '../../lib/utils';
 import { VoiceRankButtonOnly } from '../../shared/bot/buttons/LevelingButtonts';
 import { resolveKey } from '@sapphire/plugin-i18next';
+import { ButtonCooldown } from '../../lib/decorators/HandlersCooldown';
 
 export class ButtonVoiceLeaderboardHandler extends InteractionHandler {
     public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
@@ -21,25 +22,25 @@ export class ButtonVoiceLeaderboardHandler extends InteractionHandler {
     }
 
     @CheckVoiceExperienceEnabled
+    @ButtonCooldown(60)
     public async run(interaction: ButtonInteraction) {
-        console.time('Leaderboard.run');
-
+        registeringFONT();
+        await interaction.deferReply()
         const guild_leaderboard = await this.getVoiceLeaderboard(interaction.guildId!);
         if (guild_leaderboard.length === 0) {
-            await interaction.reply({ content: await resolveKey(interaction, `commands/replies/level:lb_not_data`) });
+            await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:lb_not_data`) });
             console.timeEnd('ButtonVoiceLeaderboardHandler.run');
             return;
         }
 
         const top10 = guild_leaderboard.slice(0, 10);
-        const userRank = guild_leaderboard.findIndex((user) => user.userId === interaction.member!.user.id) + 1;
+        const userRank = guild_leaderboard.findIndex((user) => user.userId === interaction.user.id) + 1;
         if (userRank === 0) {
-            await interaction.reply({ content: await resolveKey(interaction, 'commands/replies/level:lb_voice_user_not_data') });
-            console.timeEnd('ButtonVoiceLeaderboardHandler.run');
+            await interaction.editReply({ content: await resolveKey(interaction, 'commands/replies/level:lb_voice_user_not_data') });
             return;
         }
 
-        const userdata = guild_leaderboard.find((user) => user.userId === interaction.member!.user.id);
+        const userdata = guild_leaderboard.find((user) => user.userId === interaction.user.id);
         const [avatarloadimage, backgroundImage] = await Promise.all([
             loadImage(interaction.user.displayAvatarURL({ extension: 'jpg', size: 64 })),
             loadImage(join(__dirname, '../../../assets/img/Leader_VC_v2.jpg'))
@@ -115,7 +116,7 @@ export class ButtonVoiceLeaderboardHandler extends InteractionHandler {
 
         const userDataX = userAvatarX + userAvatarSize + Math.floor(imageWidth * 0.03);
         const userDataY = userAvatarY + 20;
-        drawUserData(context, interaction.member!.user.username, formatNumber(userdata?.voiceLevel!), formatNumber(userdata?.voiceExperience!), userDataX, userDataY);
+        drawUserData(context, interaction.user.displayName, formatNumber(userdata?.voiceLevel!), formatNumber(userdata?.voiceExperience!), userDataX, userDataY);
 
         const progressForUser = userdata?.voiceExperience! / experienceFormula(userdata?.voiceLevel! + 1);
         const progressBarForUserX = userDataX;
@@ -126,13 +127,12 @@ export class ButtonVoiceLeaderboardHandler extends InteractionHandler {
         drawProgressBarForUser(context, progressForUser, progressBarForUserX, progressBarForUserY, progressBarForUserWidth, progressBarForUserHeight, userColor.start, userColor.end);
 
         const buffer = canvas.toBuffer('image/png');
-        await interaction.update({ files: [{ attachment: buffer, name: 'leaderboard.png' }], components: [VoiceRankButtonOnly] });
-        console.timeEnd('Leaderboard.run');
+        await interaction.editReply({ files: [{ attachment: buffer, name: 'leaderboard.png' }], components: [VoiceRankButtonOnly] });
         return;
     }
 
     private async getVoiceLeaderboard(guildId: string) {
-        return await container.prisma.voiceExperience.findMany({
+        return await container.prisma.voice_experience.findMany({
             where: { guildId },
             orderBy: [
                 { voiceLevel: 'desc' },

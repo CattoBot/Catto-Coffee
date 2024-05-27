@@ -37,14 +37,14 @@ async function initializeDatabaseEntries() {
 
         if (!voiceExperience) {
             container.console.warn(`No voice experience entry found for guild ID: ${guildId}, creating new entry.`);
-            await container.prisma.iVoiceExperience.create({
+            await container.prisma.i_voice_experience.create({
                 data: { guildId }
             });
         }
 
         if (!textExperience) {
             container.console.warn(`No text experience entry found for guild ID: ${guildId}, creating new entry.`);
-            await container.prisma.iTextExperience.create({
+            await container.prisma.i_text_experience.create({
                 data: { guildId }
             });
         }
@@ -61,11 +61,11 @@ async function Guild(guildId: string) {
 }
 
 async function VoiceExperience(guildId: string) {
-    const voiceExperience = await container.prisma.iVoiceExperience.findUnique({ where: { guildId } });
+    const voiceExperience = await container.prisma.i_voice_experience.findUnique({ where: { guildId } });
     return voiceExperience;
 }
 
 async function TextExperience(guildId: string) {
-    const textExperience = await container.prisma.iTextExperience.findUnique({ where: { guildId } });
+    const textExperience = await container.prisma.i_text_experience.findUnique({ where: { guildId } });
     return textExperience;
 }

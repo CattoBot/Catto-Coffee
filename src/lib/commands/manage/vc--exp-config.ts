@@ -52,7 +52,7 @@ export class VoiceExperienceCommand {
         if (channelNotification !== null) updateData.msgChannelId = channelNotification.id;
         if (messageNotification !== null) updateData.lvlUpMsg = messageNotification;
 
-        await container.prisma.iVoiceExperience.upsert({
+        await container.prisma.i_voice_experience.upsert({
             where: {
                 guildId: interaction.guild!.id
             },
@@ -60,13 +60,16 @@ export class VoiceExperienceCommand {
                 guildId: interaction.guild!.id,
                 min: min ?? 5,
                 max: max ?? 20,
-                cooldown: cooldown ?? 0,
+                cooldown: cooldown ?? 60,
                 msgChannelId: channelNotification?.id ?? '',
                 lvlUpMsg: messageNotification ?? ''
             },
             update: updateData
         });
-        await container.redis.del(`voiceExpSettings:${interaction.guild!.id}`);
+
+        await container.redis.del(`minMaxExpVoice:${interaction.guild!.id}`);
+        await container.redis.del(`voiceLevelUpMessage:${interaction.guild!.id}`);
+        await container.redis.del(`notificationVoiceChannelID:${interaction.guild!.id}`);
 
         return await interaction.reply({
             content: await resolveKey(interaction, `commands/replies/admin:voice_config_success`, { emoji: Emojis.SUCCESS }),

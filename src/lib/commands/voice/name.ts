@@ -1,6 +1,6 @@
-import { Args } from "@sapphire/framework";
+import { Args, container } from "@sapphire/framework";
 import { resolveKey } from "@sapphire/plugin-i18next";
-import { Message } from "discord.js";
+import { GuildMember, Message } from "discord.js";
 import { Emojis } from "../../../shared/enum/Emojis";
 
 export class VoiceNameCommand {
@@ -14,9 +14,23 @@ export class VoiceNameCommand {
             return;
         }
         await message.member?.voice.channel?.setName(name.toString());
+        await this.updateName(name, message.member!);
         await message.reply({
             content:
                 (await resolveKey(message, 'commands/replies/voice:voice_name_success', { emoji: Emojis.SUCCESS, name: name }))
         });
+    }
+
+    private static async updateName(name: string, member: GuildMember): Promise<void> {
+        await container.prisma.i_users_temp_voice.upsert({
+            where: {
+                userId: member.id
+            }, update: {
+                channelName: name
+            }, create: {
+                userId: member.id,
+                channelName: name
+            }
+        })
     }
 }

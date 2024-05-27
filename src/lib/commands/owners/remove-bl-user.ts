@@ -32,7 +32,7 @@ export class RemoveUserBlacklistCommand {
     }
 
     private static async removeFromDatabase(userId: string) {
-        await container.prisma.botBlackListedUsers.delete({
+        await container.prisma.bot_black_listed_users.delete({
             where: { userId: userId }
         });
     }
@@ -42,7 +42,7 @@ export class RemoveUserBlacklistCommand {
     }
 
     private static async fetchUser(userId: string) {
-        return await container.prisma.botBlackListedUsers.findUnique({
+        return await container.prisma.bot_black_listed_users.findUnique({
             where: { userId: userId }
         });
     }

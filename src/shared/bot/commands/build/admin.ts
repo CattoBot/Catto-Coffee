@@ -119,9 +119,9 @@ export class AdminSubCommandsRegistration {
                     )
                 )
                 .addSubcommandGroup((group) => applyLocalizedBuilder(group, 'commands/names/admin:setup', 'commands/descriptions/admin:setup')
-                    .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:setup_logs', 'commands/descriptions/admin:setup_logs')
-                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_logs', 'commands/options/admin:channel_description_logs').setRequired(true))
-                    )
+                    // .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:setup_logs', 'commands/descriptions/admin:setup_logs')
+                    //     .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_logs', 'commands/options/admin:channel_description_logs').setRequired(true))
+                    // )
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:setup_voices', 'commands/descriptions/admin:setup_voices')
                     )
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:setup_prefix', 'commands/descriptions/admin:setup_prefix')
@@ -150,7 +150,13 @@ export class AdminSubCommandsRegistration {
                         .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:enable_command', 'commands/options/admin:command_description_enable').setRequired(true))
                     )
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:enable_module', 'commands/descriptions/admin:enable_module')
-                        .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:enable_module', 'commands/options/admin:module_description_enable').setRequired(true))
+                        .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:enable_module', 'commands/options/admin:module_description_enable').setRequired(true)
+                            .setChoices(
+                                { name: 'Voice Experience', value: 'voicexp' },
+                                { name: 'Text Experience', value: 'textxp' },
+                                { name: "Temporal Voice Channels", value: "voice" }
+                            )
+                        )
                     )
                 )
                 .addSubcommandGroup((group) => applyLocalizedBuilder(group, 'commands/names/admin:disable', 'commands/descriptions/admin:disable')
@@ -158,7 +164,13 @@ export class AdminSubCommandsRegistration {
                         .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:disable_command', 'commands/options/admin:command_description_disable').setRequired(true))
                     )
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:disable_module', 'commands/descriptions/admin:disable_module')
-                        .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:disable_module', 'commands/options/admin:module_description_disable').setRequired(true))
+                        .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:disable_module', 'commands/options/admin:module_description_disable').setRequired(true)
+                            .setChoices(
+                                { name: 'Voice Experience', value: 'voicexp' },
+                                { name: 'Text Experience', value: 'textxp' },
+                                { name: "Temporal Voice Channels", value: "voice" }
+                            )
+                        )
                     )
                 )
                 .addSubcommandGroup((group) => applyLocalizedBuilder(group, 'commands/names/admin:badge', 'commands/descriptions/admin:badge')

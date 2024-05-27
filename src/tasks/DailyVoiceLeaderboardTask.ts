@@ -16,7 +16,7 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     public async run(): Promise<void> {
-        const dailyTop = await this.container.prisma.dailyTop.findMany();
+        const dailyTop = await this.container.prisma.daily_top.findMany();
         this.container.console.info('Starting to process daily tops...', dailyTop);
 
         for (const top of dailyTop) {
@@ -58,7 +58,7 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
 
     private async getTop10VoiceUsers(guildId: string) {
         this.container.console.info('Fetching top 10 voice users...');
-        const top = await this.container.prisma.voiceExperience.findMany({
+        const top = await this.container.prisma.voice_experience.findMany({
             where: { guildId },
             take: 10,
             orderBy: { dailyTimeInVoiceChannel: 'desc' }
@@ -68,7 +68,7 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     private async deletedailyVoiceExperience(guildId: string) {
-        await this.container.prisma.voiceExperience.updateMany({
+        await this.container.prisma.voice_experience.updateMany({
             where: { guildId },
             data: { dailyTimeInVoiceChannel: 0 }
         });
@@ -76,7 +76,7 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     private async getChannelId(guildId: string) {
-        const channel = await this.container.prisma.leaderboardChannels.findUnique({
+        const channel = await this.container.prisma.leaderboard_channels.findUnique({
             where: { guildId }
         });
         this.container.console.info('Fetched channel ID:', channel?.dailyVoiceTop10channelId);
@@ -88,7 +88,7 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
         this.container.console.info('Fetched next publish date from Redis:', nextDateString);
 
         if (!nextDateString) {
-            const dailyTop = await this.container.prisma.dailyTop.findUnique({
+            const dailyTop = await this.container.prisma.daily_top.findUnique({
                 where: { guildId }
             });
 
@@ -96,7 +96,7 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
                 throw new Error(`dailyTop record not found for guildId: ${guildId}`);
             }
 
-            const baseDate = dailyTop.updatedAt!;
+            const baseDate = dailyTop.updated_at!;
             this.container.console.info(`Fetched base date from database (updatedAt): ${baseDate}`);
 
             const nextDate = addHours(baseDate, 24); // 24 hours
@@ -116,7 +116,7 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     private async updatedailyTopMessageId(guildId: string, messageId: string): Promise<void> {
-        await this.container.prisma.dailyTop.update({
+        await this.container.prisma.daily_top.update({
             where: { guildId },
             data: { lastDailyMessageId: messageId }
         });

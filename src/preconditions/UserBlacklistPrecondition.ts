@@ -22,7 +22,7 @@ export class UserBlacklistPrecondition extends Precondition {
             });
         }
 
-        const userbl = await this.container.prisma.botBlackListedUsers.findUnique({
+        const userbl = await this.container.prisma.bot_black_listed_users.findUnique({
             where: { userId: userId }
         });
 

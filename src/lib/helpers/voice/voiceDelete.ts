@@ -14,7 +14,7 @@ export class VoiceDeleteHelper extends Helper {
 
     public async findExistingChannel(guildId: string, voiceChannel: VoiceChannel) {
         try {
-            const channel = await container.prisma.voiceTempChannels.findUnique({
+            const channel = await container.prisma.voice_temp_channels.findUnique({
                 where: {
                     guildId_channelId: {
                         guildId: guildId,
@@ -35,7 +35,7 @@ export class VoiceDeleteHelper extends Helper {
     }
 
     private async deleteTrustedUsers(channelId: string) {
-        const users = await container.prisma.trustedVoiceUsers.deleteMany({
+        const users = await container.prisma.trusted_voice_users.deleteMany({
             where: {
                 channelId: channelId
             }

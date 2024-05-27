@@ -1,10 +1,10 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { TextRankButtonRow, VoiceRankButtonRow } from "../../../shared/bot/buttons/LevelingButtonts";
 import { DrawCanvas } from "../../classes/Canvas";
-import { registeringFONT, formatNumber, experienceFormula } from "../../utils";
-import { EmbedBuilder } from "discord.js";
+import { registeringFONT, formatNumber, experienceFormula, textExperienceFormula } from "../../utils";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { LevelingHelper } from "../../helpers/leveling.helper";
+import { Emojis } from "../../../shared/enum/Emojis";
 
 export class CattoRankCommand extends LevelingHelper {
     public static async run(interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
@@ -35,7 +35,7 @@ export class CattoRankCommand extends LevelingHelper {
 
         const info = await this.getVoiceUserInfo(user.id, interaction.guildId!);
         if (!info) {
-            await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:rank_not_data`) });
+            await this.buildTextCard(interaction);
             return;
         }
 
@@ -47,7 +47,7 @@ export class CattoRankCommand extends LevelingHelper {
 
         const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 512 });
         const buffer = await DrawCanvas.generateUserRankImage(
-            { userId: user.id, username: user.username, displayAvatarURL: user.displayAvatarURL, textExperience: experience, level },
+            { userId: user.id, username: user.displayName, displayAvatarURL: user.displayAvatarURL, textExperience: experience, level },
             interaction.guild?.id!,
             formattedRank,
             requiredXP,
@@ -56,6 +56,7 @@ export class CattoRankCommand extends LevelingHelper {
         );
 
         await interaction.editReply({
+            content: await resolveKey(interaction, `commands/replies/level:voice_card`, { emoji: Emojis.SUCCESS, user: user.displayName }),
             components: [TextRankButtonRow],
             files: [{ attachment: buffer, name: 'rank.png' }]
         });
@@ -78,16 +79,14 @@ export class CattoRankCommand extends LevelingHelper {
         const rank = await this.getTextRank(user.id, interaction.guildId!);
         const level = info.textLevel ?? 0;
         const experience = info.textExperience ?? 0;
-        const requiredXP = experienceFormula(level + 1);
+        const requiredXP = textExperienceFormula(level + 1);
         const formattedRank = formatNumber(rank ?? 0);
-        const formattedRequiredXP = formatNumber(requiredXP);
-        const formattedXP = formatNumber(experience ?? 0);
 
         const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 128 });
         const buffer = await DrawCanvas.generateUserRankImage(
             {
                 userId: user.id,
-                username: user.username,
+                username: user.displayName,
                 displayAvatarURL: user.displayAvatarURL,
                 textExperience: experience,
                 level
@@ -99,13 +98,8 @@ export class CattoRankCommand extends LevelingHelper {
             avatarURL
         );
 
-        const embed = new EmbedBuilder()
-            .setTitle(`${user.username}'s Text Rank`)
-            .setDescription(`Level: ${level} - XP: ${formattedXP}/${formattedRequiredXP}`)
-            .setImage('attachment://rank.png');
-
         await interaction.editReply({
-            embeds: [embed],
+            content: await resolveKey(interaction, `commands/replies/level:text_card`, { emoji: Emojis.SUCCESS, user: user.displayName }),
             components: [VoiceRankButtonRow],
             files: [{ attachment: buffer, name: 'rank.png' }]
         });

@@ -14,7 +14,7 @@ export class RoleCommandPermitPrecondition extends Precondition {
     }
 
     public async getPermittedRoles(guildId: string, commandName: string) {
-        const roles = await this.container.prisma.restrictedCommandRoles.findMany({
+        const roles = await this.container.prisma.restricted_command_roles.findMany({
             where: {
                 guildId: guildId,
                 commandName: commandName,

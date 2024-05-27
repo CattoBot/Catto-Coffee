@@ -49,7 +49,7 @@ export class ChannelOwnerPrecondition extends Precondition {
     }
 
     private async getTrustedUsers(guildId: string, channelId: string) {
-        const users = await this.container.prisma.trustedVoiceUsers.findMany({
+        const users = await this.container.prisma.trusted_voice_users.findMany({
             where: {
                 guildId: guildId,
                 channelId: channelId
@@ -59,7 +59,7 @@ export class ChannelOwnerPrecondition extends Precondition {
     }
 
     private async findChannel(guildId: string, channelId: string) {
-        const channel = await this.container.prisma.voiceTempChannels.findUnique({
+        const channel = await this.container.prisma.voice_temp_channels.findUnique({
             where: {
                 guildId_channelId: {
                     guildId: guildId,

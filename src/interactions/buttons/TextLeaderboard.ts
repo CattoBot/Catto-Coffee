@@ -2,10 +2,11 @@ import { container, InteractionHandler, InteractionHandlerTypes } from '@sapphir
 import { createCanvas, loadImage } from 'canvas';
 import type { ButtonInteraction, User } from 'discord.js';
 import { join } from 'path';
-import { formatNumber, drawRoundedImage, drawProgressBar, drawUserAvatar, drawFormattedRank, drawUserData, drawProgressBarForUser, experienceFormula } from '../../lib/utils';
+import { formatNumber, drawRoundedImage, drawProgressBar, drawUserAvatar, drawFormattedRank, drawUserData, drawProgressBarForUser, textExperienceFormula, registeringFONT } from '../../lib/utils';
 import { VoiceRankButtonOnly } from '../../shared/bot/buttons/LevelingButtonts';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { CheckTextExperienceEnabled } from '../../lib/decorators/InteractionTextExpEnabled';
+import { text_experience } from '@prisma/client';
 
 export class ButtonTextLeaderboardHandler extends InteractionHandler {
     public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
@@ -22,27 +23,25 @@ export class ButtonTextLeaderboardHandler extends InteractionHandler {
 
     @CheckTextExperienceEnabled
     public async run(interaction: ButtonInteraction) {
-        console.time('Leaderboard.run');
-
+        registeringFONT();
+        await interaction.deferReply()
         const guild_leaderboard = await this.getTextLeaderboard(interaction.guildId!);
         if (guild_leaderboard.length === 0) {
-            await interaction.reply({ content: await resolveKey(interaction, `commands/replies/level:lb_not_data`) });
-            console.timeEnd('ButtonVoiceLeaderboardHandler.run');
+            await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:lb_not_data`) });
             return;
         }
 
         const top10 = guild_leaderboard.slice(0, 10);
-        const userRank = guild_leaderboard.findIndex((user) => user.userId === interaction.member!.user.id) + 1;
+        const userRank = guild_leaderboard.findIndex((user) => user.userId === interaction.user.id) + 1;
         if (userRank === 0) {
-            await interaction.reply({ content: await resolveKey(interaction, 'commands/replies/level:lb_voice_user_not_data') });
-            console.timeEnd('ButtonVoiceLeaderboardHandler.run');
+            await interaction.editReply({ content: await resolveKey(interaction, 'commands/replies/level:lb_voice_user_not_data') });
             return;
         }
 
-        const userdata = guild_leaderboard.find((user) => user.userId === interaction.member!.user.id);
+        const userdata = guild_leaderboard.find((user) => user.userId === interaction.user.id);
         const [avatarloadimage, backgroundImage] = await Promise.all([
             loadImage(interaction.user.displayAvatarURL({ extension: 'jpg', size: 64 })),
-            loadImage(join(__dirname, '../../../assets/img/Leader_TXT.jpg'))
+            loadImage(join(__dirname, '../../../assets/img/Leader_TXT.png'))
         ]);
 
         const imageWidth = 1024;
@@ -51,7 +50,7 @@ export class ButtonTextLeaderboardHandler extends InteractionHandler {
         const context = canvas.getContext('2d');
         context.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
-        const fetchUserData = async (user: any) => {
+        const fetchUserData = async (user: text_experience) => {
             const member = await container.client.users.fetch(user.userId) as User;
             const avatar = await loadImage(member.displayAvatarURL({ extension: 'jpg', size: 64 }));
             return {
@@ -90,7 +89,7 @@ export class ButtonTextLeaderboardHandler extends InteractionHandler {
             const xpTextWidth = context.measureText(xp).width;
             const xpX = imageWidth - Math.floor(imageWidth * 0.09) - xpTextWidth;
             context.fillText('XP: ' + xp, xpX, textY);
-            const progress = top10[index].textExperience! / experienceFormula(top10[index].textLevel! + 1);
+            const progress = top10[index].textExperience! / textExperienceFormula(top10[index].textLevel! + 1);
             const progressBarX = textX;
             const progressBarY = textY + 30;
             const progressBarWidth = 720;
@@ -115,9 +114,9 @@ export class ButtonTextLeaderboardHandler extends InteractionHandler {
 
         const userDataX = userAvatarX + userAvatarSize + Math.floor(imageWidth * 0.03);
         const userDataY = userAvatarY + 20;
-        drawUserData(context, interaction.member!.user.username, formatNumber(userdata?.textLevel!), formatNumber(userdata?.textExperience!), userDataX, userDataY);
+        drawUserData(context, interaction.user.username, formatNumber(userdata?.textLevel!), formatNumber(userdata?.textExperience!), userDataX, userDataY);
 
-        const progressForUser = userdata?.textExperience! / experienceFormula(userdata?.textLevel! + 1);
+        const progressForUser = userdata?.textExperience! / textExperienceFormula(userdata?.textLevel! + 1);
         const progressBarForUserX = userDataX;
         const progressBarForUserY = userDataY + 40;
         const progressBarForUserWidth = 720;
@@ -126,13 +125,13 @@ export class ButtonTextLeaderboardHandler extends InteractionHandler {
         drawProgressBarForUser(context, progressForUser, progressBarForUserX, progressBarForUserY, progressBarForUserWidth, progressBarForUserHeight, userColor.start, userColor.end);
 
         const buffer = canvas.toBuffer('image/png');
-        await interaction.update({ files: [{ attachment: buffer, name: 'leaderboard.png' }], components: [VoiceRankButtonOnly] });
+        await interaction.editReply({ files: [{ attachment: buffer, name: 'leaderboard.png' }], components: [VoiceRankButtonOnly] });
         console.timeEnd('Leaderboard.run');
         return;
     }
 
     private async getTextLeaderboard(guildId: string) {
-        const lb = await container.prisma.textExperience.findMany({
+        const lb = await container.prisma.text_experience.findMany({
             where: {
                 guildId: guildId
             }, orderBy: [

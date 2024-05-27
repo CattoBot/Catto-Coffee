@@ -25,7 +25,7 @@ export class GuildBadgesCommand {
                         name: interaction.guild?.name || 'Unknown Guild',
                     }
                 });
-                await prisma.guildBadges.create({
+                await prisma.guild_badges.create({
                     data: {
                         guildId: interaction.guildId!,
                         badgeId: createdBadge.id
@@ -49,7 +49,7 @@ export class GuildBadgesCommand {
             await container.cloudinary.deleteImage(interaction.guildId!);
 
             await container.prisma.$transaction(async (prisma) => {
-                await prisma.guildBadges.deleteMany({
+                await prisma.guild_badges.deleteMany({
                     where: {
                         guildId: interaction.guildId!
                     }
@@ -69,12 +69,12 @@ export class GuildBadgesCommand {
     }
 
     private static async find(guildId: string) {
-        const guild = await container.prisma.guildBadges.findMany({
+        const guild = await container.prisma.guild_badges.findMany({
             where: {
                 guildId
             },
             include: {
-                badge: true
+                badges: true
             }
         });
         return guild;

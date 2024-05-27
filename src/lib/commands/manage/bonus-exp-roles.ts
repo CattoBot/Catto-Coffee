@@ -91,9 +91,9 @@ export class BonusVoiceRolesCommand {
     private static getModel(module: string) {
         switch (module) {
             case 'Voice':
-                return 'bonusVoiceRoles';
+                return 'bonus_voice_roles';
             case 'Text':
-                return 'bonusTextRoles';
+                return 'bonus_text_roles';
             default:
                 return null;
         }

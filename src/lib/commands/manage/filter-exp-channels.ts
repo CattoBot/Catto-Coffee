@@ -1,21 +1,22 @@
 import { container } from "@sapphire/pieces";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
-import { VoiceChannel, TextChannel, GuildChannel } from "discord.js";
+import { VoiceChannel, TextChannel, GuildChannel, InteractionResponse } from "discord.js";
 import { Emojis } from "../../../shared/enum/Emojis";
 
 export class FilterVoiceChannelCommand {
-    public static async add(interaction: Subcommand.ChatInputCommandInteraction) {
+    public static async add(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse> {
         const channel = interaction.options.getChannel('channel', true) as GuildChannel;
         const module = interaction.options.getString('module', true);
 
         if (!this.isValidChannel(channel, module)) {
-            return interaction.reply({ content: await resolveKey(interaction, `commands/replies/error:invalid_channel`), ephemeral: true });
+            return await interaction.reply({ content: await resolveKey(interaction, `commands/replies/error:invalid_channel`), ephemeral: true });
         }
 
         const channelExists = await this.channelExists(interaction.guild!.id, channel.id, module);
         if (channelExists) {
             return await interaction.reply({ content: await resolveKey(interaction, `commands/replies/error:already_filtered_channel`), ephemeral: true });
+
         }
 
         const result = await this.addChannelToModule(interaction.guild!.id, channel.id, module);
@@ -30,6 +31,7 @@ export class FilterVoiceChannelCommand {
         }
 
         return await interaction.reply({ content: await resolveKey(interaction, `commands/replies/error:invalid_module`), ephemeral: true });
+
     }
 
     public static async remove(interaction: Subcommand.ChatInputCommandInteraction) {
@@ -119,9 +121,9 @@ export class FilterVoiceChannelCommand {
     private static getModel(module: string) {
         switch (module) {
             case 'Voice':
-                return 'filteredVoiceChannels';
+                return 'filtered_voice_channels';
             case 'Text':
-                return 'filteredTextChannels';
+                return 'filtered_text_channels';
             default:
                 return null;
         }

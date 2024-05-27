@@ -9,7 +9,7 @@ export class TextRoleCommands {
         const level = interaction.options.getInteger('level', true);
         if (!role) return interaction.reply({ content: await resolveKey(interaction, `commands/replies/error:invalid_role`), ephemeral: true });
 
-        await container.prisma.experienceRoleRewards.create({
+        await container.prisma.experience_role_rewards.create({
             data: {
                 guildId: interaction.guild!.id,
                 roleId: role.id,
@@ -18,14 +18,14 @@ export class TextRoleCommands {
             }
         })
 
-        return await interaction.reply({ content: await resolveKey(interaction, `commands/replies/success:text_role_add`, { role: role, emoji: Emojis.SUCCESS }), ephemeral: true });
+        return await interaction.reply({ content: await resolveKey(interaction, `commands/replies/admin:text_role_add`, { role: role, emoji: Emojis.SUCCESS }), ephemeral: true });
     }
 
     public static async remove(interaction: Subcommand.ChatInputCommandInteraction) {
         const role = interaction.options.getRole('role', true);
         if (!role) return interaction.reply({ content: await resolveKey(interaction, `commands/replies/error:invalid_role`), ephemeral: true });
 
-        await container.prisma.experienceRoleRewards.delete({
+        await container.prisma.experience_role_rewards.delete({
             where: {
                 guildId_roleId_roleType: {
                     guildId: interaction.guild!.id,
@@ -34,7 +34,7 @@ export class TextRoleCommands {
                 }
             }
         })
-
-        return await interaction.reply({ content: await resolveKey(interaction, `commands/replies/success:text_role_remove`, { role: role, emoji: Emojis.SUCCESS }), ephemeral: false });
+        await container.redis.del(`textExperienceRoles:${interaction.guild!.id}`);
+        return await interaction.reply({ content: await resolveKey(interaction, `commands/replies/admin:text_role_remove`, { role: role, emoji: Emojis.SUCCESS }), ephemeral: false });
     }
 }

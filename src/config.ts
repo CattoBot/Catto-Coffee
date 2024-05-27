@@ -1,4 +1,4 @@
 export const Config = {
-    prefix: 'catto',
-    refreshCommands: false
+    prefix: '$',
+    refreshCommands: true
 }

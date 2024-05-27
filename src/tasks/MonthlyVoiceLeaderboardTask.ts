@@ -16,7 +16,7 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     public async run(): Promise<void> {
-        const dailyTop = await this.container.prisma.monthlyTop.findMany();
+        const dailyTop = await this.container.prisma.monthly_top.findMany();
         this.container.console.info('Starting to process monthly tops...', dailyTop);
 
         for (const top of dailyTop) {
@@ -48,7 +48,7 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
                     await this.deletemonthlyVoiceExperience(guildId);
                 }
 
-                const newNextDate = addDays(now, 30); // 24 hours
+                const newNextDate = addDays(now, 30); // 1 month
                 await this.updateNextPublishDate(guildId, newNextDate);
             }
         }
@@ -58,7 +58,7 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
 
     private async getTop10VoiceUsers(guildId: string) {
         this.container.console.info('Fetching top 10 voice users...');
-        const top = await this.container.prisma.voiceExperience.findMany({
+        const top = await this.container.prisma.voice_experience.findMany({
             where: { guildId },
             take: 10,
             orderBy: { monthlyTimeInVoiceChannel: 'desc' }
@@ -68,7 +68,7 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     private async deletemonthlyVoiceExperience(guildId: string) {
-        await this.container.prisma.voiceExperience.updateMany({
+        await this.container.prisma.voice_experience.updateMany({
             where: { guildId },
             data: { dailyTimeInVoiceChannel: 0 }
         });
@@ -76,7 +76,7 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     private async getChannelId(guildId: string) {
-        const channel = await this.container.prisma.leaderboardChannels.findUnique({
+        const channel = await this.container.prisma.leaderboard_channels.findUnique({
             where: { guildId }
         });
         this.container.console.info('Fetched channel ID:', channel?.monthlyVoiceTop10channelId);
@@ -88,7 +88,7 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
         this.container.console.info('Fetched next publish date from Redis:', nextDateString);
 
         if (!nextDateString) {
-            const monthlyTop = await this.container.prisma.monthlyTop.findUnique({
+            const monthlyTop = await this.container.prisma.monthly_top.findUnique({
                 where: { guildId }
             });
 
@@ -116,7 +116,7 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     private async updatemonthlyTopMessageId(guildId: string, messageId: string): Promise<void> {
-        await this.container.prisma.monthlyTop.update({
+        await this.container.prisma.monthly_top.update({
             where: { guildId },
             data: { lastMonthlyMessageId: messageId }
         });

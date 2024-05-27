@@ -20,7 +20,9 @@ export class BlacklistCommandRegistry {
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/blacklist:user_remove', 'commands/descriptions/blacklist:user_remove')
                         .addStringOption((option) => applyLocalizedBuilder(option, 'commands/names/blacklist:user_remove', 'commands/descriptions/blacklist:user_remove').setRequired(true))
                     )
-                ),
+                ), {
+                    idHints: [''], guildIds: ["1134593541172117544" , "998352785202479134"]
+                }
         )
     }
 }

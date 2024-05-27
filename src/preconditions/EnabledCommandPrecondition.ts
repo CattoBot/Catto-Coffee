@@ -16,7 +16,7 @@ export class EnabledCommandPrecondition extends Precondition {
         if (!guildId) return this.ok();
         const commandName = this.getCommandName(interaction);
 
-        const disabled = await container.prisma.disabledCommands.findUnique({
+        const disabled = await container.prisma.disabled_commands.findUnique({
             where: {
                 guildId_command: {
                     guildId: guildId,
@@ -57,7 +57,7 @@ export class EnabledCommandPrecondition extends Precondition {
 
         const res = await resolveKey(message, 'preconditions/preconditions:command_disabled', { command: fullCommandName });
 
-        const disabled = await container.prisma.disabledCommands.findUnique({
+        const disabled = await container.prisma.disabled_commands.findUnique({
             where: {
                 guildId_command: {
                     guildId: guildId,

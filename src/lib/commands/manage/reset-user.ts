@@ -55,7 +55,7 @@ export class ResetUserCommand {
         });
 
         if (moduleName === 'voice') {
-            await container.prisma.voiceExperience.delete({
+            await container.prisma.voice_experience.delete({
                 where: {
                     guildId_userId: {
                         guildId: interaction.guildId!,
@@ -64,7 +64,7 @@ export class ResetUserCommand {
                 }
             });
         } else if (moduleName === 'text') {
-            await container.prisma.textExperience.delete({
+            await container.prisma.text_experience.delete({
                 where: {
                     guildId_userId: {
                         guildId: interaction.guildId!,
@@ -83,7 +83,7 @@ export class ResetUserCommand {
     }
 
     private static async getUserVoiceExperience(userId: string, guildId: string) {
-        return await container.prisma.voiceExperience.findUnique({
+        return await container.prisma.voice_experience.findUnique({
             where: {
                 guildId_userId: {
                     guildId: guildId,
@@ -94,7 +94,7 @@ export class ResetUserCommand {
     }
 
     private static async getUserTextExperience(userId: string, guildId: string) {
-        return await container.prisma.textExperience.findUnique({
+        return await container.prisma.text_experience.findUnique({
             where: {
                 guildId_userId: {
                     guildId: guildId,

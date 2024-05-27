@@ -47,7 +47,7 @@ export class ChannelClaimPrecondition extends Precondition {
     }
 
     private async getVoiceChannelOwner(channelId: string, guildId: string) {
-        const owner = await this.container.prisma.voiceTempChannels.findUnique({
+        const owner = await this.container.prisma.voice_temp_channels.findUnique({
             where: {
                 guildId_channelId: {
                     guildId: guildId,

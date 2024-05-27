@@ -15,7 +15,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
         });
     }
 
-    @EnabledVoiceListenerExperience
+    @EnabledVoiceListenerExperience()
     @FilteredVoiceChannel()
     @VoiceUserEntry()
     public async run(oldState: VoiceState, newState: VoiceState): Promise<void> {
@@ -72,7 +72,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
         if (cachedData) {
             return JSON.parse(cachedData);
         }
-        const voiceData = await this.container.prisma.iVoiceExperience.findUnique({ where: { guildId: guild.id } });
+        const voiceData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guild.id } });
         const expData = {
             cooldown: voiceData?.cooldown ?? Time.Minute,
             min: voiceData?.min ?? 5,
@@ -98,7 +98,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
         }
     }
 
-    
+
     private async updateGlobalExperience(userId: string, duration: number) {
         const user = await this.container.prisma.users.findUnique({
             where: { userId },
@@ -115,14 +115,15 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
             nextLevelExperience = globalexperienceFormula(currentLevel + 1);
         }
 
-        await this.container.prisma.users.update({
+        await this.container.prisma.users.upsert({
             where: { userId },
-            data: { globalExperience: newExperience, globalLevel: currentLevel, totalGlobalExperience: { increment: experience }, totalTimeInVoiceChannel: { increment: duration } }
+            update: { globalExperience: newExperience, globalLevel: currentLevel, totalGlobalExperience: { increment: experience }, totalTimeInVoiceChannel: { increment: duration } },
+            create: { userId, globalExperience: newExperience, globalLevel: currentLevel, totalGlobalExperience: experience, totalTimeInVoiceChannel: duration }
         });
     }
 
     private async updateUserExperience(member: GuildMember, guildID: string, experience: number, durationInSeconds: number): Promise<any> {
-        const upsertUserExperience = async () => await this.container.prisma.voiceExperience.upsert({
+        const upsertUserExperience = async () => await this.container.prisma.voice_experience.upsert({
             where: {
                 guildId_userId: {
                     guildId: guildID,
@@ -148,10 +149,10 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
                 totalVoiceExperience: { increment: experience }
             },
         });
-    
+
         await retryAsync(upsertUserExperience, 3, 500);
         await this.updateGlobalExperience(member.user.id, durationInSeconds);
-        const updatedUser = await this.container.prisma.voiceExperience.findUnique({
+        const updatedUser = await this.container.prisma.voice_experience.findUnique({
             where: {
                 guildId_userId: {
                     guildId: guildID,
@@ -159,13 +160,13 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
                 }
             }
         });
-    
+
         if (!updatedUser) {
             throw new Error('Failed to fetch updated user data.');
         }
         return updatedUser;
     }
-    
+
 
     private async calculateLevelUp(userID: string, guildID: string, currentExperience: number, currentLevel: number): Promise<{ levelUp: boolean, newLevel: number, newExperience: number }> {
         let levelUp = false;
@@ -179,7 +180,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
         }
 
         if (levelUp) {
-            await this.container.prisma.voiceExperience.update({
+            await this.container.prisma.voice_experience.update({
                 where: {
                     guildId_userId: {
                         guildId: guildID,
@@ -212,7 +213,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
     }
 
     private async assignRoles(member: GuildMember, guildID: string, voiceLevel: number): Promise<void> {
-        const rolesForLevel = await this.container.prisma.experienceRoleRewards.findMany({
+        const rolesForLevel = await this.container.prisma.experience_role_rewards.findMany({
             where: {
                 guildId: guildID,
                 level: { lte: voiceLevel },
@@ -233,7 +234,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
 
     private async getNotificationMessage(guildID: string): Promise<string> {
         try {
-            const guildData = await this.container.prisma.iVoiceExperience.findUnique({ where: { guildId: guildID } });
+            const guildData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guildID } });
             return guildData?.lvlUpMsg ?? "Congratulations, {user}! You've just reached level {level} in voice channels!";
         } catch (error) {
             this.container.console.error(`Error fetching level up message for guild ${guildID}: ${error}`);
@@ -243,7 +244,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
 
     private async getNotificationChannelID(guildID: string): Promise<string> {
         try {
-            const guildData = await this.container.prisma.iVoiceExperience.findUnique({ where: { guildId: guildID } });
+            const guildData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guildID } });
             return guildData?.msgChannelId ?? "";
         } catch (error) {
             this.container.console.error(`Error fetching notification channel ID for guild ${guildID}: ${error}`);
@@ -276,7 +277,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
     }
 
     private async getUserBonusPercentage(member: GuildMember): Promise<number> {
-        const bonusRoles = await this.container.prisma.bonusVoiceRoles.findMany({ where: { guildId: member.guild.id } });
+        const bonusRoles = await this.container.prisma.bonus_voice_roles.findMany({ where: { guildId: member.guild.id } });
         const userRoles = member.roles.cache;
         let maxBonus = 0;
 
@@ -296,9 +297,9 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
 
     private async handleChannelJoin(newState: VoiceState, sessionId: string): Promise<void> {
         this.container.console.info(`[${newState.member!.displayName}] has joined voice channel ID [${newState.channel!.id}]`);
-        const guild = await this.container.prisma.iVoiceExperience.findUnique({ where: { guildId: newState.guild.id } });
+        const guild = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: newState.guild.id } });
         if (!guild) {
-            await this.container.prisma.iVoiceExperience.create({ data: { guildId: newState.guild.id } });
+            await this.container.prisma.i_voice_experience.create({ data: { guildId: newState.guild.id } });
         }
         await this.container.redis.set(sessionId, JSON.stringify({ startTime: Date.now() }));
     }

@@ -52,7 +52,7 @@ export class TextExperienceCommand {
         if (channelNotification !== null) updateData.msgChannelId = channelNotification.id;
         if (messageNotification !== null) updateData.lvlUpMsg = messageNotification;
 
-        await container.prisma.iTextExperience.upsert({
+        await container.prisma.i_text_experience.upsert({
             where: {
                 guildId: interaction.guild!.id
             },
@@ -60,13 +60,15 @@ export class TextExperienceCommand {
                 guildId: interaction.guild!.id,
                 min: min ?? 5,
                 max: max ?? 20,
-                cooldown: cooldown ?? 0,
+                cooldown: cooldown ?? 60,
                 msgChannelId: channelNotification?.id ?? '',
                 lvlUpMsg: messageNotification ?? ''
             },
             update: updateData
         });
-        await container.redis.del(`textExpSettings:${interaction.guild!.id}`);
+        await container.redis.del(`minMaxExpText:${interaction.guild!.id}`);
+        await container.redis.del(`notificationTextChannelID:${interaction.guild!.id}`);
+        await container.redis.del(`achievementTextMessage:${interaction.guild!.id}`);
 
         return await interaction.reply({
             content: await resolveKey(interaction, `commands/replies/admin:text_config_success`, { emoji: Emojis.SUCCESS }),

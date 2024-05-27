@@ -11,7 +11,7 @@ export class VoiceRoleCommands {
             return interaction.reply({ content: await resolveKey(interaction, 'commands/replies/error:invalid_role'), ephemeral: true });
         }
 
-        const existingRole = await container.prisma.experienceRoleRewards.findFirst({
+        const existingRole = await container.prisma.experience_role_rewards.findFirst({
             where: {
                 guildId: interaction.guild!.id,
                 roleId: role.id,
@@ -23,7 +23,7 @@ export class VoiceRoleCommands {
             return interaction.reply({ content: await resolveKey(interaction, 'commands/replies/error:voice_role_already_exists'), ephemeral: true });
         }
 
-        await container.prisma.experienceRoleRewards.create({
+        await container.prisma.experience_role_rewards.create({
             data: {
                 guildId: interaction.guild!.id,
                 roleId: role.id,
@@ -41,7 +41,7 @@ export class VoiceRoleCommands {
             return interaction.reply({ content: await resolveKey(interaction, 'commands/replies/error:invalid_role'), ephemeral: true });
         }
 
-        const existingRole = await container.prisma.experienceRoleRewards.findFirst({
+        const existingRole = await container.prisma.experience_role_rewards.findFirst({
             where: {
                 guildId: interaction.guild!.id,
                 roleId: role.id,
@@ -53,7 +53,7 @@ export class VoiceRoleCommands {
             return interaction.reply({ content: await resolveKey(interaction, 'commands/replies/error:voice_role_not_exists'), ephemeral: true });
         }
 
-        await container.prisma.experienceRoleRewards.delete({
+        await container.prisma.experience_role_rewards.delete({
             where: {
                 guildId_roleId_roleType: {
                     guildId: interaction.guild!.id,
@@ -63,6 +63,7 @@ export class VoiceRoleCommands {
             }
         });
 
+        await container.redis.del(`voiceExperienceRoles:${interaction.guild!.id}`);
         return interaction.reply({ content: await resolveKey(interaction, 'commands/replies/admin:voice_role_remove', { role: role, emoji: Emojis.SUCCESS }), ephemeral: false });
     }
 }

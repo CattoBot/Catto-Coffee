@@ -30,7 +30,7 @@ function CheckTextExperienceEnabled(
     if (cachedEnabled !== null) {
       isEnabled = JSON.parse(cachedEnabled);
     } else {
-      const result = await prisma.iTextExperience.findUnique({ where: { guildId: guildId!} });
+      const result = await prisma.i_text_experience.findUnique({ where: { guildId: guildId!} });
       isEnabled = result?.isEnabled ?? false;
       await redis.set(cacheKey, JSON.stringify(isEnabled), 'EX', 3600); 
     }

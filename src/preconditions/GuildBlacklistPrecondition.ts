@@ -15,7 +15,7 @@ export class GuildBlacklistPrecondition extends Precondition {
             });
         }
 
-        const guildBlacklist = await this.container.prisma.botBlackListedGuilds.findUnique({
+        const guildBlacklist = await this.container.prisma.bot_black_listed_guilds.findUnique({
             where: { guildId }
         });
 

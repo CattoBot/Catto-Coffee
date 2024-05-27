@@ -6,7 +6,7 @@ export class OnClickVoiceDeleteChannelHelper extends Helper {
 
     public async findExistingChannel(guildId: string, voiceChannel: VoiceChannel) {
         try {
-            return container.prisma.voiceTempChannels.findUnique({
+            return container.prisma.voice_temp_channels.findUnique({
                 where: {
                     guildId_channelId: {
                         guildId: guildId,
@@ -24,7 +24,7 @@ export class OnClickVoiceDeleteChannelHelper extends Helper {
     public async deleteChannel(voiceChannel: VoiceChannel, guildId: string) {
         try {
             setTimeout(async () => {
-                await container.prisma.voiceTempChannels.delete({
+                await container.prisma.voice_temp_channels.delete({
                     where: {
                         guildId_channelId: {
                             guildId: guildId,

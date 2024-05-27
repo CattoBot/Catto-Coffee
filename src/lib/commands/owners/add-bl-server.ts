@@ -49,7 +49,7 @@ export class AddServerBlacklistCommand {
     }
 
     private static async addToDatabase(guildId: string) {
-        await container.prisma.botBlackListedGuilds.create({
+        await container.prisma.bot_black_listed_guilds.create({
             data: { guildId: guildId }
         });
     }
@@ -64,7 +64,7 @@ export class AddServerBlacklistCommand {
     }
 
     private static async fetchGuild(guildId: string) {
-        return await container.prisma.botBlackListedGuilds.findUnique({
+        return await container.prisma.bot_black_listed_guilds.findUnique({
             where: { guildId: guildId }
         });
     }

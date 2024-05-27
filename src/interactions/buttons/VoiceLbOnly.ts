@@ -2,8 +2,9 @@ import { container, InteractionHandler, InteractionHandlerTypes } from '@sapphir
 import type { ButtonInteraction } from 'discord.js';
 import { DrawCanvas } from '../../lib/classes/Canvas';
 import { CheckVoiceExperienceEnabled } from '../../lib/decorators/InteractionVoiceExpEnabled';
-import { experienceFormula, formatNumber } from '../../lib/utils';
+import { experienceFormula, formatNumber, registeringFONT } from '../../lib/utils';
 import { TextRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
+import { ButtonCooldown } from '../../lib/decorators/HandlersCooldown';
 
 export class ButtonVoiceRankOnlyHandler extends InteractionHandler {
     public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
@@ -19,16 +20,19 @@ export class ButtonVoiceRankOnlyHandler extends InteractionHandler {
     }
 
     @CheckVoiceExperienceEnabled
+    @ButtonCooldown(60)
     public async run(interaction: ButtonInteraction) {
+        registeringFONT();
+        await interaction.deferReply();
         const user = interaction.user;
         if (user.bot) {
-            await interaction.reply({ content: 'Bots cannot earn XP.', ephemeral: true });
+            await interaction.editReply({ content: 'Bots cannot earn XP.' });
             return;
         }
 
         const info = await this.getUserInfo(user.id, interaction.guildId!);
         if (!info) {
-            await interaction.reply({ content: 'You have not earned any XP yet.', ephemeral: true });
+            await interaction.reply({ content: 'You have not earned any XP yet.' });
             return;
         }
 
@@ -43,7 +47,7 @@ export class ButtonVoiceRankOnlyHandler extends InteractionHandler {
         const buffer = await DrawCanvas.generateUserRankImage(
             {
                 userId: user.id,
-                username: user.username,
+                username: user.displayName,
                 displayAvatarURL: user.displayAvatarURL,
                 textExperience: experience,
                 level
@@ -55,14 +59,14 @@ export class ButtonVoiceRankOnlyHandler extends InteractionHandler {
             avatarURL
         );
 
-        await interaction.update({
+        await interaction.editReply({
             files: [{ attachment: buffer, name: 'rank.png' }],
             components: [TextRankButtonRow]
         });
     }
 
     public async getRank(userId: string, guildId: string) {
-        const users = await container.prisma.voiceExperience.findMany({
+        const users = await container.prisma.voice_experience.findMany({
             where: { guildId },
             orderBy: [
                 {
@@ -79,7 +83,7 @@ export class ButtonVoiceRankOnlyHandler extends InteractionHandler {
     }
 
     private async getUserInfo(userId: string, guildId: string) {
-        const user = await container.prisma.voiceExperience.findUnique({
+        const user = await container.prisma.voice_experience.findUnique({
             where: {
                 guildId_userId: {
                     userId: userId,

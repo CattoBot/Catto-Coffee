@@ -70,7 +70,6 @@ function getGuildInfo(guild: Guild | null) {
 	return `${guild.name}[${cyan(guild.id)}]`;
 }
 
-// Utility functions
 const PREFIX_KEY = (guildId: string) => `guild:${guildId}:prefix`;
 
 async function getPrefixFromRedis(guildId: string): Promise<string | null> {
@@ -87,17 +86,13 @@ async function fetchPrefixFromDatabase(guildId: string): Promise<string | null> 
 }
 
 async function getPrefix(guildId: string): Promise<string> {
-	let prefix = await getPrefixFromRedis(guildId);
-	if (!prefix) {
-		prefix = await fetchPrefixFromDatabase(guildId);
-		if (prefix) {
-			await setPrefixInRedis(guildId, prefix);
-		} else {
-			prefix = Config.prefix;
-		}
+	let prefix = await getPrefixFromRedis(guildId) ?? await fetchPrefixFromDatabase(guildId) ?? Config.prefix;
+	if (prefix !== Config.prefix) {
+		await setPrefixInRedis(guildId, prefix);
 	}
 	return prefix;
 }
+
 
 function bannerLoad() {
 	setTimeout(() => {
@@ -127,27 +122,16 @@ function setPresence() {
 	}, 10000);
 }
 
-/**
- * Calculate the XP required to reach the next level.
- * @param level - The current level of the user.
- * @param baseXP - The base XP required to reach the first level.
- * @param exponent - The exponent controlling XP growth rate.
- * @param scalingFactor - The additional XP scaling between levels.
- * @returns The XP required to advance to the next level.
- */
-// function experienceFormula(level: number, baseXP: number = 350, exponent: number = 1.5, scalingFactor: number = 50): number {
-// 	return Math.round(baseXP * Math.pow(level, exponent) + (level - 1) * scalingFactor);
-// }
 
 const experienceFormula = (level: number) => Math.floor(100 * Math.pow(level, 1.5));
-
+export const textExperienceFormula = (level: number) => 170 * level;
 export const globalexperienceFormula = (level: number) => Math.floor(2000 * Math.pow(level, 1.5));
 
 function ConvertBitrateToMillions(bitrate: number) {
 	return bitrate * 1000;
 }
 
-export function wrapText(context: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, maxHeight: number, lineHeight: number) {
+function wrapText(context: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, maxHeight: number, lineHeight: number) {
 	const words = text.split(' ');
 	let line = '';
 	let testLine = '';
@@ -164,7 +148,7 @@ export function wrapText(context: CanvasRenderingContext2D, text: string, x: num
 			testLine = `${words[n]} `;
 			lineCount++;
 			if ((lineCount + 1) * lineHeight > maxHeight) {
-				context.fillText('...', x, y); // Truncate text if it exceeds the maxHeight
+				context.fillText('...', x, y);
 				break;
 			}
 		} else {
@@ -291,13 +275,13 @@ function drawUserData(context: CanvasRenderingContext2D, username: string, level
 
 function drawProgressBar(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, progress: number, startColor: string = '#12D6DF', endColor: string = '#F70FFF') {
 	const radius = height / 2;
-	const fillWidth = width * progress; // Calculate the filled width based on progress
+	const fillWidth = width * progress;
 
 	// Function to draw a rounded rectangle with variable width
 	function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
 		ctx.beginPath();
 		ctx.moveTo(x + radius, y);
-		ctx.lineTo(x + width - radius, y); // Adjust line to width of filled area
+		ctx.lineTo(x + width - radius, y);
 		ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
 		ctx.lineTo(x + width, y + height - radius);
 		ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
@@ -315,20 +299,18 @@ function drawProgressBar(context: CanvasRenderingContext2D, x: number, y: number
 
 	// Draw filled bar with gradient
 	if (progress > 0) {
-		const gradient = context.createLinearGradient(x, y, x + width, y); // Set gradient for full width
+		const gradient = context.createLinearGradient(x, y, x + width, y);
 		gradient.addColorStop(0, startColor);
 		gradient.addColorStop(1, endColor);
 		context.fillStyle = gradient;
-		drawRoundedRect(context, x, y, fillWidth, height, radius); // Draw only the filled area
+		drawRoundedRect(context, x, y, fillWidth, height, radius);
 		context.fill();
 	}
 }
 
 function drawProgressBarForUser(context: CanvasRenderingContext2D, progress: number, x: number, y: number, width: number, height: number, startColor: string = '#12D6DF', endColor: string = '#F70FFF') {
-	const radius = height / 2; // This ensures the radius is always half the height
+	const radius = height / 2;
 	const filledWidth = width * progress;
-
-	// Function to draw a rounded rectangle with variable width
 	function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
 		ctx.beginPath();
 		ctx.moveTo(x + radius, y);
@@ -362,7 +344,7 @@ function drawProgressBarForUser(context: CanvasRenderingContext2D, progress: num
 function drawFormattedRank(context: CanvasRenderingContext2D, rank: string, x: number, y: number) {
 	context.font = '25px Poppins SemiBold';
 	context.fillStyle = '#A8A8A8';
-	context.textAlign = 'right';  // Change to 'right' alignment
+	context.textAlign = 'right';
 	context.fillText(rank, x, y);
 }
 
@@ -410,7 +392,7 @@ function years(num: number) {
 }
 
 async function retreiveRankCardConfig(userId: string) {
-	const config = await container.prisma.usersRankCardConfig.findUnique({
+	const config = await container.prisma.users_rank_card_config.findUnique({
 		where: {
 			userId
 		}
@@ -444,5 +426,6 @@ export {
 	registeringFONT,
 	retreiveRankCardConfig,
 	getPrefix,
-	formatTime
+	formatTime,
+	wrapText
 };

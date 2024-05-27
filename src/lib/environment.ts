@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { Redis } from 'ioredis';
-import { ApplicationConsole } from './lib/console';
+import { ApplicationConsole } from './console';
 import { ArrayString, IntegerString } from '@skyra/env-utilities';
-import { ChatInputDeniedCommandHelper } from './lib/events/commandDenied';
-import { CloudinaryService } from './lib/services/cloudinary';
+import { ChatInputDeniedCommandHelper } from './events/commandDenied';
+import { CloudinaryService } from './services/cloudinary';
 
 declare module '@sapphire/framework' {
 	interface Preconditions {
@@ -37,6 +37,7 @@ declare module '@sapphire/pieces' {
 declare module '@skyra/env-utilities' {
 	interface Env {
 		OWNERS: ArrayString;
+		GUILD_ID: ArrayString;
 		REDIS_HOST: string;
 		REDIS_PORT: IntegerString;
 		REDIS_TASK_DB: IntegerString;

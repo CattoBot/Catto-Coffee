@@ -54,7 +54,7 @@ export class VoiceCreateHelper extends Helper {
 
     private async getChannel(guildId: string): Promise<ChannelConfig[]> {
         try {
-            const data = await container.prisma.iVoiceTempChannels.findMany({
+            const data = await container.prisma.i_voice_temp_channels.findMany({
                 where: {
                     guildId: guildId
                 }
@@ -161,7 +161,7 @@ export class VoiceCreateHelper extends Helper {
 
     private async getUserChannelInfo(userId: string): Promise<{ channelName: string, channelLimit: number } | null> {
         try {
-            const user = await container.prisma.iUsersTempVoice.findUnique({
+            const user = await container.prisma.i_users_temp_voice.findUnique({
                 where: {
                     userId: userId
                 }
@@ -179,7 +179,7 @@ export class VoiceCreateHelper extends Helper {
     private async storeChannelInDatabase(guildId: string, channelId: string, categoryId: string, userId: string): Promise<void> {
         setTimeout(async () => {
             try {
-                await container.prisma.voiceTempChannels.create({
+                await container.prisma.voice_temp_channels.create({
                     data: {
                         guildId: guildId,
                         channelId: channelId,
@@ -195,7 +195,7 @@ export class VoiceCreateHelper extends Helper {
 
     private async retrieveDefaultChannelSettings(guildId: string, channelId: string, newState: VoiceState): Promise<{ channelName: string, channelLimit: number } | null> {
         try {
-            const defaultSettings = await container.prisma.iVoiceTempChannels.findUnique({
+            const defaultSettings = await container.prisma.i_voice_temp_channels.findUnique({
                 where: {
                     guildId_channelId: {
                         channelId: channelId,
@@ -218,7 +218,7 @@ export class VoiceCreateHelper extends Helper {
 
     private async shouldUseUserSettings(guildId: string, channelId: string): Promise<boolean> {
         try {
-            const defaultSettings = await container.prisma.iVoiceTempChannels.findUnique({
+            const defaultSettings = await container.prisma.i_voice_temp_channels.findUnique({
                 where: {
                     guildId_channelId: {
                         channelId: channelId,

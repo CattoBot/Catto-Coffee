@@ -28,5 +28,6 @@
     "user_already_in_channel": "The user `{{user}}` is already in the voice channel {{emoji}}",
     "owner_in_voice_channel": "The owner is still in the voice channel {{emoji}}",
     "bitrate_not_provided": "The bitrate option must be a number between 1 and 96 {{emoji}}",
-    "voice_name_not_provided": "The name must be provided {{emoji}}"
+    "voice_name_not_provided": "The name must be provided {{emoji}}",
+    "voice_setup_error_exists": "The temporary voice channels system is already set up more than twice {{emoji}} if you'd like to get more channels, please consider adquiring the premium version of the bot"
 }

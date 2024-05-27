@@ -18,12 +18,12 @@ export class IntervalLeaderboardCommand {
             return this.replyWithInvalidChannel(interaction);
         }
 
-        const channelExists = await container.prisma.leaderboardChannels.findUnique({
+        const channelExists = await container.prisma.leaderboard_channels.findUnique({
             where: { guildId: interaction.guild!.id }
         });
 
         if (channelExists) {
-            await container.prisma.leaderboardChannels.update({
+            await container.prisma.leaderboard_channels.update({
                 where: { guildId: interaction.guild!.id },
                 data: { [type]: channel.id }
             });
@@ -34,7 +34,7 @@ export class IntervalLeaderboardCommand {
             });
         }
 
-        await container.prisma.leaderboardChannels.create({
+        await container.prisma.leaderboard_channels.create({
             data: {
                 guildId: interaction.guild!.id,
                 [type]: channel.id

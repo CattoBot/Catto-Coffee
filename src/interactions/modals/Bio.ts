@@ -18,8 +18,8 @@ export class BiographyModalHandler extends InteractionHandler {
 
     public async run(interaction: ModalSubmitInteraction): Promise<InteractionResponse> {
         const bio = interaction.fields.getTextInputValue('text-bio');
-        await this.container.prisma.users.update({
-            where: { userId: interaction.user.id }, data: { aboutme: bio }
+        await this.container.prisma.users.upsert({
+            where: { userId: interaction.user.id }, create: { userId: interaction.user.id, aboutme: bio }, update: { aboutme: bio }
         })
 
         return await interaction.reply({

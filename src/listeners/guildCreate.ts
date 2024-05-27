@@ -1,6 +1,6 @@
 import { Events, Listener, ListenerOptions } from "@sapphire/framework";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Guild } from "discord.js";
+import { Guild, TextChannel } from "discord.js";
 
 @ApplyOptions<ListenerOptions>({ once: false, event: Events.GuildCreate })
 export class GuildCreateListener extends Listener {
@@ -11,6 +11,8 @@ export class GuildCreateListener extends Listener {
     }
 
     public async run(guild: Guild): Promise<void> {
+        const channel = this.container.client.channels.resolve("1128070491878465606") as TextChannel
+        await channel.send(`**[GUILD JOIN]** __[${this.container.client.guilds.cache.size}]__ \`${guild.name}\` (\`${guild.id}\`) ha agregado el bot. <a:pickaxe:1127394494350884974>`)
         const guild_id = guild.id;
         const exists = await this.find(guild_id);
         if (!exists) {
@@ -29,11 +31,11 @@ export class GuildCreateListener extends Listener {
         return this.container.prisma.guilds.create({ data: { guildId: guild_id } });
     }
     private async createVoiceXP(guild_id: string): Promise<object> {
-        const guild = await this.container.prisma.iVoiceExperience.create({ data: { guildId: guild_id } });
+        const guild = await this.container.prisma.i_voice_experience.create({ data: { guildId: guild_id } });
         return guild;
     }
     private async createTextXP(guild_id: string): Promise<object> {
-        const guild = await this.container.prisma.iTextExperience.create({ data: { guildId: guild_id } });
+        const guild = await this.container.prisma.i_text_experience.create({ data: { guildId: guild_id } });
         return guild;
     }
 }

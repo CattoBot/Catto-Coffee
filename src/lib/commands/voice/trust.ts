@@ -61,7 +61,7 @@ export class VoiceTrustCommand extends VoiceHelper {
         const owner = interaction.guild!.members.resolve(getOwner) as GuildMember;
 
 
-        if (interaction.member!.user.id !== owner.id) {
+        if (interaction.user.id !== owner.id) {
             return await interaction.reply({ content: translateKey('commands/replies/commandDenied:only_vc_owner'), ephemeral: true });
         }
 

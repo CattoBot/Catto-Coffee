@@ -1,9 +1,12 @@
 import { container, InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import type { ButtonInteraction } from 'discord.js';
 import { CheckTextExperienceEnabled } from '../../lib/decorators/InteractionTextExpEnabled';
-import { experienceFormula, formatNumber } from '../../lib/utils';
+import { formatNumber, registeringFONT, textExperienceFormula } from '../../lib/utils';
 import { VoiceRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
 import { DrawCanvas } from '../../lib/classes/Canvas';
+import { ButtonCooldown } from '../../lib/decorators/HandlersCooldown';
+import { resolveKey } from '@sapphire/plugin-i18next';
+import { Emojis } from '../../shared/enum/Emojis';
 
 export class ButtonTextRankHandler extends InteractionHandler {
     public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
@@ -19,15 +22,18 @@ export class ButtonTextRankHandler extends InteractionHandler {
     }
 
     @CheckTextExperienceEnabled
+    @ButtonCooldown(60)
     public async run(interaction: ButtonInteraction) {
+        registeringFONT();
+        await interaction.deferReply({ ephemeral: false });
         const user = interaction.user;
         if (user.bot) {
-            await interaction.reply({ content: 'Bots cannot earn XP.', ephemeral: true });
+            await interaction.editReply({ content: 'Bots cannot earn XP.' });
             return;
         }
         const info = await this.getUserInfo(user.id, interaction.guildId!);
         if (!info) {
-            await interaction.reply({ content: 'You have not earned any XP yet.', ephemeral: true });
+            await interaction.editReply({ content: 'You have not earned any XP yet.' });
             return;
         }
 
@@ -35,14 +41,14 @@ export class ButtonTextRankHandler extends InteractionHandler {
         const experience = info.textExperience ?? 0;
 
         const rank = await this.getRank(user.id, interaction.guildId!);
-        const requiredXP = experienceFormula(level + 1);
+        const requiredXP = textExperienceFormula(level + 1);
         const formattedRank = formatNumber(rank ?? 0);
 
         const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 128 });
         const buffer = await DrawCanvas.generateUserRankImage(
             {
                 userId: user.id,
-                username: user.username,
+                username: user.displayName,
                 displayAvatarURL: user.displayAvatarURL,
                 textExperience: experience,
                 level
@@ -54,14 +60,15 @@ export class ButtonTextRankHandler extends InteractionHandler {
             avatarURL
         );
 
-        await interaction.update({
+        await interaction.editReply({
+            content: await resolveKey(interaction, `commands/replies/level:text_card`, { emoji: Emojis.SUCCESS, user: user.displayName }),
             files: [{ attachment: buffer, name: 'rank.png' }],
             components: [VoiceRankButtonRow]
         });
     }
 
     public async getRank(userId: string, guildId: string) {
-        const users = await container.prisma.textExperience.findMany({
+        const users = await container.prisma.text_experience.findMany({
             where: { guildId },
             orderBy: [
                 {
@@ -78,7 +85,7 @@ export class ButtonTextRankHandler extends InteractionHandler {
     }
 
     private async getUserInfo(userId: string, guildId: string) {
-        const user = await container.prisma.textExperience.findUnique({
+        const user = await container.prisma.text_experience.findUnique({
             where: {
                 guildId_userId: {
                     userId: userId,

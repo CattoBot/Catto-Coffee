@@ -25,7 +25,7 @@ export class VoiceTransferCommand {
         }
     
         try {
-            await container.prisma.voiceTempChannels.update({
+            await container.prisma.voice_temp_channels.update({
                 where: {
                     guildId_channelId: {
                         channelId: message.member!.voice.channel!.id,
@@ -51,7 +51,7 @@ export class VoiceTransferCommand {
         const member = interaction.guild!.members.resolve(user!.id) as GuildMember;
 
         try {
-            await container.prisma.voiceTempChannels.update({
+            await container.prisma.voice_temp_channels.update({
                 where: {
                     guildId_channelId: {
                         channelId: member.voice.channel!.id,

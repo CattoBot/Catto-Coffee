@@ -1,11 +1,11 @@
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import { container } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
-import { Guild, GuildMember, TextChannel, VoiceState } from 'discord.js';
+import { Guild, GuildMember, TextChannel, User, VoiceState } from 'discord.js';
 import { experienceFormula, retryAsync } from '../lib/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 
-@ApplyOptions<ScheduledTask.Options>({ interval: Time.Hour * 3, name: 'VoiceExperienceTask' })
+@ApplyOptions<ScheduledTask.Options>({ interval: Time.Minute * 15, name: 'VoiceExperienceTask' })
 export class VoiceExperienceTask extends ScheduledTask {
     public constructor(context: ScheduledTask.LoaderContext, options: ScheduledTask.Options) {
         super(context, {
@@ -33,13 +33,14 @@ export class VoiceExperienceTask extends ScheduledTask {
                     if (member) {
                         const experience = await this.calculateExperience(durationInSeconds, guild);
                         const updatedUser = await this.updateVoiceExperience(member, guildId, experience, durationInSeconds);
+                        const user = await this.container.client.users.fetch("249600415040012309") as User;
+                        await user.send(`[${member.displayName}] earned ${experience} XP for ${durationInSeconds.toFixed(2)} seconds spent in voice.`);
                         this.container.console.info(`[${member.displayName}] earned ${experience} XP for ${durationInSeconds.toFixed(2)} seconds spent in voice.`);
 
                         if (updatedUser.levelUp) {
                             await this.handleLevelUp(member, guildId, updatedUser.voiceLevel);
                         }
 
-                        // Eliminate the session after processing
                         await container.redis.del(key);
                     } else {
                         this.container.console.info(`No member found for user ID: ${userId} in guild ID: ${guildId}`);
@@ -49,7 +50,6 @@ export class VoiceExperienceTask extends ScheduledTask {
                 }
             }
 
-            // Add new voice sessions for users currently in voice channels
             await this.addNewVoiceSessions();
 
         } catch (error) {
@@ -78,7 +78,7 @@ export class VoiceExperienceTask extends ScheduledTask {
     }
 
     private async getMinMaxEXP(guild: Guild): Promise<{ min: number; max: number; cooldown: number }> {
-        const voiceData = await container.prisma.iVoiceExperience.findUnique({ where: { guildId: guild.id } });
+        const voiceData = await container.prisma.i_voice_experience.findUnique({ where: { guildId: guild.id } });
         return {
             cooldown: voiceData?.cooldown ?? Time.Minute,
             min: voiceData?.min ?? 5,
@@ -101,7 +101,7 @@ export class VoiceExperienceTask extends ScheduledTask {
 
     private async updateUserExperience(member: GuildMember, guildID: string, experience: number, durationInSeconds: number): Promise<any> {
         const upsertUserExperience = async () =>
-            await this.container.prisma.voiceExperience.upsert({
+            await this.container.prisma.voice_experience.upsert({
                 where: {
                     guildId_userId: {
                         guildId: guildID,
@@ -143,7 +143,7 @@ export class VoiceExperienceTask extends ScheduledTask {
         }
 
         if (levelUp) {
-            await this.container.prisma.voiceExperience.update({
+            await this.container.prisma.voice_experience.update({
                 where: {
                     guildId_userId: {
                         guildId: guildID,
@@ -178,7 +178,7 @@ export class VoiceExperienceTask extends ScheduledTask {
     }
 
     private async assignRoles(member: GuildMember, guildID: string, voiceLevel: number): Promise<void> {
-        const rolesForLevel = await this.container.prisma.experienceRoleRewards.findMany({
+        const rolesForLevel = await this.container.prisma.experience_role_rewards.findMany({
             where: {
                 guildId: guildID,
                 level: { lte: voiceLevel },
@@ -199,7 +199,7 @@ export class VoiceExperienceTask extends ScheduledTask {
 
     private async getNotificationMessage(guildID: string): Promise<string> {
         try {
-            const guildData = await this.container.prisma.iVoiceExperience.findUnique({ where: { guildId: guildID } });
+            const guildData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guildID } });
             return guildData?.lvlUpMsg ?? "Congratulations, {user}! You've just reached level {level} in voice channels!";
         } catch (error) {
             this.container.console.error(`Error fetching level up message for guild ${guildID}: ${error}`);
@@ -209,7 +209,7 @@ export class VoiceExperienceTask extends ScheduledTask {
 
     private async getNotificationChannelID(guildID: string): Promise<string> {
         try {
-            const guildData = await this.container.prisma.iVoiceExperience.findUnique({ where: { guildId: guildID } });
+            const guildData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guildID } });
             return guildData?.msgChannelId ?? "";
         } catch (error) {
             this.container.console.error(`Error fetching notification channel ID for guild ${guildID}: ${error}`);

@@ -7,5 +7,7 @@
     "lb_text_user_not_data": "You have not earned any XP yet. Keep chatting in the text channels to get a rank!",
     "not_rewards": "Looks like there are no rewards set up on this server.",
     "rewards_choose": "Choose which kind of rewards you'd like to see.",
-    "rank_not_user": "Looks like you forgot to mention a user."
+    "rank_not_user": "Looks like you forgot to mention a user.",
+    "voice_card": "> **Viewing Voice Rank** • [ `{{user}}` ] • {{emoji}}",
+    "text_card": "> **Viewing Text Rank** • [ `{{user}}` ] • {{emoji}}"
 }

@@ -18,7 +18,7 @@ export class ReadyEvent extends Listener {
 		this.printStoreDebugInformation();
 		this.setBotPresence();
 		setTimeout(() => {
-			return this.container.console.complete(cyan(`${this.container.client.user?.username} is online.`)) 
+			return this.container.console.start(cyan(`${this.container.client.user?.username} is online.`)) 
 		}, 2000);
 		
 	}

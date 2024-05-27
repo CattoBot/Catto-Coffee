@@ -1,7 +1,7 @@
-import { ApplyOptions } from '@sapphire/decorators';
-import { CacheType, InteractionResponse, Message, MessageResolvable } from 'discord.js';
+import { ApplyOptions, RequiresUserPermissions } from '@sapphire/decorators';
+import { CacheType, InteractionResponse, Message, MessageResolvable, PermissionFlagsBits } from 'discord.js';
 import { Subcommand, SubcommandOptions } from '@sapphire/plugin-subcommands';
-import { AddUserToGuildBlacklistCommand } from '../../lib/commands/admin/bl-add-user';
+import { AddUserToGuildBlacklistCommand } from '../../lib/commands/manage/bl-add-user';
 import {
     ResetUserCommand,
     BonusVoiceRolesCommand,
@@ -19,7 +19,7 @@ import {
     VoiceExperienceCommand,
     VoiceRoleCommands,
     ResetServerCommand
-} from '../../lib/commands/admin';
+} from '../../lib/commands/manage';
 import { AdminSubCommandsRegistration } from '../../shared/bot/commands/build/admin';
 import { AdminSubCommandOptions } from '../../shared/bot/commands/options/SubCommands/admin-command.options';
 import { VoiceSetupModalHandler } from '../../shared/bot/modals/VoiceModals';
@@ -48,10 +48,12 @@ export class AdminCommands extends Subcommand {
         await interaction.showModal(VoiceSetupModalHandler);
     }
 
+    @RequiresUserPermissions(PermissionFlagsBits.Administrator)
     public async ChatInputAddUserToGuildBlacklist(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
         return AddUserToGuildBlacklistCommand.run(interaction);
     }
 
+    @RequiresUserPermissions(PermissionFlagsBits.Administrator)
     public async ChatRemoveUserFromGuildBlacklist(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
         return RemoveUserFromGuildBlacklistCommand.run(interaction);
     }

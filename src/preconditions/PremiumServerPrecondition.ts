@@ -24,7 +24,7 @@ export class PremiumServerPrecondition extends Precondition {
     }
 
     private async getPremiumServers() {
-        const servers = await this.container.prisma.premiumServers.findMany({
+        const servers = await this.container.prisma.premium_servers.findMany({
             select: { guildId: true }
         });
 

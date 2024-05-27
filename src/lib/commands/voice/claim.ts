@@ -11,12 +11,18 @@ export class VoiceClaimCommand extends VoiceHelper {
         await message.channel.sendTyping();
         const member = message.member;
         if (!member!.voice.channel) {
-            return message.reply({
+            return await message.reply({
                 content: (await resolveKey(message, `commands/replies/commandDenied:voice_channel_not_found`, { emoji: Emojis.ERROR })),
             });
         }
 
         const channel = await this.find(member!.voice.channel.id, message.guild!.id);
+
+        if (!channel) {
+            return message.reply({
+                content: (await resolveKey(message, `commands/replies/commandDenied:channel_not_found`, { emoji: Emojis.ERROR })),
+            });
+        }
 
         if (channel!.channelOwnerId === member!.id) {
             return message.reply({
@@ -29,11 +35,11 @@ export class VoiceClaimCommand extends VoiceHelper {
                 content: (await resolveKey(message, `commands/replies/voice:claim_error`, { emoji: Emojis.ERROR })),
             });
         } else {
-            await container.prisma.voiceTempChannels.update({
+            await container.prisma.voice_temp_channels.update({
                 where: {
                     guildId_channelId: {
-                        channelId: message.guild!.id,
-                        guildId: member!.voice.channel.id,
+                        channelId: member!.voice.channel.id,
+                        guildId: message.guild!.id,
                     },
                 },
                 data: {
@@ -46,10 +52,25 @@ export class VoiceClaimCommand extends VoiceHelper {
             });
         }
     }
+
     public static async chatInputRun(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse> {
         const user = interaction.user.id;
         const member = interaction.guild!.members.resolve(user);
-        const channel = await this.find(member!.voice.channel!.id, interaction.guild!.id);
+        if (!member!.voice.channel) {
+            return interaction.reply({
+                content: (await resolveKey(interaction, `commands/replies/commandDenied:voice_channel_not_found`, { emoji: Emojis.ERROR })),
+                ephemeral: true,
+            });
+        }
+
+        const channel = await this.find(member!.voice.channel.id, interaction.guild!.id);
+
+        if (!channel) {
+            return await interaction.reply({
+                content: (await resolveKey(interaction, `commands/replies/commandDenied:channel_not_found`, { emoji: Emojis.ERROR })),
+                ephemeral: true,
+            });
+        }
 
         if (channel!.channelOwnerId === member!.id) {
             return interaction.reply({
@@ -64,11 +85,11 @@ export class VoiceClaimCommand extends VoiceHelper {
                 ephemeral: true,
             });
         } else {
-            await container.prisma.voiceTempChannels.update({
+            await container.prisma.voice_temp_channels.update({
                 where: {
                     guildId_channelId: {
-                        channelId: interaction.guild!.id,
-                        guildId: member!.voice.channel!.id,
+                        channelId: member!.voice.channel!.id,
+                        guildId: interaction.guild!.id,
                     },
                 },
                 data: {
@@ -78,7 +99,7 @@ export class VoiceClaimCommand extends VoiceHelper {
 
             return interaction.reply({
                 content: (await resolveKey(interaction, `commands/replies/voice:claim_success`, { emoji: Emojis.SUCCESS })),
-                ephemeral: true
+                ephemeral: false
             });
         }
     }

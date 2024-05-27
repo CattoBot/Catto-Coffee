@@ -42,7 +42,7 @@ export class VoiceInviteCommand {
                     })
             ]);
 
-            return message.reply(translateKey('commands/replies/voice:invite_success', { user: user.username, emoji: Emojis.SUCCESS }));
+            return message.reply(translateKey('commands/replies/voice:invite_success', { user: user.displayName, emoji: Emojis.SUCCESS }));
         } catch (error) {
             console.error('Error during voice invite command:', error);
             return message.reply({ content: translateKey('commands/replies/commandDenied:unknown_error') });

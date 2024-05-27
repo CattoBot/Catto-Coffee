@@ -9,13 +9,13 @@ export class VoiceBonusChannelCommand {
         const channel = interaction.options.getChannel('channel', true) as VoiceChannel
         if (!channel) return interaction.reply({ content: await resolveKey(interaction, `commands/replies/error:invalid_channel`), ephemeral: true });
 
-        await container.prisma.bonusVoiceChannels.create({
+        await container.prisma.bonus_voice_channels.create({
             data: {
                 guildId: interaction.guild!.id,
                 channelId: channel.id
             }
         })
 
-        return await interaction.reply({ content: await resolveKey(interaction, `commands/replies/success:voice_bonus_channel_add`, { channel: channel, emoji: Emojis.SUCCESS }), ephemeral: false });
+        return await interaction.reply({ content: await resolveKey(interaction, `commands/replies/admin:voice_bonus_channel_add`, { channel: channel, emoji: Emojis.SUCCESS }), ephemeral: false });
     }
 }

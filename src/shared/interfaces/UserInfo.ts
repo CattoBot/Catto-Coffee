@@ -8,7 +8,7 @@ export interface UserInfo {
     textExperience?: number;
     level: number;
     experience?: number;
-    rank?: string;
+    rank?: number;
     totalhours?: number;
     totalMessages?: number;
     aboutMe?: string;

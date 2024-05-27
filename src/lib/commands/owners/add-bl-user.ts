@@ -46,7 +46,7 @@ export class AddUserBlacklistCommand {
     }
 
     private static async addToDatabase(userId: string) {
-        await container.prisma.botBlackListedUsers.create({
+        await container.prisma.bot_black_listed_users.create({
             data: { userId: userId }
         });
     }

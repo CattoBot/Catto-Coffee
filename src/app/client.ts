@@ -59,12 +59,12 @@ export class ApplicationClient extends SapphireClient {
             i18n: {
                 fetchLanguage: async (context: InternationalizationContext) => {
                     const guild = await container.prisma.guilds.findUnique({ where: { guildId: context.guild?.id } });
-                    return guild?.language || 'en-US';
+                    return guild?.language || 'es-ES';
                 }
             },
             loadApplicationCommandRegistriesStatusListeners: true
         });
-        
+
         this.stores.get('interaction-handlers').registerPath(join(this.rootData.root, 'interactions'));
         this.stores.get('scheduled-tasks').registerPath(join(this.rootData.root, 'tasks'));
     }

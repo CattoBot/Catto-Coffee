@@ -2,15 +2,21 @@ import { container } from "@sapphire/pieces";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
+import { AllowedCommand, allowedCommands } from "../../../shared/types/Commands";
 
 export class DisableCommand {
     public static async commandRun(interaction: Subcommand.ChatInputCommandInteraction) {
-        const command = interaction.options.getString('command', true);
+        const command = interaction.options.getString('command', true) as AllowedCommand;
 
-        // Debugging information
-        console.log(`Disabling command: ${command} for guild: ${interaction.guild!.id}`);
+        if (!allowedCommands.includes(command)) {
+            return await interaction.reply({
+                content: await resolveKey(interaction, `commands/replies/error:invalid_command`, { emoji: Emojis.ERROR }),
+                ephemeral: true,
+            });
+        }
+        container.console.log(`Disabling command: ${command} for guild: ${interaction.guild!.id}`);
 
-        const disabledCommand = await container.prisma.disabledCommands.findUnique({
+        const disabledCommand = await container.prisma.disabled_commands.findUnique({
             where: {
                 guildId_command: {
                     guildId: interaction.guild!.id,
@@ -19,8 +25,7 @@ export class DisableCommand {
             },
         });
 
-        // More debugging information
-        console.log(`Disabled command entry found: ${!!disabledCommand}`);
+        container.console.log(`Disabled command entry found: ${!!disabledCommand}`);
 
         if (disabledCommand) {
             return await interaction.reply({
@@ -29,7 +34,7 @@ export class DisableCommand {
             });
         }
 
-        await container.prisma.disabledCommands.create({
+        await container.prisma.disabled_commands.create({
             data: {
                 guildId: interaction.guild!.id,
                 command: command,
@@ -44,11 +49,9 @@ export class DisableCommand {
 
     public static async moduleRun(interaction: Subcommand.ChatInputCommandInteraction) {
         const module = interaction.options.getString('module', true);
-
-        // Debugging information
         console.log(`Disabling module: ${module} for guild: ${interaction.guild!.id}`);
 
-        const disabledModule = await container.prisma.disabledModules.findUnique({
+        const disabledModule = await container.prisma.disabled_modules.findUnique({
             where: {
                 guildId_module: {
                     guildId: interaction.guild!.id,
@@ -57,8 +60,7 @@ export class DisableCommand {
             },
         });
 
-        // More debugging information
-        console.log(`Disabled module entry found: ${!!disabledModule}`);
+        container.console.log(`Disabled module entry found: ${!!disabledModule}`);
 
         if (disabledModule) {
             return await interaction.reply({
@@ -67,7 +69,15 @@ export class DisableCommand {
             });
         }
 
-        await container.prisma.disabledModules.create({
+        if (module === "voicexp") {
+            await container.prisma.i_voice_experience.update({ where: { guildId: interaction.guild!.id }, data: { isEnabled: false } })
+            await container.redis.del(`guild:${interaction.guild!.id}:voiceXPEnabled`)
+        } else if (module === "textxp") {
+            await container.prisma.i_text_experience.update({ where: { guildId: interaction.guild!.id }, data: { isEnabled: false } })
+            await container.redis.del(`guild:${interaction.guild!.id}:textXPEnabled`)
+        }
+
+        await container.prisma.disabled_modules.create({
             data: {
                 guildId: interaction.guild!.id,
                 module: module,

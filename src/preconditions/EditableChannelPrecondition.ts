@@ -25,13 +25,13 @@ export class EditableChannelPrecondition extends Precondition {
     }
 
     private async shouldBeEdited(guildId: string, channelId: string) {
-        const voiceChannel = await container.prisma.voiceTempChannels.findUnique({
+        const voiceChannel = await container.prisma.voice_temp_channels.findUnique({
             where: { guildId_channelId: { guildId, channelId } },
         });
 
         if (!voiceChannel) return false;
 
-        const iVoiceCategory = await container.prisma.editableChannels.findFirst({
+        const iVoiceCategory = await container.prisma.editable_channels.findFirst({
             where: {
                 guildId: guildId,
                 categoryId: voiceChannel.channelCategoryId,

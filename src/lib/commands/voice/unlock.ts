@@ -1,7 +1,7 @@
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
-import { InteractionResponse, Message } from "discord.js";
+import { GuildMember, InteractionResponse, Message } from "discord.js";
 import { container } from "@sapphire/pieces";
 
 export class VoiceUnlockCommand {
@@ -44,8 +44,23 @@ export class VoiceUnlockCommand {
                 ephemeral: true,
             });
         }
+
+        await this.updateLock(member!);
         return interaction.reply({
             content: (await resolveKey(interaction, `commands/replies/voice:unlock_success`, { emoji: Emojis.SUCCESS })),
         });
+    }
+
+    private static async updateLock(member: GuildMember) {
+        await container.prisma.i_users_temp_voice.upsert({
+            where: {
+                userId: member.id
+            }, update: {
+                isLocked: false
+            }, create: {
+                userId: member.id,
+                isLocked: false
+            }
+        })
     }
 }

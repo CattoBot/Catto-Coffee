@@ -2,7 +2,7 @@ import { container } from "@sapphire/pieces";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
-import { InteractionResponse, Message } from "discord.js";
+import { GuildMember, InteractionResponse, Message } from "discord.js";
 
 export class VoiceLockCommand {
 
@@ -27,7 +27,7 @@ export class VoiceLockCommand {
             content: (await resolveKey(message, `commands/replies/voice:lock_success`, { emoji: Emojis.SUCCESS })),
         });
     }
-    
+
     public static async chatInputRun(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse> {
         const user = interaction.user.id;
         const member = interaction.guild!.members.resolve(user);
@@ -46,8 +46,23 @@ export class VoiceLockCommand {
                 ephemeral: true,
             });
         }
+
+        await this.updateLock(member!);
         return interaction.reply({
             content: (await resolveKey(interaction, `commands/replies/voice:lock_success`, { emoji: Emojis.SUCCESS })),
         });
+    }
+
+    private static async updateLock(member: GuildMember) {
+        await container.prisma.i_users_temp_voice.upsert({
+            where: {
+                userId: member.id
+            }, update: {
+                isLocked: true
+            }, create: {
+                userId: member.id,
+                isLocked: true
+            }
+        })
     }
 }

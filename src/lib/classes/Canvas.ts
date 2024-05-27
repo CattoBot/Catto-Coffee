@@ -2,7 +2,7 @@ import { container } from '@sapphire/pieces';
 import { createCanvas, loadImage, CanvasRenderingContext2D, Canvas } from 'canvas';
 import { join } from 'path';
 import { UserInfo } from '../../shared/interfaces/UserInfo';
-import { drawFormattedRank, drawProgressBar, drawProgressBarForUser, drawRoundedImage, drawUserAvatar, drawUserData, experienceFormula, formatNumber, formatSecondsToHours, globalexperienceFormula, retreiveRankCardConfig, wrapText } from '../utils';
+import { drawFormattedRank, drawProgressBar, drawProgressBarForUser, drawRoundedImage, drawUserAvatar, drawUserData, experienceFormula, formatNumber, formatSecondsToHours, globalexperienceFormula, registeringFONT, retreiveRankCardConfig, wrapText } from '../utils';
 import { User } from 'discord.js';
 
 export class DrawCanvas {
@@ -112,8 +112,8 @@ export class DrawCanvas {
             const badgeY = BADGE_CONTAINER_Y + (containerHeight - BADGE_SIZE) / 2;
             for (let i = userBadges.length - 1; i >= 0; i--) {
                 const badge = userBadges[i];
-                if (badge.badge.badgeUrl === null) continue;
-                ctx.drawImage(await loadImage(badge.badge.badgeUrl), badgeX, badgeY, BADGE_SIZE, BADGE_SIZE);
+                if (badge.badges.badgeUrl === null) continue;
+                ctx.drawImage(await loadImage(badge.badges.badgeUrl), badgeX, badgeY, BADGE_SIZE, BADGE_SIZE);
                 badgeX -= BADGE_SIZE + BADGE_SPACING;
             }
         }
@@ -171,7 +171,7 @@ export class DrawCanvas {
         ctx.fillStyle = ABOUT_ME_COLOR;
         ctx.font = ABOUT_ME_FONT;
         ctx.textBaseline = 'top'; // Align text to the top
-        const aboutMeText = user.aboutMe || "This is a sample About Me text where you can basically say whatever you want and nothing will ever happen lol. lmao kid wtf skibidi sigma XDDDDDDDDDDDDD";
+        const aboutMeText = user.aboutMe || "No information given";
         wrapText(ctx, aboutMeText, ABOUT_ME_X, ABOUT_ME_Y, ABOUT_ME_WIDTH, ABOUT_ME_HEIGHT, 40); // 25 is the line height
 
         // Draw avatar
@@ -189,7 +189,7 @@ export class DrawCanvas {
         // Crear canvas y contexto
         const canvas: Canvas = createCanvas(1000, 300);
         const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
-
+    
         // Constants for positions and dimensions
         const CANVAS_WIDTH = 1000;
         const CANVAS_HEIGHT = 300;
@@ -204,36 +204,36 @@ export class DrawCanvas {
         const BADGE_SPACING = 13;
         const CONTAINER_PADDING = 20;
         const CONTAINER_CORNER_RADIUS = 30;
-        const RANK_TEXT_X = 780;
+        const RANK_TEXT_X = 800;
         const RANK_TEXT_Y = 70;
         const RANK_LABEL_X = 680;
         const RANK_LABEL_Y = 70;
-        const USERNAME_X = 380;
+        const USERNAME_X = 300;
         const USERNAME_Y = 155;
-        const LEVEL_X = 340;
+        const LEVEL_X = 300;
         const LEVEL_Y = 180;
-        const XP_TEXT_X = 800;
+        const XP_TEXT_X = 780;
         const XP_TEXT_Y = 170;
-
+    
         // Desestructurar con valores predeterminados en caso de que sean nulos
         const {
             progressBarFirstColor = '#12D6DF',
             progressBarSecondColor = '#F70FFF'
         } = (await retreiveRankCardConfig(user.userId)) || {};
-
+    
         // Cargar imágenes
         const bg = await loadImage(join(__dirname, '../../../assets/img/White_Solid_Card.png'));
         const avatar = await loadImage(avatarURL);
-
+    
         // Ajustar las coordenadas para el avatar
         const circleX = 120 + CANVAS_WIDTH * 0.03 + AVATAR_OFFSET;
         const avatarX = circleX - CIRCLE_RADIUS;
         const circleY = 170 - (CANVAS_HEIGHT * 0.06);
         const avatarY = circleY - CIRCLE_RADIUS;
-
+    
         // Dibujar fondo
         ctx.drawImage(bg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
+    
         // Definir los colores de degradado basados en el rango
         let gradient;
         if (rank === '1') {
@@ -253,23 +253,23 @@ export class DrawCanvas {
             gradient.addColorStop(0, progressBarFirstColor ?? "#12D6DF");
             gradient.addColorStop(1, progressBarSecondColor ?? "#F70FFF");
         }
-
+    
         // Dibujar barra de progreso
         ctx.lineJoin = 'round';
         ctx.lineWidth = BAR_HEIGHT;
-
+    
         // Dibujar barra vacía
         ctx.strokeStyle = '#BEBEBE';
         ctx.strokeRect(BAR_X, BAR_Y, BAR_WIDTH, 0);
-
+    
         // Dibujar barra llena
         ctx.strokeStyle = gradient;
         ctx.strokeRect(BAR_X, BAR_Y, (BAR_WIDTH * (experience / requiredXP)), 0);
-
+    
         // Obtener las badges del usuario y de la guild
         const userBadges = await this.getUserBadges(user.userId);
         const guildBadges = await this.getGuildBadges(guildId);
-
+    
         // Dibujar las badges si hay alguna
         const allBadges = [...userBadges, ...guildBadges];
         if (allBadges.length > 0) {
@@ -278,7 +278,7 @@ export class DrawCanvas {
             const containerHeight = BADGE_SIZE + CONTAINER_PADDING;
             const containerX = 450 - containerWidth / 2;
             const containerY = 22;
-
+    
             // Dibujar el contenedor de las badges con bordes redondeados
             ctx.beginPath();
             ctx.moveTo(containerX + CONTAINER_CORNER_RADIUS, containerY);
@@ -293,17 +293,17 @@ export class DrawCanvas {
             ctx.closePath();
             ctx.fillStyle = '#EAEAEA'; // Color gris claro de fondo del contenedor
             ctx.fill();
-
+    
             // Dibujar las badges dentro del contenedor
             let badgeX = containerX + 10;
             const badgeY = containerY + (containerHeight - BADGE_SIZE) / 2;
             for (const badge of allBadges) {
-                if (badge.badge.badgeUrl === null) continue;
-                ctx.drawImage(await loadImage(badge.badge.badgeUrl), badgeX, badgeY, BADGE_SIZE, BADGE_SIZE);
+                if (badge.badges.badgeUrl === null) continue;
+                ctx.drawImage(await loadImage(badge.badges.badgeUrl), badgeX, badgeY, BADGE_SIZE, BADGE_SIZE);
                 badgeX += BADGE_SIZE + BADGE_SPACING;
             }
         }
-
+    
         // Agregar texto
         ctx.font = '50px Bahnschrift';
         ctx.fillStyle = '#A8A8A8';
@@ -311,54 +311,57 @@ export class DrawCanvas {
         ctx.fillText(`${rank}`, RANK_TEXT_X, RANK_TEXT_Y, 80);
         ctx.fillText('RANK', RANK_LABEL_X, RANK_LABEL_Y, 200);
         ctx.fillStyle = '#3D3D3D';
+        ctx.textAlign = 'left'; // Cambiar textAlign a 'left' para que el texto se expanda hacia la derecha
         ctx.font = '25px Poppins SemiBold';
         ctx.fillText(`${user.username}`, USERNAME_X, USERNAME_Y);
         ctx.font = '22px Poppins SemiBold';
         ctx.fillText(`Lv. ${user.level}`, LEVEL_X, LEVEL_Y);
         ctx.font = '25px Poppins SemiBold';
         ctx.fillText(`${formatNumber(experience)} / ${formatNumber(requiredXP)}`, XP_TEXT_X, XP_TEXT_Y);
-
+    
         // Dibujar avatar
         ctx.beginPath();
         ctx.arc(circleX, circleY, CIRCLE_RADIUS, 0, 2 * Math.PI);
         ctx.closePath();
         ctx.clip();
         ctx.drawImage(avatar, avatarX, avatarY, AVATAR_SIZE, AVATAR_SIZE);
-
+    
         return canvas.toBuffer('image/png');
     }
+    
 
 
 
     private static async getGuildBadges(guildId: string) {
-        const badges = await container.prisma.guildBadges.findMany({
+        const badges = await container.prisma.guild_badges.findMany({
             where: {
-                guild: {
+                guilds: {
                     guildId: guildId
                 }
             },
             include: {
-                badge: true
+                badges: true
             }
         });
         return badges;
     }
 
     private static async getUserBadges(userId: string) {
-        const badges = await container.prisma.userBadges.findMany({
+        const badges = await container.prisma.user_badges.findMany({
             where: {
-                user: {
+                users: {
                     userId: userId
                 }
             },
             include: {
-                badge: true
+                badges: true
             }
         });
         return badges;
     }
 
     public static async generateLeaderboardImage(guild_leaderboard: any[], userId: string, backgroundImagePath: string) {
+        registeringFONT();
         const top10 = guild_leaderboard.slice(0, 10);
         const userRank = guild_leaderboard.findIndex((user) => user.userId === userId) + 1;
         if (userRank === 0) return null;
@@ -379,7 +382,7 @@ export class DrawCanvas {
             const member = await container.client.users.fetch(user.userId) as User;
             const avatar = await loadImage(member.displayAvatarURL({ extension: 'jpg', size: 128 }));
             return {
-                userInfo: `${member.username} \n Level: ${user.voiceLevel} - XP: ${formatNumber(user.voiceExperience ?? 0)}`,
+                userInfo: `${member.username}\nLevel: ${user.voiceLevel} - XP: ${formatNumber(user.voiceExperience ?? 0)}`,
                 avatar
             };
         };

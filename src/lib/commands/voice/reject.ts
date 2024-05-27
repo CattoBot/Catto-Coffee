@@ -20,16 +20,19 @@ export class VoiceRejectCommand {
         }
 
         const memberVoiceChannel = member.voice.channel;
-        const authorVoiceChannel = message.member?.voice.channel!;
+        const authorVoiceChannel = message.member?.voice.channel;
+
+        if (!authorVoiceChannel) {
+            return message.reply(translateKey('commands/replies/commandDenied:voice_author_not_in_channel'));
+        }
 
         try {
             if (!memberVoiceChannel || authorVoiceChannel.id !== memberVoiceChannel.id) {
-                // User is either not in a voice channel or in a different voice channel
                 await authorVoiceChannel.permissionOverwrites.edit(member.id, {
                     Connect: false,
                     ViewChannel: false
                 });
-            } else {
+            } else if (authorVoiceChannel.id === memberVoiceChannel.id) {
                 await authorVoiceChannel.permissionOverwrites.edit(member.id, {
                     Connect: false,
                     ViewChannel: false
@@ -49,30 +52,44 @@ export class VoiceRejectCommand {
     public static async chatInputRun(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse> {
         const translateKey = await fetchT(interaction);
         const user = interaction.options.getUser(translateKey('commands/options/voice:reject_name'));
-        const member = interaction.guild!.members.resolve(user!.id) as GuildMember;
-        const member_interaction = interaction.guild!.members.resolve(interaction.user.id) as GuildMember;
         if (!user) {
             return interaction.reply({ content: translateKey('commands/replies/commandDenied:voice_user_not_found'), ephemeral: true });
+        }
+
+        const member = interaction.guild!.members.resolve(user.id) as GuildMember | null;
+        const memberInteraction = interaction.guild!.members.resolve(interaction.user.id) as GuildMember | null;
+
+        if (!member) {
+            return interaction.reply({ content: translateKey('commands/replies/commandDenied:voice_member_not_found'), ephemeral: true });
         }
 
         if (interaction.user.id === user.id) {
             return interaction.reply({ content: translateKey('commands/replies/commandDenied:self_voice_command', { emoji: Emojis.ERROR }), ephemeral: true });
         }
 
-        const user_permissions = member_interaction!.voice.channel!.permissionOverwrites.resolve(user?.id);
+        const memberVoiceChannel = member.voice.channel;
+        const authorVoiceChannel = memberInteraction?.voice.channel;
 
-        if (!member.voice.channel || member.voice.channel.id !== member_interaction.voice.channelId) {
-            await member.voice.channel!.permissionOverwrites.edit(user.id, {
-                ...user_permissions,
-                Connect: false,
-            });
-        } else {
-            await member_interaction.voice.channel!.permissionOverwrites.edit(user.id, {
-                Connect: false,
-            });
-            await member.voice.disconnect();
+        if (!authorVoiceChannel) {
+            return interaction.reply({ content: translateKey('commands/replies/commandDenied:voice_author_not_in_channel'), ephemeral: true });
         }
 
-        return interaction.reply({ content: translateKey('commands/replies/voice:reject_success', { user: user.displayName, emoji: Emojis.SUCCESS }) });
+        try {
+            if (!memberVoiceChannel || memberVoiceChannel.id !== authorVoiceChannel.id) {
+                await authorVoiceChannel.permissionOverwrites.edit(user.id, {
+                    Connect: false,
+                });
+            } else {
+                await authorVoiceChannel.permissionOverwrites.edit(user.id, {
+                    Connect: false,
+                });
+                await member.voice.disconnect();
+            }
+
+            return interaction.reply({ content: translateKey('commands/replies/voice:reject_success', { user: user.displayName, emoji: Emojis.SUCCESS }) });
+        } catch (error) {
+            console.error('Error editing permission overwrites:', error);
+            return interaction.reply({ content: translateKey('commands/replies/commandDenied:voice_permission_error'), ephemeral: true });
+        }
     }
 }

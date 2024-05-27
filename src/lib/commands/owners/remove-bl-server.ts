@@ -29,7 +29,7 @@ export class RemoveServerBlacklistCommand {
     }
 
     private static async removeFromDatabase(guildId: string) {
-        await container.prisma.botBlackListedGuilds.delete({
+        await container.prisma.bot_black_listed_guilds.delete({
             where: { guildId: guildId }
         });
     }
@@ -39,7 +39,7 @@ export class RemoveServerBlacklistCommand {
     }
 
     public static async fetchGuild(guildId: string) {
-        return await container.prisma.botBlackListedGuilds.findUnique({
+        return await container.prisma.bot_black_listed_guilds.findUnique({
             where: { guildId: guildId }
         });
     }

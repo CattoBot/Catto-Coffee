@@ -41,13 +41,13 @@ export class ResetServerCommand {
         await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/admin:resetting_module`, { module: moduleName, emoji: Emojis.LOADING }) });
 
         if (moduleName === 'voice') {
-            await container.prisma.voiceExperience.deleteMany({
+            await container.prisma.voice_experience.deleteMany({
                 where: {
                     guildId: interaction.guildId!
                 }
             });
         } else if (moduleName === 'text') {
-            await container.prisma.textExperience.deleteMany({
+            await container.prisma.text_experience.deleteMany({
                 where: {
                     guildId: interaction.guildId!
                 }

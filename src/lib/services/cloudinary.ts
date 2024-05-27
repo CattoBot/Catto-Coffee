@@ -2,7 +2,7 @@ import { envParseString } from '@skyra/env-utilities';
 import { v2 as cloudinary } from 'cloudinary';
 import { container } from '@sapphire/framework';
 
-class CloudinaryService {
+export class CloudinaryService {
     constructor() {
         cloudinary.config({
             cloud_name: envParseString('CLOUDINARY_CLOUD_NAME'),
@@ -45,5 +45,3 @@ class CloudinaryService {
         });
     }
 }
-
-export { CloudinaryService };

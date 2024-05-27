@@ -28,7 +28,7 @@ function CheckVoiceExperienceEnabled(
         if (cachedEnabled !== null) {
             isEnabled = JSON.parse(cachedEnabled);
         } else {
-            const result = await prisma.iVoiceExperience.findUnique({ where: { guildId } });
+            const result = await prisma.i_voice_experience.findUnique({ where: { guildId } });
             isEnabled = result?.isEnabled ?? false;
             await redis.set(cacheKey, JSON.stringify(isEnabled), 'EX', 3600); // Cache for 1 hour
         }

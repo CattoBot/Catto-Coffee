@@ -11,7 +11,7 @@ export function FilteredVoiceChannels() {
             for (const guild of guilds) {
                 for (const channel of guild.channels.cache.values()) {
                     if (channel instanceof VoiceChannel) {
-                        const filteredChannel = await container.prisma.filteredVoiceChannels.findUnique({
+                        const filteredChannel = await container.prisma.filtered_voice_channels.findUnique({
                             where: {
                                 guildId_channelId: {
                                     guildId: guild.id,

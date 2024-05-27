@@ -16,7 +16,7 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     public async run(): Promise<void> {
-        const dailyTop = await this.container.prisma.weeklyTop.findMany();
+        const dailyTop = await this.container.prisma.weekly_top.findMany();
         this.container.console.info('Starting to process weekly tops...', dailyTop);
 
         for (const top of dailyTop) {
@@ -58,7 +58,7 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
 
     private async getTop10VoiceUsers(guildId: string) {
         this.container.console.info('Fetching top 10 voice users...');
-        const top = await this.container.prisma.voiceExperience.findMany({
+        const top = await this.container.prisma.voice_experience.findMany({
             where: { guildId },
             take: 10,
             orderBy: { weeklyTimeInVoiceChannel: 'desc' }
@@ -68,7 +68,7 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     private async deleteWeeklyVoiceExperience(guildId: string) {
-        await this.container.prisma.voiceExperience.updateMany({
+        await this.container.prisma.voice_experience.updateMany({
             where: { guildId },
             data: { weeklyTimeInVoiceChannel: 0 }
         });
@@ -76,7 +76,7 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     private async getChannelId(guildId: string) {
-        const channel = await this.container.prisma.leaderboardChannels.findUnique({
+        const channel = await this.container.prisma.leaderboard_channels.findUnique({
             where: { guildId }
         });
         this.container.console.info('Fetched channel ID:', channel?.weeklyVoiceTop10channelId);
@@ -88,7 +88,7 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
         this.container.console.info('Fetched next publish date from Redis:', nextDateString);
 
         if (!nextDateString) {
-            const weeklyTop = await this.container.prisma.weeklyTop.findUnique({
+            const weeklyTop = await this.container.prisma.weekly_top.findUnique({
                 where: { guildId }
             });
 
@@ -116,7 +116,7 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     private async updateWeeklyTopMessageId(guildId: string, messageId: string): Promise<void> {
-        await this.container.prisma.weeklyTop.update({
+        await this.container.prisma.weekly_top.update({
             where: { guildId },
             data: { lastWeeklyMessageId: messageId }
         });

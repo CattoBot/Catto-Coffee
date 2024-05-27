@@ -5,7 +5,7 @@ import { Helper } from "../helper";
 export class onClickDefaultVoiceChannelDelete extends Helper {
     public async findExistingChannel(guildId: string, voiceChannel: VoiceChannel) {
         try {
-            return container.prisma.iVoiceTempChannels.findUnique({
+            return container.prisma.i_voice_temp_channels.findUnique({
                 where: {
                     guildId_channelId: {
                         guildId: guildId,
@@ -22,7 +22,7 @@ export class onClickDefaultVoiceChannelDelete extends Helper {
     public async deleteChannel(voiceChannel: VoiceChannel, guildId: string) {
         try {
             setTimeout(async () => {
-                await container.prisma.iVoiceTempChannels.delete({
+                await container.prisma.i_voice_temp_channels.delete({
                     where: {
                         guildId_channelId: {
                             guildId: guildId,

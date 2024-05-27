@@ -2,7 +2,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import { GuildMember, Message, TextChannel } from "discord.js";
 import { EnabledTextListenerExperience } from "../../lib/decorators/ListenerTextExpEnabled";
-import { experienceFormula, globalexperienceFormula } from "../../lib/utils";
+import { globalexperienceFormula, textExperienceFormula } from "../../lib/utils";
 
 @ApplyOptions<Listener.Options>({ event: Events.MessageCreate })
 export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate> {
@@ -10,7 +10,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         super(context, { ...options, once: false });
     }
 
-    @EnabledTextListenerExperience
+    @EnabledTextListenerExperience()
     public async run(message: Message) {
         if (!message.guild || message.author.bot || !message.inGuild()) return;
 
@@ -27,7 +27,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         const userExp = await this.getUserExperience(message.guild.id, message.author.id);
         const randomXP = this.getRandomXP(min, max);
         let { updatedExp, currentLevel } = this.calculateUpdatedExperience(userExp, randomXP);
-        const nextLevelExp = experienceFormula(currentLevel + 1);
+        const nextLevelExp = textExperienceFormula(currentLevel);
 
         if (updatedExp >= nextLevelExp) {
             currentLevel += 1;
@@ -52,7 +52,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
     }
 
     private async getUserExperience(guildId: string, userId: string) {
-        return this.container.prisma.textExperience.findUnique({
+        return this.container.prisma.text_experience.findUnique({
             where: { guildId_userId: { guildId, userId } }
         });
     }
@@ -62,9 +62,8 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
     }
 
     private calculateUpdatedExperience(userExp: any, randomXP: number) {
-        let updatedExp = userExp?.textExperience || 0;
+        let updatedExp = (userExp?.textExperience || 0) + randomXP;
         let currentLevel = userExp?.textLevel || 0;
-        updatedExp += randomXP;
         this.container.console.info(`Calculated updated experience: ${updatedExp}`);
         return { updatedExp, currentLevel };
     }
@@ -91,7 +90,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
             textLevel: currentLevel,
             totalTextExperience: (userExp?.totalTextExperience || 0) + randomXP
         };
-        await this.container.prisma.textExperience.upsert({
+        await this.container.prisma.text_experience.upsert({
             where: { guildId_userId: { guildId, userId } },
             update: data,
             create: { guildId, userId, ...data }
@@ -108,29 +107,32 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         let currentExperience = user?.globalExperience || 0;
         let currentLevel = user?.globalLevel || 1;
         let newExperience = currentExperience + experience;
-        let nextLevelExperience = globalexperienceFormula(currentLevel + 1);
+        let nextLevelExperience = globalexperienceFormula(currentLevel);
         while (newExperience >= nextLevelExperience) {
             newExperience -= nextLevelExperience;
             currentLevel++;
-            nextLevelExperience = globalexperienceFormula(currentLevel + 1);
+            nextLevelExperience = globalexperienceFormula(currentLevel);
         }
-        await this.container.prisma.users.update({
+        await this.container.prisma.users.upsert({
             where: { userId },
-            data: {
+            create: {
+                userId,
                 globalExperience: newExperience,
                 globalLevel: currentLevel,
+                totalGlobalExperience: experience,
+                totalRegisteredMessages: 0,
+                totalTimeInVoiceChannel: 0
+            }, update: {
                 totalGlobalExperience: { increment: experience },
                 totalRegisteredMessages: { increment: 1 }
             }
         });
     }
-    
-
 
     private async getMinMaxEXP(message: Message): Promise<{ min: number, max: number, cooldown: number }> {
         const guildID = message.guild?.id;
         if (!guildID) return { min: 5, max: 20, cooldown: 60 };
-        const guildData = await this.container.prisma.iTextExperience.findUnique({ where: { guildId: guildID } });
+        const guildData = await this.container.prisma.i_text_experience.findUnique({ where: { guildId: guildID } });
         return {
             min: guildData?.min || 5,
             max: guildData?.max || 20,
@@ -139,12 +141,12 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
     }
 
     private async getTextNotificationChannel(guildID: string): Promise<string | undefined> {
-        const guildData = await this.container.prisma.iVoiceExperience.findUnique({ where: { guildId: guildID } });
+        const guildData = await this.container.prisma.i_text_experience.findUnique({ where: { guildId: guildID } });
         return guildData?.msgChannelId ?? undefined;
     }
 
     private async assignRoles(member: GuildMember, guildID: string, textLevel: number): Promise<void> {
-        const rolesForLevel = await this.container.prisma.experienceRoleRewards.findMany({
+        const rolesForLevel = await this.container.prisma.experience_role_rewards.findMany({
             where: { guildId: guildID, level: { lte: textLevel }, roleType: "Text" }
         });
 
@@ -161,7 +163,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
     }
 
     private async getAchievementMessage(guildID: string): Promise<string> {
-        const getMessage = await this.container.prisma.iTextExperience.findUnique({ where: { guildId: guildID } });
+        const getMessage = await this.container.prisma.i_text_experience.findUnique({ where: { guildId: guildID } });
         return getMessage?.lvlUpMsg || 'Felicidades {user} has subido a nivel `{level}`.';
     }
 

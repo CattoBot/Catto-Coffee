@@ -17,11 +17,18 @@ export class VoiceSetupModalHandler extends InteractionHandler {
     }
 
     public async run(interaction: ModalSubmitInteraction): Promise<InteractionResponse> {
+        const check = await this.container.prisma.i_voice_temp_channels.findMany({ where: { guildId: interaction.guild!.id } });
+        if (check.length > 2) {
+            return interaction.reply({
+                content: await resolveKey(interaction, 'commands/replies/voice:voice_setup_error_exists', { emoji: Emojis.ERROR }),
+                ephemeral: true,
+            });
+        }
         const categoryName = interaction.fields.getTextInputValue('category-name');
         const channelName = interaction.fields.getTextInputValue('channel-name');
         const voiceLimit = interaction.fields.getTextInputValue('max-users');
         const isEditable = interaction.fields.getTextInputValue('should-edit');
-        const shouldEnumerate = interaction.fields.getTextInputValue('should-enumerate');
+        // const shouldEnumerate = interaction.fields.getTextInputValue('should-enumerate');
 
         const limit = parseInt(voiceLimit, 10);
 
@@ -36,31 +43,31 @@ export class VoiceSetupModalHandler extends InteractionHandler {
         }
 
         let editable = false;
-        if (isEditable === 'yes') {
+        if (isEditable.toLowerCase() === 'yes') {
             editable = true;
-        } else if (isEditable !== 'no') {
+        } else if (isEditable.toLocaleLowerCase() !== 'no') {
             return interaction.reply({
                 content: await resolveKey(interaction, 'commands/replies/voice:voice_setup_error_editable', { emoji: Emojis.ERROR }),
                 ephemeral: true,
             });
         }
 
-        let enumerate = false;
-        if (shouldEnumerate === 'yes') {
-            enumerate = true;
-        } else if (shouldEnumerate !== 'no') {
-            return interaction.reply({
-                content: await resolveKey(interaction, 'commands/replies/voice:voice_setup_error_enumerate', { emoji: Emojis.ERROR }),
-                ephemeral: true,
-            });
-        }
+        // let enumerate = false;
+        // if (shouldEnumerate === 'yes') {
+        //     enumerate = true;
+        // } else if (shouldEnumerate !== 'no') {
+        //     return interaction.reply({
+        //         content: await resolveKey(interaction, 'commands/replies/voice:voice_setup_error_enumerate', { emoji: Emojis.ERROR }),
+        //         ephemeral: true,
+        //     });
+        // }
 
         const category = await this.createCategory(interaction.guild!, categoryName);
         if (!category) return interaction.reply({ content: 'Error creating category.', ephemeral: true });
 
         const channel = await this.createVoiceChannel(interaction.guild!, category.id);
         if (!channel) return interaction.reply({ content: 'Error creating voice channel.', ephemeral: true });
-        await this.createDatabaseEntry(interaction.guild!, channel, category, limit, channelName, enumerate, editable);
+        await this.createDatabaseEntry(interaction.guild!, channel, category, limit, channelName, true, editable);
         await this.createDatabaseEntryForEditableChannel(interaction.guild!.id, category.id, editable);
         return interaction.reply({
             content: await resolveKey(interaction, 'commands/replies/voice:voice_setup_success', { emoji: Emojis.SUCCESS }),
@@ -69,7 +76,7 @@ export class VoiceSetupModalHandler extends InteractionHandler {
     }
 
     private async createDatabaseEntryForEditableChannel(guildId: string, categoryId: string, editable: boolean) {
-        const entry = await this.container.prisma.editableChannels.create({
+        const entry = await this.container.prisma.editable_channels.create({
             data: {
                 guildId: guildId,
                 categoryId: categoryId,
@@ -89,7 +96,7 @@ export class VoiceSetupModalHandler extends InteractionHandler {
         shouldEdit: boolean
     ): Promise<void> {
         try {
-            await this.container.prisma.iVoiceTempChannels.create({
+            await this.container.prisma.i_voice_temp_channels.create({
                 data: {
                     channelId: channel.id,
                     channelLimit,

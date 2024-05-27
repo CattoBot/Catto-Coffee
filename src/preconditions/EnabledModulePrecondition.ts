@@ -16,7 +16,7 @@ export class EnabledModulePrecondition extends Precondition {
         if (!guildId) return this.ok();
         const moduleName = this.getModuleName(interaction);
 
-        const disabled = await container.prisma.disabledModules.findUnique({
+        const disabled = await container.prisma.disabled_modules.findUnique({
             where: {
                 guildId_module: {
                     guildId: guildId,
@@ -53,7 +53,7 @@ export class EnabledModulePrecondition extends Precondition {
         const args = content.split(' ');
         const moduleName = args[0];
 
-        const disabled = await container.prisma.disabledModules.findUnique({
+        const disabled = await container.prisma.disabled_modules.findUnique({
             where: {
                 guildId_module: {
                     guildId: guildId,
