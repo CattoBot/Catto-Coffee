@@ -1,23 +1,24 @@
-<h1 align="center">
-  <b>Catto Coffee</b>
-</h1>
-<br>
+### Prerequisite
 
-Catto es un proyecto actualmente en desarrollo de un Bot de Discord, se desarrolla usando las librerias de [Sapphire](https://www.sapphirejs.dev/) y [discord.js](https://discord.js.org/#/) como herramientas principales y para el manejo de base de datos, [MySQL](https://www.mysql.com/products/workbench/) con [Prisma ORM](https://www.prisma.io/).
-
-Tras clonar el proyecto se debe ejecutar el siguiente comando
-```
+```sh
 npm install
 ```
 
-Luego se debe editar los archivos `.env.example` y renombrarlo a `.env` luego llenar los campos dentro de ese archivo.
-<br>
-Luego se ejecuta los siguientes comandos:
+### Development
 
-```
-npx prisma migrate dev --name init
+This example can be run with `tsc-watch` to watch the files and automatically restart your bot.
+
+```sh
+npm run watch:start
 ```
 
-```
-npm run start 
-```
+### Production
+
+You can also run the bot with `npm dev`, this will first build your code and then run `node ./dist/index.js`. But this is not the recommended way to run a bot in production.
+
+## License
+
+Dedicated to the public domain via the [Unlicense], courtesy of the Sapphire Community and its contributors.
+
+[sapphire]: https://github.com/sapphiredev/framework
+[unlicense]: https://github.com/sapphiredev/examples/blob/main/LICENSE.md

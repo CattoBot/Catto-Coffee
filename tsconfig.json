@@ -1,26 +1,16 @@
 {
-    "compilerOptions": {
-      "target": "ESNext",                                
-      "module": "commonjs",                                
-       "outDir": "dist",
-       "lib": [
-        "ESNext",
-        "ESNext.Array",
-        "ESNext.AsyncIterable",
-        "ESNext.Intl",
-        "ESNext.Symbol",
-        "DOM"
-       ],
-       "sourceMap": false,
-       "inlineSourceMap": true,
-       "incremental": true,
-       "inlineSources": true,
-       "experimentalDecorators": true,
-       "emitDecoratorMetadata": true,
-       "skipDefaultLibCheck": true,                                                                  
-      "esModuleInterop": true,                                                                 
-      "skipLibCheck": true                                 
-    },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules"]
-  }
+	"extends": [
+		"@sapphire/ts-config",
+		"@sapphire/ts-config/extra-strict",
+		"@sapphire/ts-config/decorators"
+	],
+	"compilerOptions": {
+		"rootDir": "src",
+		"outDir": "dist",
+		"tsBuildInfoFile": "dist/.tsbuildinfo",
+	},
+	"include": [
+		"src",
+		"src/**/*.json"
+	]
+}

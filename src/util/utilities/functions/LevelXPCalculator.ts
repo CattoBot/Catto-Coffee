@@ -1,1 +1,0 @@
-export const XPCalculator = (level: number) => (1000 * level || 1) * 1.30;
