@@ -9,7 +9,7 @@
     "voice_bonus_role_add": "Successfully added bonus role {{role}} to Voice Experience {{emoji}}.",
     "voice_bonus_channel_remove": "Successfully removed bonus channel <#{{channel}}> from Voice Experience {{emoji}}.",
     "dailyVoiceTop10channelId_channel_update": "{{emoji}} Successfully updated the daily voice top 10 channel to <#{{channel}}>.",
-    "dailyVoiceTop10channelId_hannel_add": "{{emoji}} Successfully added the daily voice top 10 channel to <#{{channel}}>.",
+    "dailyVoiceTop10channelId_channel_add": "{{emoji}} Successfully added the daily voice top 10 channel to <#{{channel}}>.",
     "weeklyVoiceTop10channelId_channel_update": "{{emoji}} Successfully updated the weekly voice top 10 channel to <#{{channel}}>.",
     "weeklyVoiceTop10channelId_channel_add": "{{emoji}} Successfully added the weekly voice top 10 channel to <#{{channel}}>.",
     "monthlyVoiceTop10channelId_channel_update": "{{emoji}} Successfully updated the monthly voice top 10 channel to <#{{channel}}>.",

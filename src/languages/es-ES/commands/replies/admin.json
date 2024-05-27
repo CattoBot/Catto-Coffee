@@ -9,7 +9,7 @@
     "voice_bonus_role_add": "Rol de bonificación {{role}} agregado exitosamente a la Experiencia de Voz {{emoji}}.",
     "voice_bonus_channel_remove": "Canal de bonificación <#{{channel}}> eliminado exitosamente de la Experiencia de Voz {{emoji}}.",
     "dailyVoiceTop10channelId_channel_update": "{{emoji}} Canal de top 10 diario de voz actualizado exitosamente a <#{{channel}}>",
-    "dailyVoiceTop10channelId_hannel_add": "{{emoji}} Canal de top 10 diario de voz agregado exitosamente a <#{{channel}}>",
+    "dailyVoiceTop10channelId_channel_add": "{{emoji}} Canal de top 10 diario de voz agregado exitosamente a <#{{channel}}>",
     "weeklyVoiceTop10channelId_channel_update": "{{emoji}} Canal de top 10 semanal de voz actualizado exitosamente a <#{{channel}}>",
     "weeklyVoiceTop10channelId_channel_add": "{{emoji}} Canal de top 10 semanal de voz agregado exitosamente a <#{{channel}}>",
     "monthlyVoiceTop10channelId_channel_update": "{{emoji}} Canal de top 10 mensual de voz actualizado exitosamente a <#{{channel}}>",
