@@ -1,7 +1,7 @@
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import { container } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
-import { Guild, GuildMember, TextChannel, User, VoiceState } from 'discord.js';
+import { Guild, GuildMember, TextChannel, VoiceState } from 'discord.js';
 import { experienceFormula, retryAsync } from '../lib/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 
@@ -33,8 +33,6 @@ export class VoiceExperienceTask extends ScheduledTask {
                     if (member) {
                         const experience = await this.calculateExperience(durationInSeconds, guild);
                         const updatedUser = await this.updateVoiceExperience(member, guildId, experience, durationInSeconds);
-                        const user = await this.container.client.users.fetch("249600415040012309") as User;
-                        await user.send(`[${member.displayName}] earned ${experience} XP for ${durationInSeconds.toFixed(2)} seconds spent in voice.`);
                         this.container.console.info(`[${member.displayName}] earned ${experience} XP for ${durationInSeconds.toFixed(2)} seconds spent in voice.`);
 
                         if (updatedUser.levelUp) {
@@ -61,6 +59,7 @@ export class VoiceExperienceTask extends ScheduledTask {
         for (const guild of this.container.client.guilds.cache.values()) {
             const voiceStates = guild.voiceStates.cache.filter((voiceState: VoiceState) => voiceState.channelId);
             for (const voiceState of voiceStates.values()) {
+                if (voiceState.member?.user.bot) continue;
                 const userId = voiceState.id;
                 const guildId = voiceState.guild.id;
                 const key = `voiceSession:${userId}:${guildId}`;
