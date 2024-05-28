@@ -31,7 +31,6 @@ export class HealthCheckCommand extends Command {
             .addFields({ name: 'Free Memory', value: `\`\`\`fix\n${(freeMemory / 1024 / 1024 / 1024).toFixed(2)} GB\`\`\``, inline: true })
             .addFields({ name: 'Memory Usage', value: `\`\`\`ini\n${memoryBar}\`\`\``, inline: true })
             .addFields({ name: 'CPU Cores', value: `\`\`\`bash\n${os.cpus().length}\`\`\``, inline: true })
-            .addFields({ name: 'CPU Model', value: `\`\`\`md\n${os.cpus()[0].model}\`\`\``, inline: true })
             .setColor(Colors.White)
             .setTimestamp();
 

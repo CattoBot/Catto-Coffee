@@ -5,7 +5,7 @@ import { resolveKey } from '@sapphire/plugin-i18next';
 import { type Message } from 'discord.js';
 import { textExperienceFormula, experienceFormula } from '../../lib/utils';
 import { LeaderboardImageBuilder } from '../../lib/classes/LeaderboardCard';
-import { VoiceRankButtonOnly } from '../../shared/bot/buttons/LevelingButtonts';
+import { TextRankButtonRow, VoiceRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
 import { LevelingHelper } from '../../lib/helpers/leveling.helper';
 
 @ApplyOptions<Command.Options>({
@@ -56,7 +56,7 @@ export class RankLeaderboardCommand extends Command {
 
         const buffer = await builder.build();
         if (buffer) {
-            await reply(message, { files: [{ attachment: buffer, name: 'leaderboard.png' }], components: [VoiceRankButtonOnly] });
+            await reply(message, { files: [{ attachment: buffer, name: 'leaderboard.png' }], components: [VoiceRankButtonRow] });
         } else {
             await reply(message, { content: await resolveKey(message, `commands/replies/level:lb_voice_user_not_data`) });
         }
@@ -79,7 +79,7 @@ export class RankLeaderboardCommand extends Command {
 
         const buffer = await builder.build();
         if (buffer) {
-            await reply(message, { files: [{ attachment: buffer, name: 'leaderboard.png' }] });
+            await reply(message, { files: [{ attachment: buffer, name: 'leaderboard.png' }], components: [TextRankButtonRow] });
         } else {
             await reply(message, { content: await resolveKey(message, `commands/replies/level:lb_voice_user_not_data`) });
         }

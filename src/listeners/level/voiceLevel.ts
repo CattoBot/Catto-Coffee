@@ -36,7 +36,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
         }
     }
 
-    private async processVoiceSession(member: GuildMember, sessionId: string, oldChannelId: string, newChannelId?: string): Promise<void> {
+    private async processVoiceSession(member: GuildMember, sessionId: string, _oldChannelId: string, newChannelId?: string): Promise<void> {
         try {
             const sessionData = await this.loadSessionData(sessionId);
             if (!sessionData) return;
@@ -48,10 +48,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
             if (bonusPercentage > 0) {
                 this.container.console.info(`[${member.displayName}] has a bonus role with a ${bonusPercentage}% bonus.`);
                 experience += experience * (bonusPercentage / 100);
-            } else {
-                this.container.console.info(`[${member.displayName}] does not have any bonus roles.`);
-            }
-            this.container.console.info(`[${member.displayName}] spent ${durationInSeconds.toFixed(2)} seconds in channel ID [${oldChannelId}] and earned ${experience} XP`);
+            } 
             const updatedUser = await this.updateVoiceExperience(member, member.guild.id, experience, durationInSeconds);
             if (updatedUser.levelUp) {
                 await this.handleLevelUp(member, member.guild.id, updatedUser.voiceLevel);
@@ -220,15 +217,11 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
                 roleType: "voice"
             }
         });
-
         const roleIdsForLevel = new Set(rolesForLevel.map(role => role.roleId));
         const currentRoleIds = new Set(member.roles.cache.keys());
         const rolesToAssign = Array.from(member.guild.roles.cache.values()).filter(role => roleIdsForLevel.has(role.id) && !currentRoleIds.has(role.id));
         if (rolesToAssign.length > 0) {
-            await member.roles.add(rolesToAssign).catch(e => {
-                this.container.console.error(`Failed to batch assign roles to ${member.displayName}: ${e}`);
-            });
-            this.container.console.info(`Assigned ${rolesToAssign.length} new roles to ${member.displayName} for reaching level ${voiceLevel}.`);
+            await member.roles.add(rolesToAssign).catch(() => null);
         }
     }
 
@@ -280,12 +273,8 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
         const bonusRoles = await this.container.prisma.bonus_voice_roles.findMany({ where: { guildId: member.guild.id } });
         const userRoles = member.roles.cache;
         let maxBonus = 0;
-
-        this.container.console.info(`Checking bonus roles for member [${member.displayName}]:`);
-
         for (const role of bonusRoles) {
             if (userRoles.has(role.roleId)) {
-                this.container.console.info(`Member [${member.displayName}] has bonus role [${role.roleId}] with a bonus of ${role.bonus}%.`);
                 if (role.bonus! > maxBonus) {
                     maxBonus = role.bonus!;
                 }
@@ -296,7 +285,6 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
     }
 
     private async handleChannelJoin(newState: VoiceState, sessionId: string): Promise<void> {
-        this.container.console.info(`[${newState.member!.displayName}] has joined voice channel ID [${newState.channel!.id}]`);
         const guild = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: newState.guild.id } });
         if (!guild) {
             await this.container.prisma.i_voice_experience.create({ data: { guildId: newState.guild.id } });
@@ -305,12 +293,10 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
     }
 
     private async handleChannelLeave(oldState: VoiceState, sessionId: string): Promise<void> {
-        this.container.console.info(`[${oldState.member!.displayName}] has left voice channel ID [${oldState.channel!.id}]`);
         await this.processVoiceSession(oldState.member!, sessionId, oldState.channel!.id);
     }
 
     private async handleChannelSwitch(oldState: VoiceState, newState: VoiceState, sessionId: string): Promise<void> {
-        this.container.console.info(`[${oldState.member!.displayName}] switched from voice channel ID [${oldState.channel!.id}] to [${newState.channel!.id}]`);
         await this.processVoiceSession(oldState.member!, sessionId, oldState.channel!.id, newState.channel!.id);
     }
 
