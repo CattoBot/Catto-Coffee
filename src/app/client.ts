@@ -52,7 +52,6 @@ export class ApplicationClient extends SapphireClient {
                     connection: {
                         port: envParseInteger('REDIS_PORT'),
                         host: envParseString('REDIS_HOST'),
-                        db: envParseInteger('REDIS_TASK_DB')
                     }
                 }
             },
