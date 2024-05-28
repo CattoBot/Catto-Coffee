@@ -5,6 +5,7 @@ import { DrawCanvas } from "../../lib/classes/Canvas";
 import { reply } from "@sapphire/plugin-editable-commands";
 import { applyLocalizedBuilder } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
+import { ProfileCardBuilder } from "../../lib/classes/ProfileCard";
 
 export class ProfileCommand extends Command {
     constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -58,11 +59,8 @@ export class ProfileCommand extends Command {
             return message.reply('User data not found.');
         }
 
-        const buffer = await DrawCanvas.generateProfileCard(userInfo);
-        const attachment = {
-            attachment: buffer,
-            name: 'profile.png'
-        };
+        const builder = new ProfileCardBuilder(userInfo);
+        const attachment = await builder.build();
 
         return await reply(message, { files: [attachment] });
     }

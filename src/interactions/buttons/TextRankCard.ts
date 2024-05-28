@@ -1,12 +1,12 @@
 import { container, InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import type { ButtonInteraction } from 'discord.js';
 import { CheckTextExperienceEnabled } from '../../lib/decorators/InteractionTextExpEnabled';
-import { formatNumber, registeringFONT, textExperienceFormula } from '../../lib/utils';
+import { formatNumber, textExperienceFormula } from '../../lib/utils';
 import { VoiceRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
-import { DrawCanvas } from '../../lib/classes/Canvas';
 import { ButtonCooldown } from '../../lib/decorators/HandlersCooldown';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { Emojis } from '../../shared/enum/Emojis';
+import { RankCardBuilder } from '../../lib/classes/RankCard';
 
 export class ButtonTextRankHandler extends InteractionHandler {
     public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
@@ -24,7 +24,6 @@ export class ButtonTextRankHandler extends InteractionHandler {
     @CheckTextExperienceEnabled
     @ButtonCooldown(60)
     public async run(interaction: ButtonInteraction) {
-        registeringFONT();
         await interaction.deferReply({ ephemeral: false });
         const user = interaction.user;
         if (user.bot) {
@@ -44,25 +43,30 @@ export class ButtonTextRankHandler extends InteractionHandler {
         const requiredXP = textExperienceFormula(level + 1);
         const formattedRank = formatNumber(rank ?? 0);
 
-        const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 128 });
-        const buffer = await DrawCanvas.generateUserRankImage(
-            {
-                userId: user.id,
-                username: user.displayName,
-                displayAvatarURL: user.displayAvatarURL,
-                textExperience: experience,
-                level
-            },
-            interaction.guildId!,
-            formattedRank,
-            requiredXP,
-            experience,
-            avatarURL
-        );
+        const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 512 });
+
+        const userInfo = {
+            userId: user.id,
+            username: user.username,
+            displayAvatarURL: (_options: { extension: string; size: number }) => user.displayAvatarURL({ extension: "jpg", size: 512 }),
+            level: level,
+            experience: experience,
+            displayName: user.displayName,
+        }
+
+        const buffer = new RankCardBuilder()
+            .setExperience(experience)
+            .setAvatarURL(avatarURL)
+            .setRank(formattedRank)
+            .setRequiredXP(requiredXP)
+            .setGuildId(interaction.guildId!)
+            .setUser(userInfo)
+            .build();
+
 
         await interaction.editReply({
             content: await resolveKey(interaction, `commands/replies/level:text_card`, { emoji: Emojis.SUCCESS, user: user.displayName }),
-            files: [{ attachment: buffer, name: 'rank.png' }],
+            files: [{ attachment: await buffer, name: 'rank.png' }],
             components: [VoiceRankButtonRow]
         });
     }

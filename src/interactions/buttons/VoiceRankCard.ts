@@ -1,12 +1,12 @@
 import { container, InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import type { ButtonInteraction } from 'discord.js';
 import { CheckVoiceExperienceEnabled } from '../../lib/decorators/InteractionVoiceExpEnabled';
-import { DrawCanvas } from '../../lib/classes/Canvas';
 import { experienceFormula, formatNumber, registeringFONT } from '../../lib/utils';
 import { TextRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
 import { ButtonCooldown } from '../../lib/decorators/HandlersCooldown';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { Emojis } from '../../shared/enum/Emojis';
+import { RankCardBuilder } from '../../lib/classes/RankCard';
 
 export class ButtonVoiceRankHandler extends InteractionHandler {
     public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
@@ -46,24 +46,28 @@ export class ButtonVoiceRankHandler extends InteractionHandler {
         const formattedRank = formatNumber(rank ?? 0);
 
         const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 128 });
-        const buffer = await DrawCanvas.generateUserRankImage(
-            {
-                userId: user.id,
-                username: user.displayName,
-                displayAvatarURL: user.displayAvatarURL,
-                textExperience: experience,
-                level
-            },
-            interaction.guild?.id!,
-            formattedRank,
-            requiredXP,
-            experience,
-            avatarURL
-        );
+
+        const userInfo = {
+            userId: user.id,
+            username: user.username,
+            displayAvatarURL: (_options: { extension: string; size: number }) => user.displayAvatarURL({ extension: "jpg", size: 128 }),
+            level: level,
+            experience: experience,
+            displayName: user.displayName,
+        }
+
+        const buffer = new RankCardBuilder()
+            .setAvatarURL(avatarURL)
+            .setExperience(experience)
+            .setRank(formattedRank)
+            .setRequiredXP(requiredXP)
+            .setUser(userInfo)
+            .setGuildId(interaction.guildId!)
+            .build();
 
         await interaction.editReply({
             content: await resolveKey(interaction, `commands/replies/level:voice_card`, { emoji: Emojis.SUCCESS, user: user.displayName }),
-            files: [{ attachment: buffer, name: 'rank.png' }],
+            files: [{ attachment: await buffer, name: 'rank.png' }],
             components: [TextRankButtonRow]
         });
     }

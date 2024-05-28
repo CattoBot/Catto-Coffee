@@ -131,33 +131,34 @@ function ConvertBitrateToMillions(bitrate: number) {
 	return bitrate * 1000;
 }
 
-function wrapText(context: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, maxHeight: number, lineHeight: number) {
-	const words = text.split(' ');
-	let line = '';
-	let testLine = '';
-	let testWidth = 0;
-	let lineCount = 0;
 
-	for (let n = 0; n < words.length; n++) {
-		testLine += `${words[n]} `;
-		testWidth = context.measureText(testLine).width;
-		if (testWidth > maxWidth && n > 0) {
-			context.fillText(line, x, y);
-			line = `${words[n]} `;
-			y += lineHeight;
-			testLine = `${words[n]} `;
-			lineCount++;
-			if ((lineCount + 1) * lineHeight > maxHeight) {
-				context.fillText('...', x, y);
-				break;
-			}
-		} else {
-			line = testLine;
-		}
-	}
-	if ((lineCount + 1) * lineHeight <= maxHeight) {
-		context.fillText(line, x, y);
-	}
+function wrapText(context: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, maxHeight: number, lineHeight: number) {
+    const words = text.split(' ');
+    let line = '';
+    let testLine = '';
+    let testWidth = 0;
+    let lineCount = 0;
+
+    for (let n = 0; n < words.length; n++) {
+        testLine += `${words[n]} `;
+        testWidth = context.measureText(testLine).width;
+        if (testWidth > maxWidth && n > 0) {
+            context.fillText(line, x, y);
+            line = `${words[n]} `;
+            y += lineHeight;
+            testLine = `${words[n]} `;
+            lineCount++;
+            if ((lineCount + 1) * lineHeight > maxHeight) {
+                context.fillText('...', x, y);
+                break;
+            }
+        } else {
+            line = testLine;
+        }
+    }
+    if ((lineCount + 1) * lineHeight <= maxHeight) {
+        context.fillText(line, x, y);
+    }
 }
 
 function formatTime(seconds: number): string {

@@ -30,6 +30,7 @@
     "date-fns": "^3.6.0",
     "discord.js": "^14.15.2",
     "ioredis": "^5.4.1",
+    "os": "^0.1.2",
     "signale": "^1.4.0"
   },
   "devDependencies": {

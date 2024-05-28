@@ -7,7 +7,8 @@ import { User } from 'discord.js';
 
 export class DrawCanvas {
     public static async generateProfileCard(user: UserInfo): Promise<Buffer> {
-        const { progressBarFirstColor = '#12D6DF', progressBarSecondColor = '#F70FFF' } = (await retreiveRankCardConfig(user.userId)) || {};
+        const progressBarFirstColor = '#12D6DF'
+        const progressBarSecondColor = '#F70FFF'
 
         // Constants for canvas dimensions and positions
         const IMAGE_WIDTH = 2500 / 2;
@@ -189,7 +190,7 @@ export class DrawCanvas {
         // Crear canvas y contexto
         const canvas: Canvas = createCanvas(1000, 300);
         const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
-    
+
         // Constants for positions and dimensions
         const CANVAS_WIDTH = 1000;
         const CANVAS_HEIGHT = 300;
@@ -214,26 +215,26 @@ export class DrawCanvas {
         const LEVEL_Y = 180;
         const XP_TEXT_X = 780;
         const XP_TEXT_Y = 170;
-    
+
         // Desestructurar con valores predeterminados en caso de que sean nulos
         const {
             progressBarFirstColor = '#12D6DF',
             progressBarSecondColor = '#F70FFF'
         } = (await retreiveRankCardConfig(user.userId)) || {};
-    
+
         // Cargar imágenes
         const bg = await loadImage(join(__dirname, '../../../assets/img/White_Solid_Card.png'));
         const avatar = await loadImage(avatarURL);
-    
+
         // Ajustar las coordenadas para el avatar
         const circleX = 120 + CANVAS_WIDTH * 0.03 + AVATAR_OFFSET;
         const avatarX = circleX - CIRCLE_RADIUS;
         const circleY = 170 - (CANVAS_HEIGHT * 0.06);
         const avatarY = circleY - CIRCLE_RADIUS;
-    
+
         // Dibujar fondo
         ctx.drawImage(bg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    
+
         // Definir los colores de degradado basados en el rango
         let gradient;
         if (rank === '1') {
@@ -253,23 +254,23 @@ export class DrawCanvas {
             gradient.addColorStop(0, progressBarFirstColor ?? "#12D6DF");
             gradient.addColorStop(1, progressBarSecondColor ?? "#F70FFF");
         }
-    
+
         // Dibujar barra de progreso
         ctx.lineJoin = 'round';
         ctx.lineWidth = BAR_HEIGHT;
-    
+
         // Dibujar barra vacía
         ctx.strokeStyle = '#BEBEBE';
         ctx.strokeRect(BAR_X, BAR_Y, BAR_WIDTH, 0);
-    
+
         // Dibujar barra llena
         ctx.strokeStyle = gradient;
         ctx.strokeRect(BAR_X, BAR_Y, (BAR_WIDTH * (experience / requiredXP)), 0);
-    
+
         // Obtener las badges del usuario y de la guild
         const userBadges = await this.getUserBadges(user.userId);
         const guildBadges = await this.getGuildBadges(guildId);
-    
+
         // Dibujar las badges si hay alguna
         const allBadges = [...userBadges, ...guildBadges];
         if (allBadges.length > 0) {
@@ -278,7 +279,7 @@ export class DrawCanvas {
             const containerHeight = BADGE_SIZE + CONTAINER_PADDING;
             const containerX = 450 - containerWidth / 2;
             const containerY = 22;
-    
+
             // Dibujar el contenedor de las badges con bordes redondeados
             ctx.beginPath();
             ctx.moveTo(containerX + CONTAINER_CORNER_RADIUS, containerY);
@@ -293,7 +294,7 @@ export class DrawCanvas {
             ctx.closePath();
             ctx.fillStyle = '#EAEAEA'; // Color gris claro de fondo del contenedor
             ctx.fill();
-    
+
             // Dibujar las badges dentro del contenedor
             let badgeX = containerX + 10;
             const badgeY = containerY + (containerHeight - BADGE_SIZE) / 2;
@@ -303,7 +304,7 @@ export class DrawCanvas {
                 badgeX += BADGE_SIZE + BADGE_SPACING;
             }
         }
-    
+
         // Agregar texto
         ctx.font = '50px Bahnschrift';
         ctx.fillStyle = '#A8A8A8';
@@ -318,17 +319,17 @@ export class DrawCanvas {
         ctx.fillText(`Lv. ${user.level}`, LEVEL_X, LEVEL_Y);
         ctx.font = '25px Poppins SemiBold';
         ctx.fillText(`${formatNumber(experience)} / ${formatNumber(requiredXP)}`, XP_TEXT_X, XP_TEXT_Y);
-    
+
         // Dibujar avatar
         ctx.beginPath();
         ctx.arc(circleX, circleY, CIRCLE_RADIUS, 0, 2 * Math.PI);
         ctx.closePath();
         ctx.clip();
         ctx.drawImage(avatar, avatarX, avatarY, AVATAR_SIZE, AVATAR_SIZE);
-    
+
         return canvas.toBuffer('image/png');
     }
-    
+
 
 
 
