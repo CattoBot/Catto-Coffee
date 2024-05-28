@@ -1,10 +1,11 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { TextRankButtonRow, VoiceRankButtonRow } from "../../../shared/bot/buttons/LevelingButtonts";
-import { DrawCanvas } from "../../classes/Canvas";
 import { registeringFONT, formatNumber, experienceFormula, textExperienceFormula } from "../../utils";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { LevelingHelper } from "../../helpers/leveling.helper";
 import { Emojis } from "../../../shared/enum/Emojis";
+import { RankCardBuilder } from "../../classes/RankCard";
+import { AvatarExtension } from "../../../shared/interfaces/UserInfo";
 
 export class CattoRankCommand extends LevelingHelper {
     public static async run(interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
@@ -45,20 +46,28 @@ export class CattoRankCommand extends LevelingHelper {
         const requiredXP = experienceFormula(level + 1);
         const formattedRank = formatNumber(rank ?? 0);
 
-        const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 512 });
-        const buffer = await DrawCanvas.generateUserRankImage(
-            { userId: user.id, username: user.displayName, displayAvatarURL: user.displayAvatarURL, textExperience: experience, level },
-            interaction.guild?.id!,
-            formattedRank,
-            requiredXP,
-            experience,
-            avatarURL
-        );
+        const userInfo = {
+            userId: user.id,
+            username: user.username,
+            displayAvatarURL: (options: { extension: AvatarExtension; size: 512 }) => user.displayAvatarURL(options),
+            level: level,
+            experience: experience,
+            displayName: user.displayName,
+        };
+
+        const buffer = new RankCardBuilder()
+            .setExperience(experience)
+            .setAvatarURL(user.displayAvatarURL({ extension: 'jpg', size: 512 }))
+            .setUser(userInfo)
+            .setGuildId(interaction.guildId!)
+            .setRequiredXP(requiredXP)
+            .setRank(formattedRank)
+        const rankCard = await buffer.build();
 
         await interaction.editReply({
             content: await resolveKey(interaction, `commands/replies/level:voice_card`, { emoji: Emojis.SUCCESS, user: user.displayName }),
             components: [TextRankButtonRow],
-            files: [{ attachment: buffer, name: 'rank.png' }]
+            files: [{ attachment: rankCard, name: 'rank.png' }]
         });
     }
 
@@ -82,26 +91,27 @@ export class CattoRankCommand extends LevelingHelper {
         const requiredXP = textExperienceFormula(level + 1);
         const formattedRank = formatNumber(rank ?? 0);
 
-        const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 128 });
-        const buffer = await DrawCanvas.generateUserRankImage(
-            {
-                userId: user.id,
-                username: user.displayName,
-                displayAvatarURL: user.displayAvatarURL,
-                textExperience: experience,
-                level
-            },
-            interaction.guild?.id!,
-            formattedRank,
-            requiredXP,
-            experience,
-            avatarURL
-        );
+        const userInfo = {
+            userId: user.id,
+            username: user.username,
+            displayAvatarURL: (options: { extension: AvatarExtension; size: 512 }) => user.displayAvatarURL(options),
+            level: level,
+            experience: experience,
+            displayName: user.displayName,
+        };
+        const buffer = new RankCardBuilder()
+            .setExperience(experience)
+            .setAvatarURL(user.displayAvatarURL({ extension: 'jpg', size: 512 }))
+            .setUser(userInfo)
+            .setGuildId(interaction.guildId!)
+            .setRequiredXP(requiredXP)
+            .setRank(formattedRank)
+        const rankCard = await buffer.build();
 
         await interaction.editReply({
             content: await resolveKey(interaction, `commands/replies/level:text_card`, { emoji: Emojis.SUCCESS, user: user.displayName }),
             components: [VoiceRankButtonRow],
-            files: [{ attachment: buffer, name: 'rank.png' }]
+            files: [{ attachment: rankCard, name: 'rank.png' }]
         });
     }
 }

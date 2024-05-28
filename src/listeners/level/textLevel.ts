@@ -19,7 +19,6 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         const remainingCooldown = await this.container.redis.ttl(cooldownKey);
 
         if (remainingCooldown > 0) {
-            this.logCooldown(message, remainingCooldown);
             return;
         }
 
@@ -40,15 +39,9 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         await this.updateGlobalExperience(message.author.id);
     }
 
-    private logCooldown(message: Message, remainingCooldown: number) {
-        this.container.console.info(
-            `User ${message.author.tag} is still on cooldown in guild ${message.guild!.name} with ${remainingCooldown} seconds remaining.`
-        );
-    }
 
     private async setCooldown(cooldownKey: string, cooldown: number) {
         await this.container.redis.set(cooldownKey, "1", "EX", cooldown);
-        this.container.console.info(`Cooldown set for key ${cooldownKey} with ${cooldown} seconds.`);
     }
 
     private async getUserExperience(guildId: string, userId: string) {
@@ -64,7 +57,6 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
     private calculateUpdatedExperience(userExp: any, randomXP: number) {
         let updatedExp = (userExp?.textExperience || 0) + randomXP;
         let currentLevel = userExp?.textLevel || 0;
-        this.container.console.info(`Calculated updated experience: ${updatedExp}`);
         return { updatedExp, currentLevel };
     }
 
@@ -155,10 +147,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         const rolesToAssign = Array.from(member.guild.roles.cache.values()).filter(role => roleIdsForLevel.has(role.id) && !currentRoleIds.has(role.id));
 
         if (rolesToAssign.length > 0) {
-            await member.roles.add(rolesToAssign).catch(e => {
-                this.container.console.error(`Failed to batch assign roles to ${member.displayName}: ${e}`);
-            });
-            this.container.console.info(`Assigned ${rolesToAssign.length} new roles to ${member.displayName} for reaching level ${textLevel}.`);
+            await member.roles.add(rolesToAssign).catch(() => null);
         }
     }
 

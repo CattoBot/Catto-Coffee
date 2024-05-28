@@ -1,10 +1,10 @@
 import { Args, Command } from "@sapphire/framework";
 import { Message, User } from "discord.js";
 import { AvatarExtension, UserInfo } from '../../shared/interfaces/UserInfo';
-import { DrawCanvas } from "../../lib/classes/Canvas";
 import { reply } from "@sapphire/plugin-editable-commands";
 import { applyLocalizedBuilder } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
+import { ProfileCardBuilder } from "../../lib/classes/ProfileCard";
 
 export class ProfileCommand extends Command {
     constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -37,9 +37,9 @@ export class ProfileCommand extends Command {
             return await command.reply('User data not found.');
         }
 
-        const buffer = await DrawCanvas.generateProfileCard(userInfo);
+        const buffer = new ProfileCardBuilder(userInfo).build();
         const attachment = {
-            attachment: buffer,
+            attachment: await buffer,
             name: 'profile.png'
         };
 
@@ -58,11 +58,8 @@ export class ProfileCommand extends Command {
             return message.reply('User data not found.');
         }
 
-        const buffer = await DrawCanvas.generateProfileCard(userInfo);
-        const attachment = {
-            attachment: buffer,
-            name: 'profile.png'
-        };
+        const builder = new ProfileCardBuilder(userInfo);
+        const attachment = await builder.build();
 
         return await reply(message, { files: [attachment] });
     }

@@ -9,5 +9,7 @@
     "rewards_choose": "Choose which kind of rewards you'd like to see.",
     "rank_not_user": "Looks like you forgot to mention a user.",
     "voice_card": "> **Viewing Voice Rank** • [ `{{user}}` ] • {{emoji}}",
-    "text_card": "> **Viewing Text Rank** • [ `{{user}}` ] • {{emoji}}"
+    "text_card": "> **Viewing Text Rank** • [ `{{user}}` ] • {{emoji}}",
+    "rank_voice_disabled": "Looks like the voice rank system is not enabled on this server.",
+    "rank_text_disabled": "Looks like the text rank system is not enabled on this server."
 }
