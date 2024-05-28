@@ -11,7 +11,7 @@ export class GuildBadgesCommand {
             return interaction.editReply({ content: await resolveKey(interaction, `commands/replies/error:already_badges`, { emoji: Emojis.ERROR }) });
         }
         const badge = interaction.options.getAttachment("badge", true);
-        if (badge.height !== 512 || badge.width !== 512) {
+        if (badge.height! > 512 || badge.width! > 512) {
             return interaction.editReply({ content: await resolveKey(interaction, `commands/replies/error:badge_size`, { emoji: Emojis.ERROR }) });
         }
 
