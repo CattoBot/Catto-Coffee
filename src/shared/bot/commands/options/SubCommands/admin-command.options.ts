@@ -87,10 +87,10 @@ export class AdminSubCommandOptions {
                 type: "group",
                 entries: [
                     {
-                        name: "daily", chatInputRun: "ChatInputAddDailyLeaderboard", preconditions: ['PremiumServerPrecondition']
+                        name: "daily", chatInputRun: "ChatInputAddDailyLeaderboard"
                     },
                     {
-                        name: "weekly", chatInputRun: "ChatInputAddWeeklyLeaderboard", preconditions: ['PremiumServerPrecondition']
+                        name: "weekly", chatInputRun: "ChatInputAddWeeklyLeaderboard"
                     },
                     {
                         name: "monthly", chatInputRun: "ChatInputAddMonthlyLeaderboard",
