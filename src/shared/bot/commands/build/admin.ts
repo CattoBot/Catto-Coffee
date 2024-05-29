@@ -1,5 +1,6 @@
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import { applyLocalizedBuilder } from '@sapphire/plugin-i18next';
+import { ChannelType } from 'discord.js';
 
 export class AdminSubCommandsRegistration {
     public static registerCommands(registry: Subcommand.Registry): void {
@@ -47,14 +48,14 @@ export class AdminSubCommandsRegistration {
                         .addIntegerOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:min_exp_text', 'commands/options/admin:min_exp_description').setRequired(false))
                         .addIntegerOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:max_exp_text', 'commands/options/admin:max_exp_description').setRequired(false))
                         .addIntegerOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:cooldown_text', 'commands/options/admin:cooldown_description').setRequired(false))
-                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_notification_text', 'commands/options/admin:channel_notification_description').setRequired(false))
+                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_notification_text', 'commands/options/admin:channel_notification_description').setRequired(false).addChannelTypes(ChannelType.GuildText))
                         .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:levelup_message_text', 'commands/options/admin:levelup_message_description').setRequired(false))
                     )
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:experience_voice', 'commands/descriptions/admin:experience_voice')
                         .addIntegerOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:min_exp_voice', 'commands/options/admin:min_exp_description').setRequired(false))
                         .addIntegerOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:max_exp_voice', 'commands/options/admin:max_exp_description').setRequired(false))
                         .addIntegerOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:cooldown_voice', 'commands/options/admin:cooldown_description').setRequired(false))
-                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_notification_voice', 'commands/options/admin:channel_notification_description').setRequired(false))
+                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_notification_voice', 'commands/options/admin:channel_notification_description').setRequired(false).addChannelTypes(ChannelType.GuildText))
                         .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:levelup_message_voice', 'commands/options/admin:levelup_message_description').setRequired(false))
                     )
                     // .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:experience_bonus_channel', 'commands/descriptions/admin:experience_bonus_channel')
@@ -82,14 +83,14 @@ export class AdminSubCommandsRegistration {
                         ).setRequired(true))
                     )
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:experience_filter_channel_add', 'commands/descriptions/admin:experience_filter_channel_add')
-                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_filter', 'commands/options/admin:channel_filter_description').setRequired(true))
+                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_filter', 'commands/options/admin:channel_filter_description').setRequired(true).addChannelTypes(ChannelType.GuildVoice).addChannelTypes(ChannelType.GuildText))
                         .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:filter_channel_module', 'commands/options/admin:filter_channel_module_description').addChoices(
                             { name: 'Voice', value: 'Voice' },
                             { name: 'Text', value: 'Text' }
                         ).setRequired(true))
                     )
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:experience_filter_channel_remove', 'commands/descriptions/admin:experience_filter_channel_remove')
-                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_filter', 'commands/options/admin:channel_filter_description').setRequired(true))
+                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_filter', 'commands/options/admin:channel_filter_description').setRequired(true).addChannelTypes(ChannelType.GuildVoice).addChannelTypes(ChannelType.GuildText))
                         .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:filter_channel_module', 'commands/options/admin:filter_channel_module_description').addChoices(
                             { name: 'Voice', value: 'Voice' },
                             { name: 'Text', value: 'Text' }
@@ -109,13 +110,13 @@ export class AdminSubCommandsRegistration {
                 // )
                 .addSubcommandGroup((group) => applyLocalizedBuilder(group, 'commands/names/admin:voice_leaderboard', 'commands/descriptions/admin:voice_leaderboard')
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:voice_leaderboard_daily', 'commands/descriptions/admin:voice_leaderboard_daily')
-                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_daily_voice', 'commands/options/admin:channel_description_daily_voice').setRequired(true))
+                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_daily_voice', 'commands/options/admin:channel_description_daily_voice').setRequired(true).addChannelTypes(ChannelType.GuildText))
                     )
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:voice_leaderboard_weekly', 'commands/descriptions/admin:voice_leaderboard_weekly')
-                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_weekly_voice', 'commands/options/admin:channel_description_weekly_voice').setRequired(true))
+                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_weekly_voice', 'commands/options/admin:channel_description_weekly_voice').setRequired(true).addChannelTypes(ChannelType.GuildText))
                     )
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:voice_leaderboard_monthly', 'commands/descriptions/admin:voice_leaderboard_monthly')
-                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_monthly_voice', 'commands/options/admin:channel_description_monthly_voice').setRequired(true))
+                        .addChannelOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:channel_monthly_voice', 'commands/options/admin:channel_description_monthly_voice').setRequired(true).addChannelTypes(ChannelType.GuildText))
                     )
                 )
                 .addSubcommandGroup((group) => applyLocalizedBuilder(group, 'commands/names/admin:setup', 'commands/descriptions/admin:setup')
