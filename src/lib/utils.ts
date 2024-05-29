@@ -226,9 +226,6 @@ function drawRoundedImage(context: CanvasRenderingContext2D, image: Image, x: nu
 	context.restore();
 }
 
-// function isMultipleDigits(num: number) {
-// 	return num >= 10 || num <= -10;
-// }
 
 function drawUserData(context: CanvasRenderingContext2D, username: string, level: string, xp: string, x: number, y: number) {
 	context.font = '16px Poppins SemiBold';
@@ -239,46 +236,12 @@ function drawUserData(context: CanvasRenderingContext2D, username: string, level
 	context.fillText(`XP: ${xp}`, x + 650, y + 10);
 }
 
-// function drawProgressBar(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, progress: number, startColor: string = '#12D6DF', endColor: string = '#F70FFF') {
-//     const radius = height / 2; // Adjust radius here for different curvature
 
-//     // Function to draw rounded rectangle
-//     function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
-//         ctx.beginPath();
-//         ctx.moveTo(x + radius, y);
-//         ctx.lineTo(x + width - radius, y);
-//         ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-//         ctx.lineTo(x + width, y + height - radius);
-//         ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-//         ctx.lineTo(x + radius, y + height);
-//         ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-//         ctx.lineTo(x, y + radius);
-//         ctx.quadraticCurveTo(x, y, x + radius, y);
-//         ctx.closePath();
-//     }
-
-//     // Draw empty bar
-//     context.fillStyle = '#BEBEBE';
-//     drawRoundedRect(context, x, y, width, height, radius);
-//     context.fill();
-
-//     // Draw filled bar
-//     if (progress > 0) { // Only draw if there is progress
-//         const fillWidth = width * progress;
-//         const gradient = context.createLinearGradient(x, y, x + fillWidth, y);
-//         gradient.addColorStop(0, startColor);
-//         gradient.addColorStop(1, endColor);
-//         context.fillStyle = gradient;
-//         drawRoundedRect(context, x, y, fillWidth, height, radius);
-//         context.fill();
-//     }
-// }
 
 function drawProgressBar(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, progress: number, startColor: string = '#12D6DF', endColor: string = '#F70FFF') {
 	const radius = height / 2;
 	const fillWidth = width * progress;
-
-	// Function to draw a rounded rectangle with variable width
+	
 	function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
 		ctx.beginPath();
 		ctx.moveTo(x + radius, y);
