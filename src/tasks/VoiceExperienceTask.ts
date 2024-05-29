@@ -12,7 +12,6 @@ export class VoiceExperienceTask extends ScheduledTask {
             ...options,
         });
     }
-
     public async run(): Promise<void> {
         try {
             const keys = await container.redis.keys('voiceSession:*');
@@ -28,9 +27,8 @@ export class VoiceExperienceTask extends ScheduledTask {
                 guilds[guildId].push(userId);
             }
 
-            for (const guildId of Object.keys(guilds)) {
-                await this.processGuildSessions(guildId, guilds[guildId]);
-            }
+            const guildPromises = Object.keys(guilds).map(guildId => this.processGuildSessions(guildId, guilds[guildId]));
+            await Promise.all(guildPromises);
 
             await this.addNewVoiceSessions();
         } catch (error) {
@@ -43,45 +41,54 @@ export class VoiceExperienceTask extends ScheduledTask {
             const guild = await this.container.client.guilds.fetch(guildId);
             this.container.console.info(`Starting to process sessions for guild: ${guild.name} (${guild.id}) with ${userIds.length} active sessions.`);
 
-            for (const userId of userIds) {
-                await new Promise(resolve => setTimeout(resolve, 500));
-                this.container.console.info(`Processing session for user ID: ${userId} in guild ID: ${guildId}`);
-                const sessionDataStr = await container.redis.get(`voiceSession:${userId}:${guildId}`);
-                if (sessionDataStr) {
-                    const sessionData = JSON.parse(sessionDataStr);
-                    const joinTime = sessionData.startTime;
-                    const now = Date.now();
-                    const durationInSeconds = (now - joinTime) / 1000;
-                    const member = await guild.members.fetch(userId);
-
-                    if (member) {
-                        await this.processVoiceSession(member, guild, `voiceSession:${userId}:${guildId}`, durationInSeconds);
-                    } else {
-                        this.container.console.info(`No member found for user ID: ${userId} in guild ID: ${guildId}`);
-                    }
-                } else {
-                    this.container.console.info(`No session data found for user ID: ${userId}`);
-                }
-            }
+            const userPromises = userIds.map(userId => this.processUserSession(userId, guild));
+            await Promise.all(userPromises);
         } catch (error) {
             this.container.console.error(`Error processing guild sessions for guild ID: ${guildId}: ${error}`);
         }
     }
 
+    private async processUserSession(userId: string, guild: Guild): Promise<void> {
+        try {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            this.container.console.info(`Processing session for user ID: ${userId} in guild ID: ${guild.id}`);
+            const sessionDataStr = await container.redis.get(`voiceSession:${userId}:${guild.id}`);
+            if (sessionDataStr) {
+                const sessionData = JSON.parse(sessionDataStr);
+                const joinTime = sessionData.startTime;
+                const now = Date.now();
+                const durationInSeconds = (now - joinTime) / 1000;
+                const member = await guild.members.fetch(userId);
+
+                if (member) {
+                    await this.processVoiceSession(member, guild, `voiceSession:${userId}:${guild.id}`, durationInSeconds);
+                } else {
+                    this.container.console.info(`No member found for user ID: ${userId} in guild ID: ${guild.id}`);
+                }
+            } else {
+                this.container.console.info(`No session data found for user ID: ${userId}`);
+            }
+        } catch (error) {
+            this.container.console.error(`Error processing user session for user ID: ${userId} in guild ID: ${guild.id}: ${error}`);
+        }
+    }
+
     private async addNewVoiceSessions(): Promise<void> {
         this.container.console.info('Adding new voice sessions for all guilds.');
-        for (const guild of this.container.client.guilds.cache.values()) {
+        const addSessionPromises = this.container.client.guilds.cache.map(async (guild) => {
             const voiceStates = guild.voiceStates.cache.filter((voiceState: VoiceState) => voiceState.channelId);
-            for (const voiceState of voiceStates.values()) {
-                if (voiceState.member?.user.bot) continue;
+            const addSessionPromises = voiceStates.map(async (voiceState) => {
+                if (voiceState.member?.user.bot) return;
                 const userId = voiceState.id;
                 const guildId = voiceState.guild.id;
                 const key = `voiceSession:${userId}:${guildId}`;
 
                 await container.redis.set(key, JSON.stringify({ startTime: Date.now() }));
                 this.container.console.info(`Added new voice session for user ID: ${userId} in guild ID: ${guildId}`);
-            }
-        }
+            });
+            await Promise.all(addSessionPromises);
+        });
+        await Promise.all(addSessionPromises);
         this.container.console.info('Finished adding new voice sessions.');
     }
 

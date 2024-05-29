@@ -17,7 +17,7 @@ export class LevelingHelper extends Helper {
         const lb = await container.prisma.text_experience.findMany({
             where: {
                 guildId: guildId
-            }, take: 50,
+            }, take: 999,
             orderBy: [
                 {
                     textLevel: 'desc'
@@ -41,7 +41,7 @@ export class LevelingHelper extends Helper {
                 {
                     voiceExperience: 'desc'
                 }
-            ], take: 50
+            ], take: 999
         });
         return lb;
     }
