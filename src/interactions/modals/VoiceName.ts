@@ -19,7 +19,11 @@ export class VoiceNameModalHandler extends InteractionHandler {
     public async run(interaction: ModalSubmitInteraction): Promise<InteractionResponse> {
         const name = interaction.fields.getTextInputValue('voice-name');
         const member = interaction.guild?.members.cache.get(interaction.user.id);
-        await member?.voice.channel?.setName(name);
+        await member?.voice.channel?.setName(name).catch(async () => {
+            return interaction.reply({
+                content: (await resolveKey(interaction, 'commands/replies/voice:voice_name_error', { emoji: Emojis.ERROR })),
+            });
+        })
         await this.updateName(name, member as GuildMember);
         return interaction.reply({
             content: (await resolveKey(interaction, 'commands/replies/voice:voice_name_success', { emoji: Emojis.SUCCESS, name: name })),

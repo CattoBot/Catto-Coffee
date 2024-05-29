@@ -5,7 +5,7 @@ import { Guild, GuildMember, TextChannel, VoiceState } from 'discord.js';
 import { experienceFormula, globalexperienceFormula, retryAsync } from '../lib/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 
-@ApplyOptions<ScheduledTask.Options>({ interval: Time.Minute * 10, name: 'VoiceExperienceTask' })
+@ApplyOptions<ScheduledTask.Options>({ interval: Time.Minute * 15, name: 'VoiceExperienceTask' })
 export class VoiceExperienceTask extends ScheduledTask {
     public constructor(context: ScheduledTask.LoaderContext, options: ScheduledTask.Options) {
         super(context, {
