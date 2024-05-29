@@ -67,6 +67,7 @@ export class ApplicationClient extends SapphireClient {
 
         this.stores.get('interaction-handlers').registerPath(join(this.rootData.root, 'interactions'));
         this.stores.get('scheduled-tasks').registerPath(join(this.rootData.root, 'tasks'));
+        this.stores.get('pattern-commands').registerPath(join(this.rootData.root, 'commands/pattern'));
     }
 
     public override async login(token?: string): Promise<string> {
