@@ -48,7 +48,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
             if (bonusPercentage > 0) {
                 this.container.console.info(`[${member.displayName}] has a bonus role with a ${bonusPercentage}% bonus.`);
                 experience += experience * (bonusPercentage / 100);
-            } 
+            }
             const updatedUser = await this.updateVoiceExperience(member, member.guild.id, experience, durationInSeconds);
             if (updatedUser.levelUp) {
                 await this.handleLevelUp(member, member.guild.id, updatedUser.voiceLevel);
@@ -79,7 +79,6 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
         return expData;
     }
 
-
     private async updateVoiceExperience(member: GuildMember, guildID: string, experience: number, durationInSeconds: number): Promise<any> {
         try {
             const updatedUser = await this.updateUserExperience(member, guildID, experience, durationInSeconds);
@@ -94,7 +93,6 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
             throw error;
         }
     }
-
 
     private async updateGlobalExperience(userId: string, duration: number) {
         const user = await this.container.prisma.users.findUnique({
@@ -164,7 +162,6 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
         return updatedUser;
     }
 
-
     private async calculateLevelUp(userID: string, guildID: string, currentExperience: number, currentLevel: number): Promise<{ levelUp: boolean, newLevel: number, newExperience: number }> {
         let levelUp = false;
         let xpNeeded = experienceFormula(currentLevel);
@@ -198,10 +195,12 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
             const message = await this.getNotificationMessage(guildID);
             const messageWithUserAndLevel = message.replace(/\{user}/g, `<@${member.id}>`).replace(/\{level}/g, voiceLevel.toString());
             const channelID = await this.getNotificationChannelID(guildID);
-            const notificationChannel = this.container.client.channels.resolve(channelID) as TextChannel;
-            if (notificationChannel) {
-                await notificationChannel.send(messageWithUserAndLevel);
-            }
+            if (channelID && await this.doesChannelExist(member.guild, channelID)) {
+                const notificationChannel = this.container.client.channels.resolve(channelID) as TextChannel;
+                if (notificationChannel) {
+                    await notificationChannel.send(messageWithUserAndLevel);
+                }
+            } 
 
             await this.assignRoles(member, guildID, voiceLevel);
         } catch (error) {
@@ -302,5 +301,14 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
 
     private getRandomXP(min: number, max: number): number {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    private async doesChannelExist(guild: Guild, channelId: string): Promise<boolean> {
+        try {
+            const channel = await guild.channels.fetch(channelId);
+            return channel != null;
+        } catch {
+            return false;
+        }
     }
 }
