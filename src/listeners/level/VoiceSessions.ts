@@ -2,11 +2,9 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Listener } from '@sapphire/framework';
 import { Events, VoiceChannel } from 'discord.js';
 import { FilteredVoiceChannels } from '../../lib/decorators/FilteredVoiceChannelCheck';
-import { SaveActiveVoiceSessions } from '../../lib/decorators/SaveActiveVoiceSessions';
 
 @ApplyOptions<Listener.Options>({ event: Events.ClientReady, once: true })
 export class VoiceSessionsListener extends Listener<typeof Events.ClientReady> {
-    @SaveActiveVoiceSessions()
     @FilteredVoiceChannels()
     public async run() {
         this.container.console.await('Bot is ready. Checking for users in voice channels without session keys.');
