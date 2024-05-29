@@ -142,7 +142,7 @@ export class LeaderboardImageBuilder extends CanvaHelper {
         const userdata = this.userId ? this.guildLeaderboard.find((user) => user.userId === this.userId) : null;
 
         const [avatarloadimage, backgroundImage] = await Promise.all([
-            this.userId ? loadImage(await container.client.users.fetch(this.userId).then(user => user.displayAvatarURL({ extension: 'jpg', size: 64 }))) : null,
+            this.userId ? loadImage(await container.client.users.fetch(this.userId).then(user => user.displayAvatarURL({ extension: 'jpg', size: 256 }))) : null,
             loadImage(join(__dirname, this.backgroundImagePath))
         ]);
 

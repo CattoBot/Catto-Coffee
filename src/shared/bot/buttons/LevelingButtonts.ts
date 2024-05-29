@@ -3,7 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 export const VoiceRankButtonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
         .setCustomId('vc-rank')
-        .setLabel('Voice Rank')
+        .setLabel('View your voice rank')
         .setStyle(ButtonStyle.Secondary)
         .setEmoji('1237904473980932107')
         .setDisabled(false),
@@ -18,7 +18,7 @@ export const VoiceRankButtonRow = new ActionRowBuilder<ButtonBuilder>().addCompo
 export const TextRankButtonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
         .setCustomId('txt-rank')
-        .setLabel('Text Rank')
+        .setLabel('View your text rank')
         .setStyle(ButtonStyle.Secondary)
         .setEmoji('1237904475704787066')
         .setDisabled(false),
@@ -45,7 +45,7 @@ export const RewardButtons = new ActionRowBuilder<ButtonBuilder>()
 export const VoiceRankButtonOnly = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
         .setCustomId('vc-only-rank')
-        .setLabel('Voice Rank')
+        .setLabel('View your voice rank')
         .setStyle(ButtonStyle.Secondary)
         .setEmoji('1237904473980932107')
         .setDisabled(false),
