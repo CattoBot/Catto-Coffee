@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/img/catto_light.png" alt="Catto Light">
+</p>
+
 ### Prerequisite
 
 ```sh
