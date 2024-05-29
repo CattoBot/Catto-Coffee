@@ -3,6 +3,7 @@ import { Events, Listener } from "@sapphire/framework";
 import { Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { EnabledTextListenerExperience } from "../../lib/decorators/ListenerTextExpEnabled";
 import { globalexperienceFormula, textExperienceFormula } from "../../lib/utils";
+import { FilteredTextChannel } from "../../lib/decorators/FilteredTextChannel";
 
 @ApplyOptions<Listener.Options>({ event: Events.MessageCreate })
 export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate> {
@@ -11,6 +12,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
     }
 
     @EnabledTextListenerExperience()
+    @FilteredTextChannel()
     public async run(message: Message) {
         if (!message.guild || message.author.bot || !message.inGuild()) return;
 
