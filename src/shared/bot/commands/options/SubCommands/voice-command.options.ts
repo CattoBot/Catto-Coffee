@@ -18,7 +18,7 @@ export class VoiceSubCommands {
                 chatInputRun: "chatInputName",
                 messageRun: "messageRunName",
                 cooldownDelay: Time.Minute * 5,
-                cooldownLimit: 2,
+                cooldownLimit: 1,
                 preconditions: ['ChannelOwnerPrecondition']
             },
             {

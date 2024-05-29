@@ -29,41 +29,45 @@ export class RankCommand extends Command {
             return;
         }
 
-        const type = await args.pick('string').catch(() => 'voice');
+        const user = await args.pick('user').catch(() => message.author);
+        let type: 'voice' | 'text' = await args.pick('string').catch(() => 'text') as 'voice' | 'text';
 
         if (type !== 'voice' && type !== 'text') {
             await reply(message, { content: await resolveKey(message, 'commands/replies/level:rank_invalid_type') });
             return;
         }
 
-        if (type === 'voice' && !voiceEnabled) {
-            await reply(message, { content: await resolveKey(message, 'commands/replies/level:rank_voice_disabled') });
-            return;
+        if ((type === 'voice' && !voiceEnabled) || (type === 'text' && !textEnabled)) {
+            type = type === 'text' && voiceEnabled ? 'voice' : 'text';
+            if ((type === 'voice' && !voiceEnabled) || (type === 'text' && !textEnabled)) {
+                await reply(message, { content: await resolveKey(message, `commands/replies/level:rank_${type}_disabled`) });
+                return;
+            }
         }
 
-        if (type === 'text' && !textEnabled) {
-            await reply(message, { content: await resolveKey(message, 'commands/replies/level:rank_text_disabled') });
-            return;
-        }
-
-        await this.buildCard(message, args, type);
+        await this.buildCard(message, user, type);
     }
 
-    private async buildCard(message: Message, args: Args, type: 'voice' | 'text'): Promise<void> {
-        const user = await args.pick('user').catch(() => message.author);
-
+    private async buildCard(message: Message, user: any, type: 'voice' | 'text'): Promise<void> {
         if (user.bot) {
             await reply(message, { content: await resolveKey(message, 'commands/replies/level:rank_bot') });
             return;
         }
 
-        const info: VoiceExperience | TextExperience | null = type === 'voice' ?
+        let info: VoiceExperience | TextExperience | null = type === 'voice' ?
             await LevelingHelper.getVoiceUserInfo(user.id, message.guildId!) :
             await LevelingHelper.getTextUserInfo(user.id, message.guildId!);
 
         if (!info) {
-            await reply(message, { content: await resolveKey(message, 'commands/replies/level:rank_not_data') });
-            return;
+            type = type === 'text' ? 'voice' : 'text';
+            info = type === 'voice' ?
+                await LevelingHelper.getVoiceUserInfo(user.id, message.guildId!) :
+                await LevelingHelper.getTextUserInfo(user.id, message.guildId!);
+
+            if (!info) {
+                await reply(message, { content: await resolveKey(message, 'commands/replies/level:rank_not_data') });
+                return;
+            }
         }
 
         const rank = type === 'voice' ?
@@ -94,10 +98,14 @@ export class RankCommand extends Command {
             .setUser(userInfo);
 
         const buffer = await card.build();
-        const buttonRow = type === 'voice' ? VoiceRankButtonRow : TextRankButtonRow;
+        const buttonRow = type === 'voice' ? TextRankButtonRow : VoiceRankButtonRow;
+        const ViewingText = await resolveKey(message, `commands/replies/level:text_card`, { emoji: Emojis.SUCCESS, user: user.displayName })
+        const ViewingVoice = await resolveKey(message, `commands/replies/level:voice_card`, { emoji: Emojis.SUCCESS, user: user.displayName })
+
+        const content = type === 'voice' ? ViewingVoice : ViewingText;
 
         await reply(message, {
-            content: await resolveKey(message, `commands/replies/level:${type}_card`, { emoji: Emojis.SUCCESS, user: user.displayName }),
+            content: content,
             components: [buttonRow],
             files: [{ attachment: buffer, name: 'rank.png' }],
         });

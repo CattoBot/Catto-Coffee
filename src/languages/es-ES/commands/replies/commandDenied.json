@@ -1,5 +1,5 @@
 {
-    "command_denied": "{{emoji}} - Podrás usar este comando nuevamente en {{seconds}}.",
+    "command_denied": "{{emoji}} - Podrás usar este comando nuevamente {{seconds}}.",
     "already_owner": "Ya eres el propietario de este canal de voz. {{emoji}}",
     "not_in_voice_channel": "Necesitas estar en un canal de voz para usar este comando. {{emoji}}",
     "voice_not_found_in_db": "Parece que este canal no puede ser modificado. Por favor, verifica si yo lo creé. {{emoji}}",

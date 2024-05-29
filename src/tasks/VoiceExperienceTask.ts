@@ -5,7 +5,7 @@ import { Guild, GuildMember, TextChannel, VoiceState } from 'discord.js';
 import { experienceFormula, globalexperienceFormula, retryAsync } from '../lib/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 
-@ApplyOptions<ScheduledTask.Options>({ interval: Time.Minute * 15, name: 'VoiceExperienceTask' })
+@ApplyOptions<ScheduledTask.Options>({ interval: Time.Minute * 10, name: 'VoiceExperienceTask' })
 export class VoiceExperienceTask extends ScheduledTask {
     public constructor(context: ScheduledTask.LoaderContext, options: ScheduledTask.Options) {
         super(context, {
@@ -18,26 +18,18 @@ export class VoiceExperienceTask extends ScheduledTask {
             const keys = await container.redis.keys('voiceSession:*');
             this.container.console.info(`Found ${keys.length} active voice sessions to process.`);
 
+            const guilds: { [key: string]: string[] } = {};
+
             for (const key of keys) {
                 const [, userId, guildId] = key.split(':');
-                this.container.console.info(`Processing session for user ID: ${userId} in guild ID: ${guildId}`);
-                const sessionDataStr = await container.redis.get(key);
-                if (sessionDataStr) {
-                    const sessionData = JSON.parse(sessionDataStr);
-                    const joinTime = sessionData.startTime;
-                    const now = Date.now();
-                    const durationInSeconds = (now - joinTime) / 1000;
-                    const guild = await this.container.client.guilds.fetch(guildId);
-                    const member = await guild.members.fetch(userId);
-
-                    if (member) {
-                        await this.processVoiceSession(member, guild, key, durationInSeconds);
-                    } else {
-                        this.container.console.info(`No member found for user ID: ${userId} in guild ID: ${guildId}`);
-                    }
-                } else {
-                    this.container.console.info(`No session data found for user ID: ${userId}`);
+                if (!guilds[guildId]) {
+                    guilds[guildId] = [];
                 }
+                guilds[guildId].push(userId);
+            }
+
+            for (const guildId of Object.keys(guilds)) {
+                await this.processGuildSessions(guildId, guilds[guildId]);
             }
 
             await this.addNewVoiceSessions();
@@ -46,7 +38,38 @@ export class VoiceExperienceTask extends ScheduledTask {
         }
     }
 
+    private async processGuildSessions(guildId: string, userIds: string[]): Promise<void> {
+        try {
+            const guild = await this.container.client.guilds.fetch(guildId);
+            this.container.console.info(`Starting to process sessions for guild: ${guild.name} (${guild.id}) with ${userIds.length} active sessions.`);
+
+            for (const userId of userIds) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                this.container.console.info(`Processing session for user ID: ${userId} in guild ID: ${guildId}`);
+                const sessionDataStr = await container.redis.get(`voiceSession:${userId}:${guildId}`);
+                if (sessionDataStr) {
+                    const sessionData = JSON.parse(sessionDataStr);
+                    const joinTime = sessionData.startTime;
+                    const now = Date.now();
+                    const durationInSeconds = (now - joinTime) / 1000;
+                    const member = await guild.members.fetch(userId);
+
+                    if (member) {
+                        await this.processVoiceSession(member, guild, `voiceSession:${userId}:${guildId}`, durationInSeconds);
+                    } else {
+                        this.container.console.info(`No member found for user ID: ${userId} in guild ID: ${guildId}`);
+                    }
+                } else {
+                    this.container.console.info(`No session data found for user ID: ${userId}`);
+                }
+            }
+        } catch (error) {
+            this.container.console.error(`Error processing guild sessions for guild ID: ${guildId}: ${error}`);
+        }
+    }
+
     private async addNewVoiceSessions(): Promise<void> {
+        this.container.console.info('Adding new voice sessions for all guilds.');
         for (const guild of this.container.client.guilds.cache.values()) {
             const voiceStates = guild.voiceStates.cache.filter((voiceState: VoiceState) => voiceState.channelId);
             for (const voiceState of voiceStates.values()) {
@@ -59,6 +82,7 @@ export class VoiceExperienceTask extends ScheduledTask {
                 this.container.console.info(`Added new voice session for user ID: ${userId} in guild ID: ${guildId}`);
             }
         }
+        this.container.console.info('Finished adding new voice sessions.');
     }
 
     private async processVoiceSession(member: GuildMember, guild: Guild, sessionId: string, durationInSeconds: number): Promise<void> {
@@ -77,6 +101,7 @@ export class VoiceExperienceTask extends ScheduledTask {
             }
 
             await container.redis.del(sessionId);
+            this.container.console.info(`Deleted session data for user ID: ${member.id} in guild ID: ${guild.id}`);
         } catch (error) {
             this.container.console.error(`Error processing voice session for member ${member.displayName}: ${error}`);
         }
@@ -138,11 +163,11 @@ export class VoiceExperienceTask extends ScheduledTask {
                 },
                 update: {
                     voiceExperience: { increment: experience },
+                    totalVoiceExperience: { increment: experience },
                     totalTimeInVoiceChannel: { increment: durationInSeconds },
                     weeklyTimeInVoiceChannel: { increment: durationInSeconds },
                     dailyTimeInVoiceChannel: { increment: durationInSeconds },
-                    monthlyTimeInVoiceChannel: { increment: durationInSeconds },
-                    totalVoiceExperience: { increment: experience }
+                    monthlyTimeInVoiceChannel: { increment: durationInSeconds }
                 }
             });
 
