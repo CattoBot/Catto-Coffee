@@ -1,6 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
-import { GuildMember, Message, TextChannel } from "discord.js";
+import { Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { EnabledTextListenerExperience } from "../../lib/decorators/ListenerTextExpEnabled";
 import { globalexperienceFormula, textExperienceFormula } from "../../lib/utils";
 
@@ -24,7 +24,11 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
 
         await this.setCooldown(cooldownKey, cooldown);
         const userExp = await this.getUserExperience(message.guild.id, message.author.id);
-        const randomXP = this.getRandomXP(min, max);
+        let randomXP = this.getRandomXP(min, max);
+        const bonusPercentage = await this.getUserBonusPercentage(message.member as GuildMember);
+        if (bonusPercentage > 0) {
+            randomXP += randomXP * (bonusPercentage / 100);
+        }
         let { updatedExp, currentLevel } = this.calculateUpdatedExperience(userExp, randomXP);
         const nextLevelExp = textExperienceFormula(currentLevel);
 
@@ -38,7 +42,6 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         await this.updateUserExperience(message.guild.id, message.author.id, updatedExp, currentLevel, randomXP, userExp);
         await this.updateGlobalExperience(message.author.id);
     }
-
 
     private async setCooldown(cooldownKey: string, cooldown: number) {
         await this.container.redis.set(cooldownKey, "1", "EX", cooldown);
@@ -63,14 +66,19 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
     private async sendLevelUpNotification(message: Message, currentLevel: number) {
         const messageToSend = await this.getAchievementMessage(message.guild!.id);
         const notificationChannelId = await this.getTextNotificationChannel(message.guild!.id);
-        const notificationChannel = notificationChannelId
-            ? (await message.guild!.channels.fetch(notificationChannelId)) as TextChannel
-            : null;
-
         const replacementMessage = messageToSend.replace(/{user}/g, message.author.toString()).replace(/{level}/g, currentLevel.toString());
 
-        if (notificationChannel) {
-            await notificationChannel.send(replacementMessage);
+        if (notificationChannelId && await this.doesChannelExist(message.guild!, notificationChannelId)) {
+            try {
+                const notificationChannel = await message.guild!.channels.fetch(notificationChannelId);
+                if (notificationChannel && notificationChannel.isTextBased()) {
+                    await (notificationChannel as TextChannel).send(replacementMessage);
+                } else {
+                    await message.reply(replacementMessage);
+                }
+            } catch (error) {
+                await message.reply(replacementMessage);
+            }
         } else {
             await message.reply(replacementMessage);
         }
@@ -158,5 +166,28 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
 
     private getCooldownKey(guildID: string, userID: string): string {
         return `cooldown:text:${guildID}:${userID}`;
+    }
+
+    private async doesChannelExist(guild: Guild, channelId: string): Promise<boolean> {
+        try {
+            const channel = await guild.channels.fetch(channelId);
+            return channel != null;
+        } catch {
+            return false;
+        }
+    }
+
+    private async getUserBonusPercentage(member: GuildMember): Promise<number> {
+        const bonusRoles = await this.container.prisma.bonus_text_roles.findMany({ where: { guildId: member.guild.id } });
+        const userRoles = member.roles.cache;
+        let maxBonus = 0;
+        for (const role of bonusRoles) {
+            if (userRoles.has(role.roleId)) {
+                if (role.bonus! > maxBonus) {
+                    maxBonus = role.bonus!;
+                }
+            }
+        }
+        return maxBonus;
     }
 }
