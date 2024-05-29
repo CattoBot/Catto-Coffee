@@ -4,6 +4,7 @@ import { Time } from '@sapphire/time-utilities';
 import { Guild, GuildMember, TextChannel, VoiceState } from 'discord.js';
 import { experienceFormula, globalexperienceFormula, retryAsync } from '../lib/utils';
 import { ApplyOptions } from '@sapphire/decorators';
+import { chunk } from 'lodash';
 
 @ApplyOptions<ScheduledTask.Options>({ interval: Time.Minute * 15, name: 'VoiceExperienceTask' })
 export class VoiceExperienceTask extends ScheduledTask {
@@ -12,6 +13,7 @@ export class VoiceExperienceTask extends ScheduledTask {
             ...options,
         });
     }
+
     public async run(): Promise<void> {
         try {
             const keys = await container.redis.keys('voiceSession:*');
@@ -27,8 +29,11 @@ export class VoiceExperienceTask extends ScheduledTask {
                 guilds[guildId].push(userId);
             }
 
-            const guildPromises = Object.keys(guilds).map(guildId => this.processGuildSessions(guildId, guilds[guildId]));
-            await Promise.all(guildPromises);
+            const guildChunks = chunk(Object.keys(guilds), 1000);
+            for (const guildChunk of guildChunks) {
+                const guildPromises = guildChunk.map(guildId => this.processGuildSessions(guildId, guilds[guildId]));
+                await Promise.all(guildPromises);
+            }
 
             await this.addNewVoiceSessions();
         } catch (error) {
