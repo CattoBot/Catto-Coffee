@@ -45,12 +45,15 @@ export class AdminCommands extends Subcommand {
     }
 
     public async ChatInputVoices(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
+        const isPremium = await this.container.prisma.premium_servers.findUnique({ where: { guildId: interaction.guildId! } });
         const find = await this.container.prisma.i_voice_temp_channels.findMany({ where: { guildId: interaction.guildId! } });
-        if (find.length === 2 || find.length > 2) {
-            await interaction.reply({ content: `You have reached the maximum amount of voice channels. If you need more, please consider getting the premium version.`, ephemeral: true })
+        if (!isPremium && (find.length >= 2)) {
+            await interaction.reply({
+                content: `You have reached the maximum amount of voice channels. If you need more, please consider getting the premium version.`,
+                ephemeral: true
+            });
             return;
         }
-        
         await interaction.showModal(VoiceSetupModalHandler);
     }
 
