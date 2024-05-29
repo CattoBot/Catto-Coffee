@@ -13,7 +13,13 @@ export class VoiceNameCommand {
             });
             return;
         }
-        await message.member?.voice.channel?.setName(name.toString());
+        await message.member?.voice.channel?.setName(name.toString()).catch(async () => {
+            await message.reply({
+                content:
+                    (await resolveKey(message, 'commands/replies/voice:voice_name_error', { emoji: Emojis.ERROR }))
+            });
+            return;
+        })
         await this.updateName(name, message.member!);
         await message.reply({
             content:
