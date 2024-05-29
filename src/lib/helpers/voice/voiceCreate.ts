@@ -30,12 +30,7 @@ export class VoiceCreateHelper extends Helper {
 
     private async createChannel(guild: Guild, parent: CategoryChannel, user_id: string, newState: VoiceState): Promise<void> {
         const user_cooldown = await this.getUserCooldown(user_id);
-        if (user_cooldown && user_cooldown > Date.now()) {
-            const remainingTime = (user_cooldown - Date.now()) / 1000;
-            container.console.info(`User ${user_id} is still on cooldown for ${remainingTime.toFixed(2)} seconds.`, { userId: user_id });
-            return;
-        }
-
+        if (user_cooldown && user_cooldown > Date.now()) return;
         await this.setUserCooldown(user_id);
         const channel_details = await this.setChannelDetails(user_id, parent, newState, guild.id, newState.channelId!);
         if (!channel_details) return;
@@ -81,7 +76,6 @@ export class VoiceCreateHelper extends Helper {
         try {
             const expirationTime = Date.now() + cooldownPeriod;
             await container.redis.set(`voiceCreate:cooldown:${user_id}`, expirationTime, 'PX', cooldownPeriod);
-            container.console.info(`Set cooldown for user ${user_id} to expire in ${cooldownPeriod / 1000} seconds.`, { userId: user_id });
         } catch (error) {
             container.console.error(`Error setting cooldown for user ${user_id}: ${error}`, { userId: user_id });
         }
@@ -118,7 +112,6 @@ export class VoiceCreateHelper extends Helper {
                 permissionOverwrites: permissions
             });
         } catch (error) {
-            container.console.error(`Error while creating a channel: ${error}`, { guildId: guild.id });
             return null;
         }
     }
@@ -133,8 +126,6 @@ export class VoiceCreateHelper extends Helper {
     private async setChannelDetails(user_id: string, parent: CategoryChannel, newState: VoiceState, guildId: string, channelId: string): Promise<{ name: string, userLimit: number, permissions: OverwriteResolvable[] } | null> {
         try {
             const shouldUseUserSettings = await this.shouldUseUserSettings(guildId, channelId);
-            container.console.info(`Using user settings: ${shouldUseUserSettings}`, { userId: user_id });
-
             let channelInfo;
 
             if (shouldUseUserSettings) {
@@ -177,8 +168,8 @@ export class VoiceCreateHelper extends Helper {
     }
 
     private async storeChannelInDatabase(guildId: string, channelId: string, categoryId: string, userId: string): Promise<void> {
-        setTimeout(async () => {
-            try {
+        try {
+            setTimeout(async () => {
                 await container.prisma.voice_temp_channels.create({
                     data: {
                         guildId: guildId,
@@ -186,11 +177,12 @@ export class VoiceCreateHelper extends Helper {
                         channelCategoryId: categoryId,
                         channelOwnerId: userId
                     }
-                });
-            } catch (error) {
-                container.console.error(`Error storing channel in database: ${error}`, { guildId: guildId, channelId: channelId, userId: userId });
-            }
-        }, 500);
+                })
+            }, 500);
+
+        } catch (error) {
+            container.console.error(`Error storing channel in database: ${error}`, { guildId: guildId, channelId: channelId, userId: userId });
+        }
     }
 
     private async retrieveDefaultChannelSettings(guildId: string, channelId: string, newState: VoiceState): Promise<{ channelName: string, channelLimit: number } | null> {
@@ -229,10 +221,8 @@ export class VoiceCreateHelper extends Helper {
 
             if (defaultSettings) {
                 const useUserSettings = defaultSettings.editables;
-                container.console.info(`Guild: ${guildId}, Channel: ${channelId}, Editables: ${useUserSettings}`, { guildId, channelId });
                 return useUserSettings!;
             } else {
-                container.console.warn(`No default settings found for Guild: ${guildId}, Channel: ${channelId}`, { guildId, channelId });
                 return false;
             }
         } catch (error) {

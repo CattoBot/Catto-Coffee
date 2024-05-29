@@ -4,12 +4,16 @@ import { Helper } from "../helper";
 
 export class VoiceDeleteHelper extends Helper {
     public async deleteChannel(voiceChannel: VoiceChannel) {
-        try {
-            await voiceChannel.delete();
-            await this.deleteTrustedUsers(voiceChannel.id);
-        } catch (error) {
-            container.console.error(`Error while deleting voice channel: ${error}`);
-        }
+        await voiceChannel.delete().catch(() => null);
+        await container.prisma.voice_temp_channels.delete({
+            where: {
+                guildId_channelId: {
+                    guildId: voiceChannel.guild.id,
+                    channelId: voiceChannel.id,
+                },
+            }
+        }).catch(() => null)
+        await this.deleteTrustedUsers(voiceChannel.id).catch(() => null);
     }
 
     public async findExistingChannel(guildId: string, voiceChannel: VoiceChannel) {
