@@ -46,8 +46,10 @@ export class VoiceExperienceTask extends ScheduledTask {
             const guild = await this.container.client.guilds.fetch(guildId);
             this.container.console.info(`Starting to process sessions for guild: ${guild.name} (${guild.id}) with ${userIds.length} active sessions.`);
 
-            const userPromises = userIds.map(userId => this.processUserSession(userId, guild));
-            await Promise.all(userPromises);
+            for (const userId of userIds) {
+                await this.processUserSession(userId, guild);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
         } catch (error) {
             this.container.console.error(`Error processing guild sessions for guild ID: ${guildId}: ${error}`);
         }
@@ -55,7 +57,6 @@ export class VoiceExperienceTask extends ScheduledTask {
 
     private async processUserSession(userId: string, guild: Guild): Promise<void> {
         try {
-            await new Promise(resolve => setTimeout(resolve, 500));
             this.container.console.info(`Processing session for user ID: ${userId} in guild ID: ${guild.id}`);
             const sessionDataStr = await container.redis.get(`voiceSession:${userId}:${guild.id}`);
             if (sessionDataStr) {
