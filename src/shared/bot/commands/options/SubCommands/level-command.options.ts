@@ -4,6 +4,7 @@ import { PermissionFlagsBits } from "discord.js";
 export class LevelSubCommands {
     public static Options: SubcommandOptions = {
         name: 'catto',
+        description: 'Ranking Commands',
         requiredClientPermissions: [PermissionFlagsBits.ManageGuild],
         requiredUserPermissions: [PermissionFlagsBits.SendMessages],
         preconditions: ['GuildOnly', 'GuildExistsPrecondition', 'GuildBlacklistPrecondition', 'UserBlacklistPrecondition', 'GuildUserBlacklistPrecondition', 'RoleCommandPermitPrecondition'],
