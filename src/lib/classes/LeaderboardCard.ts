@@ -11,7 +11,7 @@ import { secondsToHours } from 'date-fns';
 
 const HOURS_POSITION_Y_OFFSET = -10;
 const MESSAGES_POSITION_Y_OFFSET = -10;
-const HOURS_POSITION_X_OFFSET = 615;
+const HOURS_POSITION_X_OFFSET = 620;
 const MESSAGES_POSITION_X_OFFSET = 615;
 
 export class LeaderboardImageBuilder extends CanvaHelper {
