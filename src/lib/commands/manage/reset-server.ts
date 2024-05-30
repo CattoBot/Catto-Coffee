@@ -34,7 +34,7 @@ export class ResetServerCommand {
             errors: ['time']
         }).catch(() => null);
 
-        if (!confirm || confirm.first()?.content.toLowerCase() !== "confirm") {
+        if (!confirm || !["confirm", "confirmar"].includes(confirm.first()?.content.toLowerCase() || "")) {
             return interaction.followUp({ content: await resolveKey(interaction, `commands/replies/error:no_time_reset_server`, { emoji: Emojis.WARN }), ephemeral: false });
         }
 
