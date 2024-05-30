@@ -50,7 +50,9 @@ export class FilterVoiceChannelCommand {
         const result = await this.removeChannelFromModule(interaction.guild!.id, channel.id, module);
         if (result) {
             const redisKey = `filteredVoiceChannel:${interaction.guild!.id}:${channel.id}`;
+            const redisKey2 = `filteredTextChannel:${interaction.guild!.id}:${channel.id}`;
             await container.redis.del(redisKey);
+            await container.redis.del(redisKey2);
 
             return await interaction.reply({
                 content: await resolveKey(interaction, `commands/replies/admin:${module.toLowerCase()}_filter_channel_remove`, { channel: channel, emoji: Emojis.SUCCESS }),

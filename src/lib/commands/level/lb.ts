@@ -39,6 +39,7 @@ export class LeaderboardCommand extends LevelingHelper {
             .setUserId(userId)
             .setBackground('../../../assets/img/Leader_VC_v2.jpg')
             .setExperienceFormula(experienceFormula)
+            .setShowHours(true)
             .setType('voice');
 
         const buffer = await builder.build();
@@ -64,6 +65,7 @@ export class LeaderboardCommand extends LevelingHelper {
             .setUserId(userId)
             .setBackground('../../../assets/img/Leader_TXT.png')
             .setExperienceFormula(textExperienceFormula)
+            .setShowMessages(true)
             .setType('text');
 
         const buffer = await builder.build();

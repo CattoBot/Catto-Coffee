@@ -341,24 +341,6 @@ model role_leaderboard_rewards {
   @@index([guildId, roleId, roleType], map: "IDX_ROLE_LEADERBOARD_REWARDS_GUILD_ID_ROLE_ID_ROLE_TYPE")
 }
 
-model text_experience {
-  id                   Int      @id @default(autoincrement())
-  guildId              String   @db.VarChar(255)
-  userId               String   @db.VarChar(255)
-  textExperience       Int      @default(0)
-  textLevel            Int      @default(1)
-  totalTextExperience  Int      @default(0)
-  totalMessagesDaily   Int      @default(0)
-  totalMessagesWeekly  Int      @default(0)
-  totalMessagesMonthly Int      @default(0)
-  createdAt            DateTime @default(now()) @db.DateTime(6)
-  updatedAt            DateTime @default(now()) @db.DateTime(6)
-  guilds               guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_04abffedff742a06c2e0adc266c")
-
-  @@unique([guildId, userId], map: "UQ_TEXT_EXPERIENCE_GUILD_ID_USER_ID")
-  @@index([guildId, userId], map: "IDX_TEXT_EXPERIENCE_GUILD_ID_USER_ID")
-}
-
 model trusted_voice_users {
   id                  Int                 @id @default(autoincrement())
   guildId             String              @db.VarChar(255)
@@ -415,6 +397,25 @@ model users_rank_card_config {
   @@index([userId], map: "IDX_USERS_RANK_CARD_CONFIG_USER_ID")
 }
 
+model text_experience {
+  id                   Int      @id @default(autoincrement())
+  guildId              String   @db.VarChar(255)
+  userId               String   @db.VarChar(255)
+  textExperience       Int      @default(0)
+  textLevel            Int      @default(1)
+  totalTextExperience  Int      @default(0)
+  totalMessagesDaily   Int      @default(0)
+  totalMessagesWeekly  Int      @default(0)
+  totalMessagesMonthly Int      @default(0)
+  totalMessages        Int      @default(0)
+  createdAt            DateTime @default(now()) @db.DateTime(6)
+  updatedAt            DateTime @default(now()) @updatedAt @db.DateTime(6)
+  guilds               guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_04abffedff742a06c2e0adc266c")
+
+  @@unique([guildId, userId], map: "UQ_TEXT_EXPERIENCE_GUILD_ID_USER_ID")
+  @@index([guildId, userId], map: "IDX_TEXT_EXPERIENCE_GUILD_ID_USER_ID")
+}
+
 model voice_experience {
   id                        Int      @id @default(autoincrement())
   guildId                   String   @db.VarChar(255)
@@ -427,7 +428,7 @@ model voice_experience {
   totalVoiceExperience      Int      @default(0)
   totalTimeInVoiceChannel   Int      @default(0)
   createdAt                 DateTime @default(now()) @db.DateTime(6)
-  updatedAt                 DateTime @default(now()) @db.DateTime(6)
+  updatedAt                 DateTime @default(now()) @updatedAt @db.DateTime(6)
   guilds                    guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_7a259b73a1a6c41f01d7803331a")
 
   @@unique([guildId, userId], map: "UQ_VOICE_EXPERIENCE_GUILD_ID_USER_ID")

@@ -15,7 +15,6 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
     @FilteredTextChannel()
     public async run(message: Message) {
         if (!message.guild || message.author.bot || !message.inGuild()) return;
-
         const { min, max, cooldown } = await this.getMinMaxEXP(message);
         const cooldownKey = this.getCooldownKey(message.guild.id, message.author.id);
         const remainingCooldown = await this.container.redis.ttl(cooldownKey);
@@ -163,7 +162,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
 
     private async getAchievementMessage(guildID: string): Promise<string> {
         const getMessage = await this.container.prisma.i_text_experience.findUnique({ where: { guildId: guildID } });
-        return getMessage?.lvlUpMsg || 'Felicidades {user} has subido a nivel `{level}`.';
+        return getMessage?.lvlUpMsg || 'Felicidades {user} has subido a nivel `{level}`, sigue participando en los chats!';
     }
 
     private getCooldownKey(guildID: string, userID: string): string {

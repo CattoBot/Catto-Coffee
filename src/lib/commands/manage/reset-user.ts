@@ -18,7 +18,7 @@ export class ResetUserCommand {
         } else if (module === "Text") {
             await this.resetModule(interaction, user, this.getUserTextExperience, 'text');
         } else {
-            return interaction.reply({ content: await resolveKey(interaction, 'commands/replies/error:bot_experience', { emoji: Emojis.ERROR }), ephemeral: true });
+            return interaction.reply({ content: await resolveKey(interaction, 'commands/replies/error:invalid_module', { emoji: Emojis.ERROR }), ephemeral: true });
         }
         return;
     }
@@ -46,7 +46,7 @@ export class ResetUserCommand {
             errors: ['time']
         }).catch(() => null);
 
-        if (!confirm || confirm.first()?.content.toLowerCase() !== "confirm") {
+        if (!confirm || !["confirm", "confirmar"].includes(confirm.first()?.content.toLowerCase() || "")) {
             return interaction.followUp({ content: await resolveKey(interaction, `no_time_reset_user`), ephemeral: false });
         }
 
