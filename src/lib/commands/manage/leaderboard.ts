@@ -3,12 +3,7 @@ import { resolveKey } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { TextChannel, GuildChannel } from "discord.js";
 import { Emojis } from "../../../shared/enum/Emojis";
-
-enum LeaderboardType {
-    Daily = 'dailyVoiceTop10channelId',
-    Weekly = 'weeklyVoiceTop10channelId',
-    Monthly = 'monthlyVoiceTop10channelId'
-}
+import { LeaderboardType } from "../../../shared/enum/LeaderboardType";
 
 export class IntervalLeaderboardCommand {
     public static async run(interaction: Subcommand.ChatInputCommandInteraction, type: LeaderboardType) {
@@ -28,6 +23,8 @@ export class IntervalLeaderboardCommand {
                 data: { [type]: channel.id }
             });
 
+            await this.updateLeaderboardTable(interaction.guild!.id, type);
+
             return await interaction.reply({
                 content: await resolveKey(interaction, `commands/replies/admin:${type}_channel_update`, { channel: channel, emoji: Emojis.SUCCESS }),
                 ephemeral: false
@@ -41,10 +38,38 @@ export class IntervalLeaderboardCommand {
             }
         });
 
+        await this.updateLeaderboardTable(interaction.guild!.id, type);
+
         return await interaction.reply({
             content: await resolveKey(interaction, `commands/replies/admin:${type}_channel_add`, { channel: channel, emoji: Emojis.SUCCESS }),
             ephemeral: false
         });
+    }
+
+    private static async updateLeaderboardTable(guildId: string, type: LeaderboardType) {
+        switch (type) {
+            case LeaderboardType.Daily:
+                await container.prisma.daily_top.upsert({
+                    where: { guildId: guildId },
+                    update: {},
+                    create: { guildId: guildId }
+                });
+                break;
+            case LeaderboardType.Weekly:
+                await container.prisma.weekly_top.upsert({
+                    where: { guildId: guildId },
+                    update: {},
+                    create: { guildId: guildId }
+                });
+                break;
+            case LeaderboardType.Monthly:
+                await container.prisma.monthly_top.upsert({
+                    where: { guildId: guildId },
+                    update: {},
+                    create: { guildId: guildId }
+                });
+                break;
+        }
     }
 
     public static async dailyRun(interaction: Subcommand.ChatInputCommandInteraction) {

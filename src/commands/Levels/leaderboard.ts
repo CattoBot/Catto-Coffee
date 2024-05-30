@@ -50,6 +50,7 @@ export class RankLeaderboardCommand extends Command {
         const builder = new LeaderboardImageBuilder()
             .setGuildLeaderboard(guild_leaderboard)
             .setUserId(userId)
+            .setShowHours(true)
             .setBackground('../../../assets/img/Leader_VC_v2.jpg')
             .setExperienceFormula(experienceFormula)
             .setType('voice');
@@ -75,6 +76,7 @@ export class RankLeaderboardCommand extends Command {
             .setUserId(userId)
             .setBackground('../../../assets/img/Leader_TXT.png')
             .setExperienceFormula(textExperienceFormula)
+            .setShowMessages(true)
             .setType('text');
 
         const buffer = await builder.build();

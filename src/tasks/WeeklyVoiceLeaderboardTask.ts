@@ -1,11 +1,10 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { ScheduledTask } from "@sapphire/plugin-scheduled-tasks";
 import { Time } from "@sapphire/time-utilities";
-import { TextChannel } from "discord.js";
+import { TextChannel, EmbedBuilder } from "discord.js";
 import { addDays, formatISO } from "date-fns";
-import { createCanvas, loadImage } from "canvas";
-import { join } from "path";
-import { formatTime, drawRoundedImage, drawProgressBar } from "../lib/utils";
+import { toZonedTime, format } from "date-fns-tz";
+import { LeaderboardImageBuilder } from "../lib/classes/LeaderboardCard";
 
 @ApplyOptions<ScheduledTask.Options>({ interval: Time.Hour * 3, name: 'WeeklyVoiceTop10Task' })
 export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
@@ -16,10 +15,10 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     public async run(): Promise<void> {
-        const dailyTop = await this.container.prisma.weekly_top.findMany();
-        this.container.console.info('Starting to process weekly tops...', dailyTop);
+        const weeklyTop = await this.container.prisma.weekly_top.findMany();
+        this.container.console.info('Starting to process weekly tops...', weeklyTop);
 
-        for (const top of dailyTop) {
+        for (const top of weeklyTop) {
             const guildId = top.guildId;
             let nextPublishDate = await this.getNextPublishDate(guildId);
             const now = new Date();
@@ -42,13 +41,22 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
                             this.container.console.error('Error deleting previous message:', error);
                         }
                     }
-                    const newMessage = await textChannel.send({ files: [{ attachment: buffer, name: 'leaderboard.png' }] });
+
+                    const timeZone = 'America/New_York';
+                    const zonedDate = toZonedTime(nextPublishDate, timeZone);
+                    const nextResetTime = format(zonedDate, 'HH:mm zzz', { timeZone });
+
+                    const embed = new EmbedBuilder()
+                        .setAuthor({ name: 'Weekly Voice Leaderboard', iconURL: 'https://res.cloudinary.com/dp5dbsd8w/image/upload/v1717049320/badges/hveiskr7ec2oxpvfrzko.png' })
+                        .setFooter({ text: `Resets every week at: ${nextResetTime}`, iconURL: 'https://res.cloudinary.com/dp5dbsd8w/image/upload/v1717049320/badges/djrnims3eavniivxbqjs.webp' })
+                        .setImage('attachment://leaderboard.png');
+                    const newMessage = await textChannel.send({ embeds: [embed], files: [{ attachment: buffer, name: 'leaderboard.png' }] });
                     this.container.console.info('Sent new weekly top message.');
                     await this.updateWeeklyTopMessageId(guildId, newMessage.id);
                     await this.deleteWeeklyVoiceExperience(guildId);
                 }
 
-                const newNextDate = addDays(now, 7); // 24 hours
+                const newNextDate = addDays(now, 7); // 1 week
                 await this.updateNextPublishDate(guildId, newNextDate);
             }
         }
@@ -124,66 +132,12 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
     }
 
     private async generateWeeklyVoiceLeaderboard(guildTop10: any[]) {
-        const [backgroundImage] = await Promise.all([
-            loadImage(join(__dirname, '../../assets/img/Catto_VC_Weekly.png'))
-        ]);
-
-        const imageWidth = 1024;
-        const imageHeight = 1440;
-        const canvas = createCanvas(imageWidth, imageHeight);
-        const context = canvas.getContext('2d');
-        context.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-
-        const fetchUserData = async (user: any) => {
-            const member = await this.container.client.users.fetch(user.userId);
-            const avatar = await loadImage(member.displayAvatarURL({ extension: 'jpg', size: 512 }));
-            return {
-                userInfo: `${member.username} - ${formatTime(user.dailyTimeInVoiceChannel)}`,
-                avatar
-            };
-        };
-
-        const results = await Promise.all(guildTop10.map(fetchUserData));
-        const lb = results.map(result => result.userInfo);
-        const userAvatars = results.map(result => result.avatar);
-
-        const colors = [
-            { start: '#f4b547', end: '#faf3bb' },
-            { start: '#04a0ff', end: '#03ddcd' },
-            { start: '#ff5394', end: '#ff7064' }
-        ];
-
-        let y = Math.floor(imageHeight / 9.6);
-        const lineHeight = Math.floor(imageHeight / 10);
-        const avatarSpacing = -27.5;
-        const avatarSize = Math.floor(imageHeight / 14);
-
-        for (const [index, user] of lb.entries()) {
-            const avatar = userAvatars[index];
-            const avatarX = imageWidth * 0.12;
-            const avatarY = y + lineHeight / 2 - avatarSize;
-            drawRoundedImage(context, avatar, avatarX, avatarY, avatarSize);
-            const textX = avatarX + avatarSize + Math.floor(imageWidth * 0.03);
-            const textY = avatarY + avatarSize / 2 + 6 - Math.floor(imageHeight * 0.02);
-            const [username, time] = user.split(' - ');
-            context.font = '16px Poppins SemiBold';
-            context.fillStyle = '#000000';
-            context.textAlign = 'left';
-            context.fillText(username, textX, textY);
-            const timeTextWidth = context.measureText(time).width;
-            const timeX = imageWidth - Math.floor(imageWidth * 0.09) - timeTextWidth;
-            context.fillText(time, timeX, textY);
-            const progress = guildTop10[index].dailyTimeInVoiceChannel! / (7 * 24 * 60 * 60); // 7 days
-            const progressBarX = textX;
-            const progressBarY = textY + 30;
-            const progressBarWidth = 720;
-            const progressBarHeight = 15;
-            const color = index < 3 ? colors[index] : { start: '#12D6DF', end: '#F70FFF' };
-            drawProgressBar(context, progressBarX, progressBarY, progressBarWidth, progressBarHeight, progress, color.start, color.end);
-            y += lineHeight + avatarSpacing;
-        }
-
-        const buffer = canvas.toBuffer('image/png');
-        return buffer;
+        const bg = ('../../../assets/img/Catto_VC_Weekly.png');
+        const leaderboard = new LeaderboardImageBuilder()
+            .setGuildLeaderboard(guildTop10)
+            .setBackground(bg)
+            .setShowWeeklyTimeInVoiceChannel(true);
+        const lb = await leaderboard.build();
+        return lb as Buffer;
     }
 }

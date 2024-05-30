@@ -7,6 +7,12 @@ import { LeaderboardUserData } from '../../shared/interfaces/LeaderboardUser';
 import { FetchUserData } from '../../shared/interfaces/UserData';
 import { CanvaHelper } from '../helpers/Canva';
 import { LeaderboardType } from '../../shared/types/LeaderboardType';
+import { secondsToHours } from 'date-fns';
+
+const HOURS_POSITION_Y_OFFSET = -10;
+const MESSAGES_POSITION_Y_OFFSET = -10;
+const HOURS_POSITION_X_OFFSET = 615;
+const MESSAGES_POSITION_X_OFFSET = 615;
 
 export class LeaderboardImageBuilder extends CanvaHelper {
     private guildLeaderboard: LeaderboardUserData[] = [];
@@ -14,6 +20,14 @@ export class LeaderboardImageBuilder extends CanvaHelper {
     private backgroundImagePath: string = '';
     private experienceFormula: (level: number) => number = (level: number) => Math.floor(100 * Math.pow(level, 1.5));
     private type: LeaderboardType = 'voice';
+    private showHours: boolean = false;
+    private showMessages: boolean = false;
+    private showDailyTimeInVoiceChannel: boolean = false;
+    private showWeeklyTimeInVoiceChannel: boolean = false;
+    private showMonthlyTimeInVoiceChannel: boolean = false;
+    private showDailyMessages: boolean = false;
+    private showWeeklyMessages: boolean = false;
+    private showMonthlyMessages: boolean = false;
 
     setGuildLeaderboard(guildLeaderboard: LeaderboardUserData[]): LeaderboardImageBuilder {
         this.guildLeaderboard = guildLeaderboard;
@@ -37,6 +51,46 @@ export class LeaderboardImageBuilder extends CanvaHelper {
 
     setType(type: 'voice' | 'text'): LeaderboardImageBuilder {
         this.type = type;
+        return this;
+    }
+
+    setShowHours(show: boolean): LeaderboardImageBuilder {
+        this.showHours = show;
+        return this;
+    }
+
+    setShowMessages(show: boolean): LeaderboardImageBuilder {
+        this.showMessages = show;
+        return this;
+    }
+
+    setShowDailyTimeInVoiceChannel(show: boolean): LeaderboardImageBuilder {
+        this.showDailyTimeInVoiceChannel = show;
+        return this;
+    }
+
+    setShowWeeklyTimeInVoiceChannel(show: boolean): LeaderboardImageBuilder {
+        this.showWeeklyTimeInVoiceChannel = show;
+        return this;
+    }
+
+    setShowMonthlyTimeInVoiceChannel(show: boolean): LeaderboardImageBuilder {
+        this.showMonthlyTimeInVoiceChannel = show;
+        return this;
+    }
+
+    setShowDailyMessages(show: boolean): LeaderboardImageBuilder {
+        this.showDailyMessages = show;
+        return this;
+    }
+
+    setShowWeeklyMessages(show: boolean): LeaderboardImageBuilder {
+        this.showWeeklyMessages = show;
+        return this;
+    }
+
+    setShowMonthlyMessages(show: boolean): LeaderboardImageBuilder {
+        this.showMonthlyMessages = show;
         return this;
     }
 
@@ -96,6 +150,48 @@ export class LeaderboardImageBuilder extends CanvaHelper {
             const color = index < 3 ? colors[index] : { start: '#12D6DF', end: '#F70FFF' };
             drawProgressBar(context, progressBarX, progressBarY, progressBarWidth, progressBarHeight, progress, color.start, color.end);
 
+            // Draw optional data
+            if (this.showHours) {
+                const hours = top10[index].totalTimeInVoiceChannel;
+                context.fillStyle = '#000000';
+                context.fillText(`Hours: ${hours}`, textX + HOURS_POSITION_X_OFFSET, progressBarY + HOURS_POSITION_Y_OFFSET);
+            }
+            if (this.showMessages) {
+                const messages = top10[index].totalMessages;
+                context.fillStyle = '#000000'; 
+                context.fillText(`Messages: ${messages}`, textX + MESSAGES_POSITION_X_OFFSET, progressBarY + MESSAGES_POSITION_Y_OFFSET);
+            }
+            if (this.showDailyTimeInVoiceChannel) {
+                const dailyTime = top10[index].dailyTimeInVoiceChannel;
+                context.fillStyle = '#000000';
+                context.fillText(`Daily Time: ${secondsToHours(dailyTime ?? 0)}h`, textX + HOURS_POSITION_X_OFFSET, progressBarY + HOURS_POSITION_Y_OFFSET);
+            }
+            if (this.showWeeklyTimeInVoiceChannel) {
+                const weeklyTime = top10[index].weeklyTimeInVoiceChannel;
+                context.fillStyle = '#000000';
+                context.fillText(`Weekly Time: ${secondsToHours(weeklyTime ?? 0)}h`, textX + HOURS_POSITION_X_OFFSET, progressBarY + HOURS_POSITION_Y_OFFSET);
+            }
+            if (this.showMonthlyTimeInVoiceChannel) {
+                const monthlyTime = top10[index].monthlyTimeInVoiceChannel;
+                context.fillStyle = '#000000';
+                context.fillText(`Monthly Time: ${secondsToHours(monthlyTime ?? 0)}`, textX + HOURS_POSITION_X_OFFSET, progressBarY + HOURS_POSITION_Y_OFFSET);
+            }
+            if (this.showDailyMessages) {
+                const dailyMessages = top10[index].totalMessagesDaily;
+                context.fillStyle = '#000000';
+                context.fillText(`Daily Messages: ${dailyMessages}`, textX + MESSAGES_POSITION_X_OFFSET, progressBarY + MESSAGES_POSITION_Y_OFFSET);
+            }
+            if (this.showWeeklyMessages) {
+                const weeklyMessages = top10[index].totalMessagesWeekly;
+                context.fillStyle = '#000000';
+                context.fillText(`Weekly Messages: ${weeklyMessages}`, textX + MESSAGES_POSITION_X_OFFSET, progressBarY + MESSAGES_POSITION_Y_OFFSET);
+            }
+            if (this.showMonthlyMessages) {
+                const monthlyMessages = top10[index].totalMessagesMonthly;
+                context.fillStyle = '#000000';
+                context.fillText(`Monthly Messages: ${monthlyMessages}`, textX + MESSAGES_POSITION_X_OFFSET, progressBarY + MESSAGES_POSITION_Y_OFFSET);
+            }
+
             y += lineHeight + avatarSpacing;
         });
     }
@@ -129,10 +225,52 @@ export class LeaderboardImageBuilder extends CanvaHelper {
         ];
         const userColor = userRank <= 3 ? colors[userRank - 1] : { start: '#12D6DF', end: '#F70FFF' };
         drawProgressBar(context, progressBarForUserX, progressBarForUserY, progressBarForUserWidth, progressBarForUserHeight, progressForUser, userColor.start, userColor.end);
+
+        // Draw optional data
+        if (this.showHours) {
+            const hours = userdata.totalTimeInVoiceChannel;
+            context.fillStyle = '#000000'; // Color negro
+            context.fillText(`Hours: ${hours}`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
+        }
+        if (this.showMessages) {
+            const messages = userdata.totalMessages;
+            context.fillStyle = '#000000'; // Color negro
+            context.fillText(`Messages: ${messages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
+        }
+        if (this.showDailyTimeInVoiceChannel) {
+            const dailyTime = userdata.dailyTimeInVoiceChannel;
+            context.fillStyle = '#000000'; // Color negro
+            context.fillText(`Daily Time: ${dailyTime}`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 2);
+        }
+        if (this.showWeeklyTimeInVoiceChannel) {
+            const weeklyTime = userdata.weeklyTimeInVoiceChannel;
+            context.fillStyle = '#000000'; // Color negro
+            context.fillText(`Weekly Time: ${weeklyTime}`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 3);
+        }
+        if (this.showMonthlyTimeInVoiceChannel) {
+            const monthlyTime = userdata.monthlyTimeInVoiceChannel;
+            context.fillStyle = '#000000'; // Color negro
+            context.fillText(`Monthly Time: ${monthlyTime}`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 4);
+        }
+        if (this.showDailyMessages) {
+            const dailyMessages = userdata.totalMessagesDaily;
+            context.fillStyle = '#000000'; // Color negro
+            context.fillText(`Daily Messages: ${dailyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET * 2);
+        }
+        if (this.showWeeklyMessages) {
+            const weeklyMessages = userdata.totalMessagesWeekly;
+            context.fillStyle = '#000000'; // Color negro
+            context.fillText(`Weekly Messages: ${weeklyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET * 3);
+        }
+        if (this.showMonthlyMessages) {
+            const monthlyMessages = userdata.totalMessagesMonthly;
+            context.fillStyle = '#000000'; // Color negro
+            context.fillText(`Monthly Messages: ${monthlyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET * 4);
+        }
     }
 
     public async build(): Promise<Buffer | null> {
-        this.registerFonts()
+        this.registerFonts();
         if (!this.guildLeaderboard.length || !this.backgroundImagePath) {
             throw new Error('Guild leaderboard and background image path must be set.');
         }
