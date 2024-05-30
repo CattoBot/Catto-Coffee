@@ -38,6 +38,7 @@ export class ButtonVoiceLeaderboardHandler extends InteractionHandler {
                 .setUserId(userId)
                 .setBackground('../../../assets/img/Leader_VC_v2.jpg')
                 .setExperienceFormula(experienceFormula)
+                .setShowHours(true)
                 .setType('voice');
 
             const buffer = await builder.build();

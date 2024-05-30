@@ -38,6 +38,7 @@ export class ButtonTextLeaderboardHandler extends InteractionHandler {
                 .setUserId(userId)
                 .setBackground('../../../assets/img/Leader_TXT.png')
                 .setExperienceFormula(textExperienceFormula)
+                .setShowMessages(true)
                 .setType('text');
 
             const buffer = await builder.build();

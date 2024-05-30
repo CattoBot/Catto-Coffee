@@ -3,7 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 export const VoiceRankButtonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
         .setCustomId('vc-rank')
-        .setLabel('View your voice rank')
+        .setLabel('Voice Rank')
         .setStyle(ButtonStyle.Secondary)
         .setEmoji('1237904473980932107')
         .setDisabled(false),
@@ -18,7 +18,7 @@ export const VoiceRankButtonRow = new ActionRowBuilder<ButtonBuilder>().addCompo
 export const TextRankButtonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
         .setCustomId('txt-rank')
-        .setLabel('View your text rank')
+        .setLabel('Text Rank')
         .setStyle(ButtonStyle.Secondary)
         .setEmoji('1237904475704787066')
         .setDisabled(false),
@@ -34,18 +34,18 @@ export const RewardButtons = new ActionRowBuilder<ButtonBuilder>()
 .addComponents(
     new ButtonBuilder()
         .setCustomId('text_rewards')
-        .setLabel('Show Text Rewards')
+        .setLabel('Text Rewards')
         .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
         .setCustomId('voice_rewards')
-        .setLabel('Show Voice Rewards')
+        .setLabel('Voice Rewards')
         .setStyle(ButtonStyle.Primary)
 );
 
 export const VoiceRankButtonOnly = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
         .setCustomId('vc-only-rank')
-        .setLabel('View your voice rank')
+        .setLabel('Voice Rank')
         .setStyle(ButtonStyle.Secondary)
         .setEmoji('1237904473980932107')
         .setDisabled(false),

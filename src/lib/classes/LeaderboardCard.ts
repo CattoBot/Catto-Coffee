@@ -154,12 +154,12 @@ export class LeaderboardImageBuilder extends CanvaHelper {
             if (this.showHours) {
                 const hours = top10[index].totalTimeInVoiceChannel;
                 context.fillStyle = '#000000';
-                context.fillText(`Hours: ${hours}`, textX + HOURS_POSITION_X_OFFSET, progressBarY + HOURS_POSITION_Y_OFFSET);
+                context.fillText(`Hours: ${secondsToHours(hours ?? 0)}h`, textX + HOURS_POSITION_X_OFFSET, progressBarY + HOURS_POSITION_Y_OFFSET);
             }
             if (this.showMessages) {
                 const messages = top10[index].totalMessages;
-                context.fillStyle = '#000000'; 
-                context.fillText(`Messages: ${messages}`, textX + MESSAGES_POSITION_X_OFFSET, progressBarY + MESSAGES_POSITION_Y_OFFSET);
+                context.fillStyle = '#000000';
+                context.fillText(`Messages: ${formatNumber(messages ?? 0)}`, textX + MESSAGES_POSITION_X_OFFSET, progressBarY + MESSAGES_POSITION_Y_OFFSET);
             }
             if (this.showDailyTimeInVoiceChannel) {
                 const dailyTime = top10[index].dailyTimeInVoiceChannel;
@@ -174,7 +174,7 @@ export class LeaderboardImageBuilder extends CanvaHelper {
             if (this.showMonthlyTimeInVoiceChannel) {
                 const monthlyTime = top10[index].monthlyTimeInVoiceChannel;
                 context.fillStyle = '#000000';
-                context.fillText(`Monthly Time: ${secondsToHours(monthlyTime ?? 0)}`, textX + HOURS_POSITION_X_OFFSET, progressBarY + HOURS_POSITION_Y_OFFSET);
+                context.fillText(`Monthly Time: ${secondsToHours(monthlyTime ?? 0)}h`, textX + HOURS_POSITION_X_OFFSET, progressBarY + HOURS_POSITION_Y_OFFSET);
             }
             if (this.showDailyMessages) {
                 const dailyMessages = top10[index].totalMessagesDaily;
@@ -230,27 +230,27 @@ export class LeaderboardImageBuilder extends CanvaHelper {
         if (this.showHours) {
             const hours = userdata.totalTimeInVoiceChannel;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Hours: ${hours}`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
+            context.fillText(`Hours: ${secondsToHours(hours ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
         }
         if (this.showMessages) {
             const messages = userdata.totalMessages;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Messages: ${messages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
+            context.fillText(`Messages: ${formatNumber(messages ?? 0)}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
         }
         if (this.showDailyTimeInVoiceChannel) {
             const dailyTime = userdata.dailyTimeInVoiceChannel;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Daily Time: ${dailyTime}`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 2);
+            context.fillText(`Daily Time: ${secondsToHours(dailyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 2);
         }
         if (this.showWeeklyTimeInVoiceChannel) {
             const weeklyTime = userdata.weeklyTimeInVoiceChannel;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Weekly Time: ${weeklyTime}`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 3);
+            context.fillText(`Weekly Time: ${secondsToHours(weeklyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 3);
         }
         if (this.showMonthlyTimeInVoiceChannel) {
             const monthlyTime = userdata.monthlyTimeInVoiceChannel;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Monthly Time: ${monthlyTime}`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 4);
+            context.fillText(`Monthly Time: ${secondsToHours(monthlyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 4);
         }
         if (this.showDailyMessages) {
             const dailyMessages = userdata.totalMessagesDaily;
