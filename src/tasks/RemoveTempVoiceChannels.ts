@@ -1,8 +1,8 @@
 import { ApplyOptions } from "@sapphire/decorators";
-import { ScheduledTask } from "@sapphire/plugin-scheduled-tasks";
+import { ScheduledTask, ScheduledTaskOptions } from "@sapphire/plugin-scheduled-tasks";
 import { Time } from "@sapphire/time-utilities";
 
-@ApplyOptions<ScheduledTask.Options>({ interval: Time.Day, name: 'RemoveTempVoiceChannelsTask' })
+@ApplyOptions<ScheduledTaskOptions>({ interval: Time.Day, name: 'RemoveTempVoiceChannelsTask' })
 export class RemoveTempVoiceChannelsTask extends ScheduledTask {
     constructor(context: ScheduledTask.LoaderContext, options: ScheduledTask.Options) {
         super(context, {

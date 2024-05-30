@@ -1,4 +1,4 @@
-import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
+import { ScheduledTask, ScheduledTaskOptions } from '@sapphire/plugin-scheduled-tasks';
 import { container } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
 import { Guild, GuildMember, TextChannel, VoiceState } from 'discord.js';
@@ -6,7 +6,7 @@ import { experienceFormula, globalexperienceFormula, retryAsync } from '../lib/u
 import { ApplyOptions } from '@sapphire/decorators';
 import { chunk } from 'lodash';
 
-@ApplyOptions<ScheduledTask.Options>({ interval: Time.Minute * 15, name: 'VoiceExperienceTask' })
+@ApplyOptions<ScheduledTaskOptions>({ interval: Time.Minute * 15, name: 'VoiceExperienceTask' })
 export class VoiceExperienceTask extends ScheduledTask {
     public constructor(context: ScheduledTask.LoaderContext, options: ScheduledTask.Options) {
         super(context, {
