@@ -18,7 +18,6 @@ export function FilteredVoiceChannel() {
                 const redisKey = `filteredVoiceChannel:${guildId}:${channelId}`;
                 const redisResult = await container.redis.get(redisKey);
                 if (redisResult) {
-                    container.console.info(`Channel ${channelId} is filtered (cached). No voice session will be added for guild ${guildId}.`);
                     return;
                 }
 
@@ -33,7 +32,6 @@ export function FilteredVoiceChannel() {
 
                 if (isFilteredChannel) {
                     await container.redis.set(redisKey, 'true');
-                    container.console.info(`Channel ${channelId} is filtered. No voice session will be added for guild ${guildId}.`);
                     return;
                 }
 
