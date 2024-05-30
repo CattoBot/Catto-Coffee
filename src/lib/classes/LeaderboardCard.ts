@@ -11,7 +11,7 @@ import { secondsToHours } from 'date-fns';
 
 const HOURS_POSITION_Y_OFFSET = -10;
 const MESSAGES_POSITION_Y_OFFSET = -10;
-const HOURS_POSITION_X_OFFSET = 620;
+const HOURS_POSITION_X_OFFSET = 620 ;
 const MESSAGES_POSITION_X_OFFSET = 615;
 
 export class LeaderboardImageBuilder extends CanvaHelper {
@@ -230,7 +230,7 @@ export class LeaderboardImageBuilder extends CanvaHelper {
         if (this.showHours) {
             const hours = userdata.totalTimeInVoiceChannel;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Hours: ${secondsToHours(hours ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
+            context.fillText(`Hours: ${secondsToHours(hours ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET + 5, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
         }
         if (this.showMessages) {
             const messages = userdata.totalMessages;
@@ -240,32 +240,32 @@ export class LeaderboardImageBuilder extends CanvaHelper {
         if (this.showDailyTimeInVoiceChannel) {
             const dailyTime = userdata.dailyTimeInVoiceChannel;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Daily Time: ${secondsToHours(dailyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 2);
+            context.fillText(`Daily Time: ${secondsToHours(dailyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
         }
         if (this.showWeeklyTimeInVoiceChannel) {
             const weeklyTime = userdata.weeklyTimeInVoiceChannel;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Weekly Time: ${secondsToHours(weeklyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 3);
+            context.fillText(`Weekly Time: ${secondsToHours(weeklyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
         }
         if (this.showMonthlyTimeInVoiceChannel) {
             const monthlyTime = userdata.monthlyTimeInVoiceChannel;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Monthly Time: ${secondsToHours(monthlyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET * 4);
+            context.fillText(`Monthly Time: ${secondsToHours(monthlyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
         }
         if (this.showDailyMessages) {
             const dailyMessages = userdata.totalMessagesDaily;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Daily Messages: ${dailyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET * 2);
+            context.fillText(`Daily Messages: ${dailyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
         }
         if (this.showWeeklyMessages) {
             const weeklyMessages = userdata.totalMessagesWeekly;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Weekly Messages: ${weeklyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET * 3);
+            context.fillText(`Weekly Messages: ${weeklyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
         }
         if (this.showMonthlyMessages) {
             const monthlyMessages = userdata.totalMessagesMonthly;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Monthly Messages: ${monthlyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET * 4);
+            context.fillText(`Monthly Messages: ${monthlyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
         }
     }
 
