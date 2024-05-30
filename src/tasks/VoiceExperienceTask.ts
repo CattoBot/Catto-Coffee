@@ -57,7 +57,6 @@ export class VoiceExperienceTask extends ScheduledTask {
 
     private async processUserSession(userId: string, guild: Guild): Promise<void> {
         try {
-            this.container.console.info(`Processing session for user ID: ${userId} in guild ID: ${guild.id}`);
             const sessionDataStr = await container.redis.get(`voiceSession:${userId}:${guild.id}`);
             if (sessionDataStr) {
                 const sessionData = JSON.parse(sessionDataStr);
@@ -90,7 +89,6 @@ export class VoiceExperienceTask extends ScheduledTask {
                 const key = `voiceSession:${userId}:${guildId}`;
 
                 await container.redis.set(key, JSON.stringify({ startTime: Date.now() }));
-                this.container.console.info(`Added new voice session for user ID: ${userId} in guild ID: ${guildId}`);
             });
             await Promise.all(addSessionPromises);
         });
@@ -103,18 +101,13 @@ export class VoiceExperienceTask extends ScheduledTask {
             let experience = await this.calculateExperience(durationInSeconds, guild);
             const bonusPercentage = await this.getUserBonusPercentage(member);
             if (bonusPercentage > 0) {
-                this.container.console.info(`[${member.displayName}] has a bonus role with a ${bonusPercentage}% bonus.`);
                 experience += experience * (bonusPercentage / 100);
             }
             const updatedUser = await this.updateVoiceExperience(member, guild.id, experience, durationInSeconds);
-            this.container.console.info(`[${member.displayName}] earned ${experience} XP for ${durationInSeconds.toFixed(2)} seconds spent in voice.`);
-
             if (updatedUser.levelUp) {
                 await this.handleLevelUp(member, guild.id, updatedUser.voiceLevel);
             }
-
             await container.redis.del(sessionId);
-            this.container.console.info(`Deleted session data for user ID: ${member.id} in guild ID: ${guild.id}`);
         } catch (error) {
             this.container.console.error(`Error processing voice session for member ${member.displayName}: ${error}`);
         }
@@ -284,7 +277,6 @@ export class VoiceExperienceTask extends ScheduledTask {
         const rolesToAssign = Array.from(member.guild.roles.cache.values()).filter(role => roleIdsForLevel.has(role.id) && !currentRoleIds.has(role.id));
         if (rolesToAssign.length > 0) {
             await member.roles.add(rolesToAssign).catch(() => null);
-            this.container.console.info(`Assigned ${rolesToAssign.length} new roles to ${member.displayName} for reaching level ${voiceLevel}.`);
         }
     }
 

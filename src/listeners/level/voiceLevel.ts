@@ -46,7 +46,6 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
             let experience = await this.calculateExperience(durationInSeconds, member.guild);
             const bonusPercentage = await this.getUserBonusPercentage(member);
             if (bonusPercentage > 0) {
-                this.container.console.info(`[${member.displayName}] has a bonus role with a ${bonusPercentage}% bonus.`);
                 experience += experience * (bonusPercentage / 100);
             }
             const updatedUser = await this.updateVoiceExperience(member, member.guild.id, experience, durationInSeconds);

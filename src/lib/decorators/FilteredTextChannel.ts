@@ -18,7 +18,6 @@ export function FilteredTextChannel() {
                 const redisKey = `filteredTextChannel:${guildId}:${channelId}`;
                 const redisResult = await container.redis.get(redisKey);
                 if (redisResult) {
-                    container.console.info(`Channel ${channelId} is filtered (cached). No text experience will be added for guild ${guildId}.`);
                     return;
                 }
 
@@ -33,7 +32,6 @@ export function FilteredTextChannel() {
 
                 if (isFilteredChannel) {
                     await container.redis.set(redisKey, 'true');
-                    container.console.info(`Channel ${channelId} is filtered. No text experience will be added for guild ${guildId}.`);
                     return;
                 }
 
