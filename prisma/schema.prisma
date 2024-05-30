@@ -80,12 +80,13 @@ model bot_black_listed_users {
 }
 
 model daily_top {
-  id                 Int      @id @default(autoincrement())
-  guildId            String   @unique(map: "IDX_20b9309e7bb7f79d2417dd22fe") @db.VarChar(255)
-  lastDailyMessageId String?  @db.VarChar(255)
-  created_at         DateTime @default(now()) @db.DateTime(6)
-  updated_at         DateTime @default(now()) @db.DateTime(6)
-  guilds             guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_20b9309e7bb7f79d2417dd22fe8")
+  id                     Int      @id @default(autoincrement())
+  guildId                String   @unique(map: "IDX_20b9309e7bb7f79d2417dd22fe") @db.VarChar(255)
+  lastDailyMessageId     String?  @db.VarChar(255)
+  lastDailyTextMessageId String?  @db.VarChar(255)
+  created_at             DateTime @default(now()) @db.DateTime(6)
+  updated_at             DateTime @default(now()) @db.DateTime(6)
+  guilds                 guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_20b9309e7bb7f79d2417dd22fe8")
 
   @@index([guildId], map: "IDX_DAILY_TOP_GUILD_ID")
 }
@@ -289,6 +290,9 @@ model leaderboard_channels {
   weeklyVoiceTop10channelId  String?  @db.VarChar(255)
   monthlyVoiceTop10channelId String?  @db.VarChar(255)
   dailyVoiceTop10channelId   String?  @db.VarChar(255)
+  dailyTextTop10channelId    String?  @db.VarChar(255)
+  weeklyTextTop10channelId   String?  @db.VarChar(255)
+  monthlyTextTop10channelId  String?  @db.VarChar(255)
   createdAt                  DateTime @default(now()) @db.DateTime(6)
   updatedAt                  DateTime @default(now()) @db.DateTime(6)
   guilds                     guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_38ec21f88f22b5a483c52c8a6df")
@@ -297,12 +301,13 @@ model leaderboard_channels {
 }
 
 model monthly_top {
-  id                   Int      @id @default(autoincrement())
-  guildId              String   @unique(map: "IDX_0df52067f2b19400392a22725d") @db.VarChar(255)
-  lastMonthlyMessageId String?  @db.VarChar(255)
-  createdAt            DateTime @default(now()) @db.DateTime(6)
-  updatedAt            DateTime @default(now()) @db.DateTime(6)
-  guilds               guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_0df52067f2b19400392a22725d2")
+  id                     Int      @id @default(autoincrement())
+  guildId                String   @unique(map: "IDX_0df52067f2b19400392a22725d") @db.VarChar(255)
+  lastMonthlyMessageId   String?  @db.VarChar(255)
+  lastMonthlyTextMessageId String?  @db.VarChar(255)
+  createdAt              DateTime @default(now()) @db.DateTime(6)
+  updatedAt              DateTime @default(now()) @db.DateTime(6)
+  guilds                 guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_0df52067f2b19400392a22725d2")
 
   @@index([guildId], map: "IDX_MONTHLY_TOP_GUILD_ID")
 }
@@ -465,12 +470,13 @@ model webhooks {
 }
 
 model weekly_top {
-  id                  Int      @id @default(autoincrement())
-  guildId             String   @unique(map: "IDX_3c15071d1f77003659f418036f") @db.VarChar(255)
-  lastWeeklyMessageId String?  @db.VarChar(255)
-  createdAt           DateTime @default(now()) @db.DateTime(6)
-  updatedAt           DateTime @default(now()) @db.DateTime(6)
-  guilds              guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_3c15071d1f77003659f418036f7")
+  id                     Int      @id @default(autoincrement())
+  guildId                String   @unique(map: "IDX_3c15071d1f77003659f418036f") @db.VarChar(255)
+  lastWeeklyMessageId    String?  @db.VarChar(255)
+  lastWeeklyTextMessageId String?  @db.VarChar(255)
+  createdAt              DateTime @default(now()) @db.DateTime(6)
+  updatedAt              DateTime @default(now()) @db.DateTime(6)
+  guilds                 guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_3c15071d1f77003659f418036f7")
 
   @@index([guildId], map: "IDX_WEEKLY_TOP_GUILD_ID")
 }

@@ -1,12 +1,12 @@
 import { ApplyOptions } from "@sapphire/decorators";
-import { ScheduledTask } from "@sapphire/plugin-scheduled-tasks";
+import { ScheduledTask, ScheduledTaskOptions } from "@sapphire/plugin-scheduled-tasks";
 import { Time } from "@sapphire/time-utilities";
 import { TextChannel, EmbedBuilder } from "discord.js";
 import { addDays, formatISO } from "date-fns";
 import { toZonedTime, format } from "date-fns-tz";
 import { LeaderboardImageBuilder } from "../lib/classes/LeaderboardCard";
 
-@ApplyOptions<ScheduledTask.Options>({ interval: Time.Hour * 3, name: 'WeeklyVoiceTop10Task' })
+@ApplyOptions<ScheduledTaskOptions>({ interval: Time.Hour * 3, name: 'WeeklyVoiceTop10Task' })
 export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
     public constructor(context: ScheduledTask.LoaderContext, options: ScheduledTask.Options) {
         super(context, {
