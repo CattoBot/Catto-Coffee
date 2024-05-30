@@ -4,6 +4,7 @@ import { PermissionFlagsBits } from "discord.js";
 export class VoiceSubCommands {
     public static Options: SubcommandOptions = {
         name: 'voice',
+        description: 'Voice channel management commands',
         requiredClientPermissions: [PermissionFlagsBits.ManageChannels],
         requiredUserPermissions: [PermissionFlagsBits.SendMessages],
         subcommands: [

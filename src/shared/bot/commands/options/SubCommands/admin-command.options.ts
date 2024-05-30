@@ -4,6 +4,7 @@ import { PermissionFlagsBits } from "discord.js";
 export class AdminSubCommandOptions {
     public static Options: SubcommandOptions = {
         name: 'manage',
+        description: 'Manage the bot interactions in the server',
         requiredClientPermissions: [PermissionFlagsBits.ManageGuild],
         requiredUserPermissions: [PermissionFlagsBits.ManageGuild],
         subcommands: [
