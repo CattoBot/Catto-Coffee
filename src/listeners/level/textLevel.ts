@@ -93,7 +93,17 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         };
         await this.container.prisma.text_experience.upsert({
             where: { guildId_userId: { guildId, userId } },
-            update: data,
+            update: {
+                textExperience: updatedExp,
+                textLevel: currentLevel,
+                totalTextExperience: (userExp?.totalTextExperience || 0) + randomXP,
+                totalMessages: { increment: 1 },
+                totalMessagesDaily: { increment: 1 },
+                totalMessagesWeekly: { increment: 1 },
+                totalMessagesMonthly: {
+                    increment: 1
+                },
+            },
             create: { guildId, userId, ...data }
         });
     }
