@@ -47,7 +47,7 @@ export class MonthlyTextLeaderboardTask extends ScheduledTask {
                     const nextResetTime = format(zonedDate, 'HH:mm zzz', { timeZone });
 
                     const embed = new EmbedBuilder()
-                        .setAuthor({ name: 'Monthly Text Leaderboard', iconURL: 'https://res.cloudinary.com/dp5dbsd8w/image/upload/v1717049320/badges/hveiskr7ec2oxpvfrzko.png' })
+                        .setAuthor({ name: 'Monthly Text Leaderboard', iconURL: 'https://res.cloudinary.com/dp5dbsd8w/image/upload/v1717113879/yzgwc3eo6lw4gpncgutw.png' })
                         .setFooter({ text: `Resets every month at: ${nextResetTime}`, iconURL: 'https://res.cloudinary.com/dp5dbsd8w/image/upload/v1717049320/badges/djrnims3eavniivxbqjs.webp' })
                         .setImage('attachment://leaderboard.png')
                         .setColor(Colors.White)
