@@ -10,7 +10,7 @@ export class HealthCheckCommand extends Command {
             ...options,
             name: 'healthcheck',
             aliases: ['hc'],
-            description: 'Displays the health status of the bot.',
+            description: 'Displays the health status of the bot, database, and server machine.',
             preconditions: ['GuildOnly']
         });
     }
