@@ -6,7 +6,7 @@ import { AddUserBlacklistCommand } from '../../lib/commands/owners/add-bl-user';
 import { RemoveServerBlacklistCommand } from '../../lib/commands/owners/remove-bl-server';
 import { RemoveUserBlacklistCommand } from '../../lib/commands/owners/remove-bl-user';
 import { BlacklistCommandRegistry } from '../../shared/bot/commands/build/owner';
-import { OwnerOnlyCommandsOptions } from '../../shared/bot/commands/options/SubCommands/owner-only.command.options';
+import { OwnerOnlyCommandsOptions } from '../../shared/bot/commands/options/SubCommands/owner';
 
 
 @ApplyOptions<SubcommandOptions>(OwnerOnlyCommandsOptions.Options)

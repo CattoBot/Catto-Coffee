@@ -5,7 +5,7 @@ import { LeaderboardCommand } from '../../lib/commands/level/lb';
 import { CattoRankCommand } from '../../lib/commands/level/rank';
 import { RewardsCommand } from '../../lib/commands/level/rewards';
 import { LevelingCommandsRegistry } from '../../shared/bot/commands/build/leveling';
-import { LevelSubCommands } from '../../shared/bot/commands/options/SubCommands/level-command.options';
+import { LevelSubCommands } from '../../shared/bot/commands/options/SubCommands/levels';
 
 @ApplyOptions<SubcommandOptions>(LevelSubCommands.Options)
 export class LevelingCommands extends Subcommand {

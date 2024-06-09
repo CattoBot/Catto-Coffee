@@ -158,7 +158,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
 
     private async assignRoles(member: GuildMember, guildID: string, textLevel: number): Promise<void> {
         const rolesForLevel = await this.container.prisma.experience_role_rewards.findMany({
-            where: { guildId: guildID, level: { lte: textLevel }, roleType: "Text" }
+            where: { guildId: guildID, level: { lte: textLevel }, roleType: "text" }
         });
 
         const roleIdsForLevel = new Set(rolesForLevel.map(role => role.roleId));

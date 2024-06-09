@@ -3,7 +3,7 @@ import { CacheType, CommandInteraction, InteractionResponse, Message } from 'dis
 import { Subcommand, SubcommandOptions } from '@sapphire/plugin-subcommands';
 import { VoiceShowCommand, VoiceInviteCommand, VoiceClaimCommand, VoiceGhostCommand, VoiceUnghostCommand, VoiceLimitCommand, VoiceLockCommand, VoiceUnlockCommand, VoicePermitCommand, VoiceRejectCommand, VoiceTransferCommand, VoiceBitrateCommand, VoiceResetCommand, VoiceTrustCommand, VoiceUntrustCommand } from '../../lib/commands/voice';
 import { VoiceSubCommandsRegistration } from '../../shared/bot/commands/build/voice';
-import { VoiceSubCommands } from '../../shared/bot/commands/options/SubCommands/voice-command.options';
+import { VoiceSubCommands } from '../../shared/bot/commands/options/SubCommands/voice';
 import { VoiceNameModal } from '../../shared/bot/modals/VoiceModals';
 import { Args } from '@sapphire/framework';
 import { VoiceNameCommand } from '../../lib/commands/voice/name';

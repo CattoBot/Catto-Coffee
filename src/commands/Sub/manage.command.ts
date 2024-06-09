@@ -21,12 +21,13 @@ import {
     ResetServerCommand
 } from '../../lib/commands/manage';
 import { AdminSubCommandsRegistration } from '../../shared/bot/commands/build/admin';
-import { AdminSubCommandOptions } from '../../shared/bot/commands/options/SubCommands/admin-command.options';
+import { AdminSubCommandOptions } from '../../shared/bot/commands/options/SubCommands/manage';
 import { VoiceSetupModalHandler } from '../../shared/bot/modals/VoiceModals';
 import { Args } from '@sapphire/framework';
 import { reply } from '@sapphire/plugin-editable-commands';
 import { Embed } from '../../lib/classes/Embed';
 import { resolveKey } from '@sapphire/plugin-i18next';
+import { Emojis } from '../../shared/enum/Emojis';
 
 @ApplyOptions<SubcommandOptions>(AdminSubCommandOptions.Options)
 export class AdminCommands extends Subcommand {
@@ -45,14 +46,22 @@ export class AdminCommands extends Subcommand {
     }
 
     public async ChatInputVoices(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
-        const isPremium = await this.container.prisma.premium_servers.findUnique({ where: { guildId: interaction.guildId! } });
         const find = await this.container.prisma.i_voice_temp_channels.findMany({ where: { guildId: interaction.guildId! } });
-        if (!isPremium && (find.length >= 2)) {
-            await interaction.reply({
-                content: `You have reached the maximum amount of voice channels. If you need more, please consider getting the premium version.`,
-                ephemeral: true
-            });
-            return;
+        if (find.length === 1 || find.length > 1) {
+            const isPremium = await this.container.prisma.premium_servers.findUnique({
+                where: {
+                    guildId: interaction.guild?.id
+                }
+            })
+            if (isPremium) {
+                await interaction.showModal(VoiceSetupModalHandler);
+            } else {
+                await interaction.reply({
+                    content: `Parece que ya tienes 1 categoria existente para tus canales de voz temporales ${Emojis.ERROR}, si necesitas más, por favor considera adquirir mi versión premium.`,
+                    ephemeral: true
+                })
+                return;
+            }
         }
         await interaction.showModal(VoiceSetupModalHandler);
     }
@@ -67,20 +76,20 @@ export class AdminCommands extends Subcommand {
         return RemoveUserFromGuildBlacklistCommand.run(interaction);
     }
 
-    public async ChatInputAddVoiceRole(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return VoiceRoleCommands.add(interaction);
+    public async ChatInputAddVoiceRole(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
+        await VoiceRoleCommands.add(interaction);
     }
 
     public async ChatInputRemoveVoiceRole(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
         return VoiceRoleCommands.remove(interaction);
     }
 
-    public async ChatInputAddTextRole(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return TextRoleCommands.add(interaction);
+    public async ChatInputAddTextRole(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
+        await TextRoleCommands.add(interaction);
     }
 
-    public async ChatInputRemoveTextRole(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return TextRoleCommands.add(interaction);
+    public async ChatInputRemoveTextRole(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
+        await TextRoleCommands.add(interaction);
     }
 
     public async ChatInputTextExperience(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {

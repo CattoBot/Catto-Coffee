@@ -36,5 +36,7 @@
     "invalid_module": "{{emoji}} The module you provided is invalid. Please try again.",
     "bot_experience": "{{emoji}} Bots cannot earn any experience, so you cannot reset their experience.",
     "user_not_blacklisted": "{{emoji}} The user `{{user}}` is not blacklisted in this server.",
-    "already_backlisted_user": "{{emoji}} The user `{{user}}` is already blacklisted in this server."
+    "already_backlisted_user": "{{emoji}} The user `{{user}}` is already blacklisted in this server.",
+    "voice_role_exists": "{{emoji}} The role you provided already exists as a reward in the Voice Experience module for the level  {{level}}.",
+    "text_role_exists": "{{emoji}} The role you provided already exists as a reward in the Text Experience module for the level  {{level}}."
 }

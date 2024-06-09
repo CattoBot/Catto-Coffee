@@ -1,6 +1,6 @@
 {
   "name": "@kohi/catto",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "main": "dist/app.js",
   "author": "@arestosora",
   "license": "UNLICENSE",
@@ -39,7 +39,7 @@
     "@sapphire/cli": "^1.9.3",
     "@sapphire/prettier-config": "^2.0.0",
     "@sapphire/ts-config": "^5.0.1",
-    "@types/lodash": "^4.17.4",
+    "@types/lodash": "^4.17.5",
     "@types/node": "^20.14.2",
     "@types/signale": "^1.4.7",
     "@types/ws": "^8.5.10",
