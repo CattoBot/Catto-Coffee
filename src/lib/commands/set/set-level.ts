@@ -35,7 +35,7 @@ export class SetLevelCommand {
         });
 
         const member = await interaction.guild!.members.fetch(user.id);
-        await this.assignRoles(member, interaction.guildId!, 'text').catch(() =>
+        await this.assignRoles(member, interaction.guildId!, 'text', level).catch(() =>
             interaction.editReply(`Successfully set ${user.username}'s level to \`${level}\` ${Emojis.SUCCESS}, but the roles could not be added due to a role hierarchy issue. Please make sure the bot has the correct permissions to add roles. ${Emojis.ERROR}`)
         );
 
@@ -66,17 +66,18 @@ export class SetLevelCommand {
         });
 
         const member = await interaction.guild!.members.fetch(user.id);
-        await this.assignRoles(member, interaction.guildId!, 'voice').catch(() =>
+        await this.assignRoles(member, interaction.guildId!, 'voice', level).catch(() =>
             interaction.editReply(`Successfully set ${user.username}'s level to \`${level}\` ${Emojis.SUCCESS}, but the roles could not be added due to a role hierarchy issue. Please make sure the bot has the correct permissions to add roles. ${Emojis.ERROR}`)
         );
 
         return interaction.editReply(`Successfully set ${user.username}'s level to \`${level}\` ${Emojis.SUCCESS}`);
     }
 
-    private static async assignRoles(member: GuildMember, guildID: string, type: 'text' | 'voice'): Promise<void> {
+    private static async assignRoles(member: GuildMember, guildID: string, type: 'text' | 'voice', level: number): Promise<void> {
         const rolesForLevel = await container.prisma.experience_role_rewards.findMany({
             where: {
                 guildId: guildID,
+                level: { lte: level },
                 roleType: type
             }
         });
