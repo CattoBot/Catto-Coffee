@@ -20,10 +20,10 @@ export class SetCommandOptions {
                 type: "group",
                 entries: [
                     {
-                        name: "text", chatInputRun: "chatInputLevelSetText", cooldownDelay: Time.Minute
+                        name: "text", chatInputRun: "chatInputLevelSetText", cooldownDelay: Time.Minute, requiredClientPermissions: ["ManageRoles"], requiredUserPermissions: ["ManageRoles"]
                     },
                     {
-                        name: "voice", chatInputRun: "chatInputLevelSetVoice", cooldownDelay: Time.Minute
+                        name: "voice", chatInputRun: "chatInputLevelSetVoice", cooldownDelay: Time.Minute, requiredClientPermissions: ["ManageRoles"], requiredUserPermissions: ["ManageRoles"]
                     }
                 ]
             }
