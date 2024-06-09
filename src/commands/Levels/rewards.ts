@@ -9,7 +9,7 @@ import { Embed } from '../../lib/classes/Embed';
 import { Time } from '@sapphire/time-utilities';
 
 @ApplyOptions<Command.Options>({
-    description: 'Check the server leaderboard.',
+    description: 'Check the server current role rewards.',
     aliases: ['rw'],
     cooldownDelay: Time.Second * 10
 })

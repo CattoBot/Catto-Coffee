@@ -5,12 +5,13 @@ import { reply } from "@sapphire/plugin-editable-commands";
 import { applyLocalizedBuilder } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { ProfileCardBuilder } from "../../lib/classes/ProfileCard";
+import { Emojis } from "../../shared/enum/Emojis";
 
 export class ProfileCommand extends Command {
     constructor(context: Command.LoaderContext, options: Command.Options) {
         super(context, {
             ...options,
-            description: 'Check your global profile.',
+            description: 'Displays your global profile.',
             aliases: ['p']
         });
     }
@@ -29,12 +30,12 @@ export class ProfileCommand extends Command {
         const user = command.options.getUser('user') ?? command.user;
 
         if (!user) {
-            return await command.reply('User not found.');
+            return await command.reply(`I couldn't find the user you're looking for. ${Emojis.ERROR}`);
         }
         const userInfo = await this.fetchUserInfo(user, command);
 
         if (!userInfo) {
-            return await command.reply('User data not found.');
+            return await command.reply(`Seems like I couldn't find the user data. ${Emojis.ERROR}`);
         }
 
         const buffer = new ProfileCardBuilder(userInfo).build();
@@ -50,12 +51,12 @@ export class ProfileCommand extends Command {
         await message.channel.sendTyping();
         const user = await args.pick('user').catch(() => message.author);
         if (!user) {
-            return message.reply('User not found.');
+            return message.reply(`I couldn't find the user you're looking for. ${Emojis.ERROR}`);
         }
         const userInfo = await this.fetchUserInfo(user, message);
 
         if (!userInfo) {
-            return message.reply('User data not found.');
+            return message.reply(`Seems like I couldn't find the user data. ${Emojis.ERROR}`);
         }
 
         const builder = new ProfileCardBuilder(userInfo);
@@ -71,9 +72,9 @@ export class ProfileCommand extends Command {
 
         if (!data) {
             if (context instanceof Message) {
-                await context.reply('User data not found.');
+                await context.reply(`Seems like I couldn't find the user data. ${Emojis.ERROR}`);
             } else {
-                await context.editReply('User data not found.');
+                await context.editReply(`Seems like I couldn't find the user data. ${Emojis.ERROR}`);
             }
             return null;
         }
@@ -104,12 +105,6 @@ export class ProfileCommand extends Command {
                 },
                 {
                     totalGlobalExperience: 'desc'
-                },
-                {
-                    totalTimeInVoiceChannel: 'desc'
-                },
-                {
-                    totalRegisteredMessages: 'desc'
                 }
             ]
         });

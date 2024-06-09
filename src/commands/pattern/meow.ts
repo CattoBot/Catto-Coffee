@@ -2,6 +2,7 @@ import type { Message } from 'discord.js';
 import { PatternCommand } from '@sapphire/plugin-pattern-commands';
 import { ApplyOptions } from '@sapphire/decorators';
 import { resolveKey } from '@sapphire/plugin-i18next';
+import { Emojis } from '../../shared/enum/Emojis';
 
 @ApplyOptions<PatternCommand.Options>({
 	aliases: ['gato', 'cat'],
@@ -9,6 +10,6 @@ import { resolveKey } from '@sapphire/plugin-i18next';
 })
 export class MeowCommand extends PatternCommand {
 	public async messageRun(message: Message) {
-		message.reply({ content: await resolveKey(message, 'commands/replies/pattern:meow') });
+		message.reply({ content: await resolveKey(message, 'commands/replies/pattern:meow', { emoji: Emojis.FIESTA }) });
 	}
 }

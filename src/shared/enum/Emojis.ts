@@ -5,5 +5,6 @@ export enum Emojis {
     WARN = '<:warning1:1183344529118601308>',
     ERROR = '<a:cattonope:1078929462290292756>',
     SUCCESS = '<:accepted:1083594549575823430>',
-    LOADING = '<a:loading:1128207815073333341>'
+    LOADING = '<a:loading:1128207815073333341>',
+    FIESTA = '<a:Fiesta:1076031807943872522>'
 }

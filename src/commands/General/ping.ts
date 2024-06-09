@@ -5,7 +5,7 @@ import { resolveKey } from '@sapphire/plugin-i18next';
 import { type Message } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
-	description: 'ping pong',
+	description: 'Check the app latency.',
 	preconditions: ['GuildExistsPrecondition']
 })
 export class UserCommand extends Command {
