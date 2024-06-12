@@ -17,13 +17,6 @@ export class VoiceSetupModalHandler extends InteractionHandler {
     }
 
     public async run(interaction: ModalSubmitInteraction): Promise<InteractionResponse> {
-        const check = await this.container.prisma.i_voice_temp_channels.findMany({ where: { guildId: interaction.guild!.id } });
-        if (check.length > 2) {
-            return interaction.reply({
-                content: await resolveKey(interaction, 'commands/replies/voice:voice_setup_error_exists', { emoji: Emojis.ERROR }),
-                ephemeral: true,
-            });
-        }
         const categoryName = interaction.fields.getTextInputValue('category-name');
         const channelName = interaction.fields.getTextInputValue('channel-name');
         const voiceLimit = interaction.fields.getTextInputValue('max-users');
