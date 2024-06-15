@@ -1,18 +1,15 @@
 {
-    "voice": "voice",
-    "voice_setup": "setup",
     "name": "name",
-    "ghost": "ghost",
-    "unghost": "unghost",
+    "claim": "claim",
+    "ghosted": "ghosted",
+    "reset": "reset",
+    "locked": "locked",
     "limit": "limit",
-    "lock": "lock",
-    "unlock": "unlock",
     "permit": "permit",
     "reject": "reject",
     "transfer": "transfer",
     "invite": "invite",
     "bitrate": "bitrate",
-    "reset": "reset",
     "trust": "trust",
     "untrust": "untrust"
 }
