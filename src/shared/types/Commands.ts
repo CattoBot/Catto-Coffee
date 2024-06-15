@@ -51,14 +51,32 @@ type CattoSubcommandObject = {
 }
 
 type CattoCommandOptionObject = {
-    type: 'string' | 'integer' | 'user' | 'role' | 'mentionable' | 'boolean' | 'attachment',
+    type: 'string' | 'integer' | 'user' | 'role' | 'mentionable' | 'boolean' | 'attachment' | 'channel',
     key:string,
     required:boolean,
     choices?:CattoStringChoiceObject[],
     min?:number,
     max?:number,
-    autocomplete?:boolean
+    autocomplete?:boolean,
+    channel_types?:DiscordChannelArray[] | DiscordChannelArrayCode[]
 }
+
+type DiscordChannelArrayCode = [ 1,2,3,4,5,6,7,8,9,10,11,12 ]
+type DiscordChannelArray = [
+    "GUILD_TEXT",
+    "DM",
+    "GUILD_VOICE",
+    "GROUP_DM",
+    "GUILD_CATEGORY",
+    "GUILD_ANNOUNCEMENT",
+    "ANNOUNCEMENT_THREAD",
+    "PUBLIC_THREAD",
+    "PRIVATE_THREAD",
+    "GUILD_DIRECTORY",
+    "GUILD_FORUM",
+    "GUILD_MEDIA"
+]
+
 
 type CattoStringChoiceObject = {
     key:string,
