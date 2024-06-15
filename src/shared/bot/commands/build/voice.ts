@@ -5,7 +5,7 @@ export class VoiceSubCommandsRegistration {
     public static registerCommands(registry: Subcommand.Registry): void {
         registry.registerChatInputCommand((builder) => {
             const register = new CommandRegister({
-                key: "voice",
+                key: 'voice',
                 subcommands: [
                     { key: 'name' },
                     { key: 'claim' },
