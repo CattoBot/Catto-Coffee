@@ -1,4 +1,4 @@
-export type AllowedCommand = 
+type AllowedCommand = 
     'voice bitrate' |
     'voice claim' |
     'voice ghost' |
@@ -15,7 +15,7 @@ export type AllowedCommand =
     'voice unlock' |
     'voice untrust';
 
-export const allowedCommands: AllowedCommand[] = [
+const allowedCommands: AllowedCommand[] = [
     'voice bitrate',
     'voice claim',
     'voice ghost',
@@ -32,3 +32,37 @@ export const allowedCommands: AllowedCommand[] = [
     'voice unlock',
     'voice untrust',
 ];
+
+type CattoCommandObject = {
+    key: string,
+    subcommands?: CattoSubcommandObject[],
+    subcommandgroups?: CattoSubcommandGroupObject[],
+    options?: CattoCommandOptionObject[];
+}
+
+type CattoSubcommandGroupObject = {
+    key: string,
+    subcommands: CattoSubcommandObject[],
+}
+
+type CattoSubcommandObject = {
+    key: string,
+    options?: CattoCommandOptionObject[];
+}
+
+type CattoCommandOptionObject = {
+    type: 'string' | 'integer' | 'user' | 'role' | 'mentionable' | 'boolean' | 'attachment',
+    key:string,
+    required:boolean,
+    choices?:CattoStringChoiceObject[],
+    min?:number,
+    max?:number,
+    autocomplete?:boolean
+}
+
+type CattoStringChoiceObject = {
+    key:string,
+    value:string
+}
+
+export {AllowedCommand, allowedCommands, CattoCommandObject, CattoSubcommandGroupObject, CattoSubcommandObject, CattoCommandOptionObject, CattoStringChoiceObject}
