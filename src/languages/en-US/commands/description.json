@@ -1,0 +1,13 @@
+{
+    "voice": "cmd",
+    "admin": "cmd",
+    "set": "cmd",
+    "manage": "cmd",
+    "bot": "cmd",
+    "mod": "cmd",
+    "server": "cmd",
+    "my": "cmd",
+    "me": "cmd",
+    "blacklist": "cmd",
+    "level": "cmd"
+}

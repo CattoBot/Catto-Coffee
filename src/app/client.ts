@@ -17,7 +17,7 @@ export class ApplicationClient extends SapphireClient {
     constructor() {
         super({
             defaultPrefix: Config.prefix,
-            regexPrefix: /^(hey +)?bot[,! ]/i,
+            regexPrefix: /^(hey +)?catto[,! ]/i,
             caseInsensitiveCommands: true,
             logger: {
                 level: LogLevel.Debug
