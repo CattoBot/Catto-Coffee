@@ -1,7 +1,7 @@
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { TextRankButtonRow, VoiceRankButtonRow } from "../../../shared/bot/buttons/LevelingButtonts";
-import { registeringFONT, formatNumber, experienceFormula, textExperienceFormula } from "../../utils";
 import { resolveKey } from "@sapphire/plugin-i18next";
+import { container } from "@sapphire/pieces";
 import { LevelingHelper } from "../../helpers/leveling.helper";
 import { Emojis } from "../../../shared/enum/Emojis";
 import { RankCardBuilder } from "../../classes/RankCard";
@@ -27,7 +27,7 @@ export class CattoRankCommand extends LevelingHelper {
     }
 
     private static async buildVoiceCard(interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
-        registeringFONT();
+        container.utils.canvas.registeringFONT();
         const user = interaction.options.getUser('user') ?? interaction.user;
         if (user.bot) {
             await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:rank_not_bots`) });
@@ -43,8 +43,8 @@ export class CattoRankCommand extends LevelingHelper {
         const rank = await this.getVoiceRank(user.id, interaction.guildId!);
         const level = info.voiceLevel ?? 0;
         const experience = info.voiceExperience ?? 0;
-        const requiredXP = experienceFormula(level + 1);
-        const formattedRank = formatNumber(rank ?? 0);
+        const requiredXP = container.utils.xp.experienceFormula(level + 1);
+        const formattedRank = container.utils.numbers.format(rank ?? 0);
 
         const userInfo = {
             userId: user.id,
@@ -72,7 +72,7 @@ export class CattoRankCommand extends LevelingHelper {
     }
 
     private static async buildTextCard(interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
-        registeringFONT();
+        container.utils.canvas.registeringFONT();
         const user = interaction.options.getUser('user') ?? interaction.user;
         if (user.bot) {
             await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:rank_not_bots`) });
@@ -88,8 +88,8 @@ export class CattoRankCommand extends LevelingHelper {
         const rank = await this.getTextRank(user.id, interaction.guildId!);
         const level = info.textLevel ?? 0;
         const experience = info.textExperience ?? 0;
-        const requiredXP = textExperienceFormula(level + 1);
-        const formattedRank = formatNumber(rank ?? 0);
+        const requiredXP = container.utils.xp.textExperienceFormula(level + 1);
+        const formattedRank = container.utils.numbers.format(rank ?? 0);
 
         const userInfo = {
             userId: user.id,

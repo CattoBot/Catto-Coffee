@@ -1,7 +1,7 @@
 import { createCanvas, loadImage, Canvas, CanvasRenderingContext2D, Image } from 'canvas';
 import { join } from 'path';
+import { container } from '@sapphire/pieces';
 import { UserInfo } from '../../shared/interfaces/UserInfo';
-import { formatNumber } from '../utils';
 import { CanvaHelper } from '../helpers/Canva';
 
 export class RankCardBuilder extends CanvaHelper {
@@ -178,7 +178,7 @@ export class RankCardBuilder extends CanvaHelper {
         ctx.font = '22px Poppins SemiBold';
         ctx.fillText(`Lv. ${user.level}`, LEVEL_X, LEVEL_Y);
         ctx.font = '25px Poppins SemiBold';
-        ctx.fillText(`${formatNumber(experience)} / ${formatNumber(requiredXP)}`, XP_TEXT_X, XP_TEXT_Y);
+        ctx.fillText(`${container.utils.numbers.format(experience)} / ${container.utils.numbers.format(requiredXP)}`, XP_TEXT_X, XP_TEXT_Y);
     }
 
     private drawAvatar(avatar: Image) {

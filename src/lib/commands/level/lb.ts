@@ -1,7 +1,7 @@
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import { ChatInputCommandInteraction } from 'discord.js';
+import { container } from '@sapphire/pieces';
 import { TextRankButtonRow, VoiceRankButtonOnly } from '../../../shared/bot/buttons/LevelingButtonts';
-import { experienceFormula, textExperienceFormula } from '../../utils';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { LevelingHelper } from '../../helpers/leveling.helper';
 import { LeaderboardImageBuilder } from '../../classes/LeaderboardCard';
@@ -38,7 +38,7 @@ export class LeaderboardCommand extends LevelingHelper {
             .setGuildLeaderboard(guild_leaderboard)
             .setUserId(userId)
             .setBackground('../../../assets/img/Leader_VC_v2.jpg')
-            .setExperienceFormula(experienceFormula)
+            .setExperienceFormula(container.utils.xp.experienceFormula)
             .setShowHours(true)
             .setType('voice');
 
@@ -64,7 +64,7 @@ export class LeaderboardCommand extends LevelingHelper {
             .setGuildLeaderboard(guild_leaderboard)
             .setUserId(userId)
             .setBackground('../../../assets/img/Leader_TXT.png')
-            .setExperienceFormula(textExperienceFormula)
+            .setExperienceFormula(container.utils.xp.textExperienceFormula)
             .setShowMessages(true)
             .setType('text');
 
