@@ -64,6 +64,10 @@ export class Utils {
 		}
 	}
 
+	ConvertBitrateToMillions(bitrate: number) {
+		return bitrate * 1000;
+	}
+
 	/**
 	 *   _______ _                
 	 *  |__   __(_)               
