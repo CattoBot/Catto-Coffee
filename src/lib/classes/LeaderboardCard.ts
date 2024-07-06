@@ -127,7 +127,7 @@ export class LeaderboardImageBuilder extends CanvaHelper {
             const avatar = userAvatars[index];
             const avatarX = 1024 * 0.12;
             const avatarY = y + lineHeight / 2 - avatarSize;
-            drawRoundedImage(context, avatar, avatarX, avatarY, avatarSize);
+            container.utils.canvas.drawRoundedImage(context, avatar, avatarX, avatarY, avatarSize);
 
             const textX = avatarX + avatarSize + Math.floor(1024 * 0.03);
             const textY = avatarY + avatarSize / 2 + 6 - Math.floor(1440 * 0.02);
@@ -147,7 +147,7 @@ export class LeaderboardImageBuilder extends CanvaHelper {
             const progressBarWidth = 720;
             const progressBarHeight = 15;
             const color = index < 3 ? colors[index] : { start: '#12D6DF', end: '#F70FFF' };
-            drawProgressBar(context, progressBarX, progressBarY, progressBarWidth, progressBarHeight, progress, color.start, color.end);
+            container.utils.canvas.drawProgressBar(context, progressBarX, progressBarY, progressBarWidth, progressBarHeight, progress, color.start, color.end);
 
             // Draw optional data
             if (this.showHours) {
@@ -158,7 +158,7 @@ export class LeaderboardImageBuilder extends CanvaHelper {
             if (this.showMessages) {
                 const messages = top10[index].totalMessages;
                 context.fillStyle = '#000000';
-                context.fillText(`Messages: ${formatNumber(messages ?? 0)}`, textX + MESSAGES_POSITION_X_OFFSET, progressBarY + MESSAGES_POSITION_Y_OFFSET);
+                context.fillText(`Messages: ${container.utils.numbers.format(messages ?? 0)}`, textX + MESSAGES_POSITION_X_OFFSET, progressBarY + MESSAGES_POSITION_Y_OFFSET);
             }
             if (this.showDailyTimeInVoiceChannel) {
                 const dailyTime = top10[index].dailyTimeInVoiceChannel;
@@ -201,16 +201,16 @@ export class LeaderboardImageBuilder extends CanvaHelper {
         const userAvatarSize = Math.floor(1440 / 15);
         const userAvatarX = userBlockX;
         const userAvatarY = userBlockY;
-        drawUserAvatar(context, avatarloadimage, userAvatarX, userAvatarY, userAvatarSize);
+        container.utils.canvas.drawUserAvatar(context, avatarloadimage, userAvatarX, userAvatarY, userAvatarSize);
 
         const baseOffset = Math.floor(1024 * 0.002);
         const rankX = userAvatarX - baseOffset - 15;
         const rankY = userAvatarY + userAvatarSize / 2 + 6 + 4;
-        drawFormattedRank(context, formatNumber(userRank), rankX, rankY);
+        container.utils.canvas.drawFormattedRank(context, container.utils.numbers.format(userRank), rankX, rankY);
 
         const userDataX = userAvatarX + userAvatarSize + Math.floor(1024 * 0.03);
         const userDataY = userAvatarY + 20;
-        drawUserData(context, await container.client.users.fetch(userId).then(user => user.username), formatNumber(userdata[`${this.type}Level`] ?? 0), formatNumber(userdata[`${this.type}Experience`] ?? 0), userDataX, userDataY);
+        container.utils.canvas.drawUserData(context, await container.client.users.fetch(userId).then(user => user.username), container.utils.numbers.format(userdata[`${this.type}Level`] ?? 0), container.utils.numbers.format(userdata[`${this.type}Experience`] ?? 0), userDataX, userDataY);
 
         const progressForUser = (userdata[`${this.type}Experience`] ?? 0) / this.experienceFormula(userdata[`${this.type}Level`] ?? 0);
         const progressBarForUserX = userDataX;
@@ -223,7 +223,7 @@ export class LeaderboardImageBuilder extends CanvaHelper {
             { start: '#ff5394', end: '#ff7064' }
         ];
         const userColor = userRank <= 3 ? colors[userRank - 1] : { start: '#12D6DF', end: '#F70FFF' };
-        drawProgressBar(context, progressBarForUserX, progressBarForUserY, progressBarForUserWidth, progressBarForUserHeight, progressForUser, userColor.start, userColor.end);
+        container.utils.canvas.drawProgressBar(context, progressBarForUserX, progressBarForUserY, progressBarForUserWidth, progressBarForUserHeight, progressForUser, userColor.start, userColor.end);
 
         // Draw optional data
         if (this.showHours) {
@@ -234,7 +234,7 @@ export class LeaderboardImageBuilder extends CanvaHelper {
         if (this.showMessages) {
             const messages = userdata.totalMessages;
             context.fillStyle = '#000000'; // Color negro
-            context.fillText(`Messages: ${formatNumber(messages ?? 0)}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
+            context.fillText(`Messages: ${container.utils.numbers.format(messages ?? 0)}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
         }
         if (this.showDailyTimeInVoiceChannel) {
             const dailyTime = userdata.dailyTimeInVoiceChannel;
