@@ -2,7 +2,6 @@ import { ScheduledTask, ScheduledTaskOptions } from '@sapphire/plugin-scheduled-
 import { container } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
 import { Guild, GuildMember, TextChannel, VoiceState } from 'discord.js';
-import { experienceFormula, globalexperienceFormula, retryAsync } from '../lib/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { chunk } from 'lodash';
 
@@ -177,7 +176,7 @@ export class VoiceExperienceTask extends ScheduledTask {
                 }
             });
 
-        await retryAsync(upsertUserExperience, 3, 500);
+        await container.utils.retryAsync(upsertUserExperience, 3, 500);
         await this.updateGlobalExperience(member.user.id, durationInSeconds);
         const updatedUser = await this.container.prisma.voice_experience.findUnique({
             where: {
@@ -203,11 +202,11 @@ export class VoiceExperienceTask extends ScheduledTask {
         let currentExperience = user?.globalExperience || 0;
         let currentLevel = user?.globalLevel || 1;
         let newExperience = currentExperience + experience;
-        let nextLevelExperience = globalexperienceFormula(currentLevel + 1);
+        let nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel + 1);
         while (newExperience >= nextLevelExperience) {
             newExperience -= nextLevelExperience;
             currentLevel++;
-            nextLevelExperience = globalexperienceFormula(currentLevel + 1);
+            nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel + 1);
         }
 
         await this.container.prisma.users.upsert({
@@ -219,12 +218,12 @@ export class VoiceExperienceTask extends ScheduledTask {
 
     private async calculateLevelUp(userID: string, guildID: string, currentExperience: number, currentLevel: number): Promise<{ levelUp: boolean, newLevel: number, newExperience: number }> {
         let levelUp = false;
-        let xpNeeded = experienceFormula(currentLevel);
+        let xpNeeded = container.utils.xp.experienceFormula(currentLevel);
 
         while (currentExperience >= xpNeeded) {
             currentLevel++;
             currentExperience -= xpNeeded;
-            xpNeeded = experienceFormula(currentLevel);
+            xpNeeded = container.utils.xp.experienceFormula(currentLevel);
             levelUp = true;
         }
 

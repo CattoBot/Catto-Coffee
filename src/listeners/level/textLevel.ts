@@ -1,8 +1,8 @@
 import { ApplyOptions } from "@sapphire/decorators";
+import { container } from "@sapphire/framework";
 import { Events, Listener } from "@sapphire/framework";
 import { Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { EnabledTextListenerExperience } from "../../lib/decorators/ListenerTextExpEnabled";
-import { globalexperienceFormula, textExperienceFormula } from "../../lib/utils";
 import { FilteredTextChannel } from "../../lib/decorators/FilteredTextChannel";
 
 @ApplyOptions<Listener.Options>({ event: Events.MessageCreate })
@@ -31,7 +31,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
             randomXP += randomXP * (bonusPercentage / 100);
         }
         let { updatedExp, currentLevel } = this.calculateUpdatedExperience(userExp, randomXP);
-        const nextLevelExp = textExperienceFormula(currentLevel);
+        const nextLevelExp = container.utils.xp.textExperienceFormula(currentLevel);
 
         if (updatedExp >= nextLevelExp) {
             currentLevel += 1;
@@ -118,11 +118,11 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         let currentExperience = user?.globalExperience || 0;
         let currentLevel = user?.globalLevel || 1;
         let newExperience = currentExperience + experience;
-        let nextLevelExperience = globalexperienceFormula(currentLevel);
+        let nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel);
         while (newExperience >= nextLevelExperience) {
             newExperience -= nextLevelExperience;
             currentLevel++;
-            nextLevelExperience = globalexperienceFormula(currentLevel);
+            nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel);
         }
         await this.container.prisma.users.upsert({
             where: { userId },

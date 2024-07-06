@@ -1,9 +1,9 @@
 import { ApplyOptions } from "@sapphire/decorators";
+import { container } from "@sapphire/framework";
 import { Events, Listener } from "@sapphire/framework";
 import { Time } from "@sapphire/time-utilities";
 import { Guild, GuildMember, TextChannel, VoiceState } from "discord.js";
 import { EnabledVoiceListenerExperience } from "../../lib/decorators/ListenerVoiceExpEnabled";
-import { experienceFormula, globalexperienceFormula, retryAsync } from "../../lib/utils";
 import { FilteredVoiceChannel } from "../../lib/decorators/ListenerVoiceExperienceFilteredChannel";
 import { VoiceUserEntry } from "../../lib/decorators/DatabaseVoiceUserEntry";
 
@@ -102,11 +102,11 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
         let currentExperience = user?.globalExperience || 0;
         let currentLevel = user?.globalLevel || 1;
         let newExperience = currentExperience + experience;
-        let nextLevelExperience = globalexperienceFormula(currentLevel + 1);
+        let nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel + 1);
         while (newExperience >= nextLevelExperience) {
             newExperience -= nextLevelExperience;
             currentLevel++;
-            nextLevelExperience = globalexperienceFormula(currentLevel + 1);
+            nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel + 1);
         }
 
         await this.container.prisma.users.upsert({
@@ -144,7 +144,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
             },
         });
 
-        await retryAsync(upsertUserExperience, 3, 500);
+        await container.utils.retryAsync(upsertUserExperience, 3, 500);
         await this.updateGlobalExperience(member.user.id, durationInSeconds);
         const updatedUser = await this.container.prisma.voice_experience.findUnique({
             where: {
@@ -163,12 +163,12 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
 
     private async calculateLevelUp(userID: string, guildID: string, currentExperience: number, currentLevel: number): Promise<{ levelUp: boolean, newLevel: number, newExperience: number }> {
         let levelUp = false;
-        let xpNeeded = experienceFormula(currentLevel);
+        let xpNeeded = container.utils.xp.experienceFormula(currentLevel);
 
         while (currentExperience >= xpNeeded) {
             currentLevel++;
             currentExperience -= xpNeeded;
-            xpNeeded = experienceFormula(currentLevel);
+            xpNeeded = container.utils.xp.experienceFormula(currentLevel);
             levelUp = true;
         }
 
@@ -248,7 +248,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
             const sessionDataStr = await this.container.redis.get(sessionId);
             return sessionDataStr ? JSON.parse(sessionDataStr) : null;
         };
-        return retryAsync(getSessionData, 3, 200);
+        return container.utils.retryAsync(getSessionData, 3, 200);
     }
 
     private async calculateExperience(durationInSeconds: number, guild: Guild): Promise<number> {
@@ -259,12 +259,12 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
 
     private async updateRedisOnChannelLeave(sessionId: string): Promise<void> {
         const deleteSession = async () => await this.container.redis.del(sessionId);
-        await retryAsync(deleteSession, 3, 200);
+        await container.utils.retryAsync(deleteSession, 3, 200);
     }
 
     private async updateRedisOnChannelSwitch(sessionId: string, leaveTime: number): Promise<void> {
         const updateSession = async () => await this.container.redis.set(sessionId, JSON.stringify({ startTime: leaveTime }));
-        await retryAsync(updateSession, 3, 200);
+        await container.utils.retryAsync(updateSession, 3, 200);
     }
 
     private async getUserBonusPercentage(member: GuildMember): Promise<number> {
