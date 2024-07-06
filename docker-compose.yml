@@ -12,6 +12,16 @@ services:
     volumes:
       - database_data:/var/lib/mysql
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=password
+    ports:
+      - '8080:80'
+
   redis:
     image: redis:latest
     ports:
