@@ -2,7 +2,6 @@ import { CanvasRenderingContext2D, createCanvas, Image, loadImage } from 'canvas
 import { join } from 'path';
 import { User } from 'discord.js';
 import { container } from '@sapphire/framework';
-import { formatNumber, drawRoundedImage, drawProgressBar, drawUserAvatar, drawFormattedRank, drawUserData } from '../utils';
 import { LeaderboardUserData } from '../../shared/interfaces/LeaderboardUser';
 import { FetchUserData } from '../../shared/interfaces/UserData';
 import { CanvaHelper } from '../helpers/Canva';
@@ -103,7 +102,7 @@ export class LeaderboardImageBuilder extends CanvaHelper {
         const experience = this.type === 'voice' ? user.voiceExperience : user.textExperience;
 
         return {
-            userInfo: `${member.username}\nLevel: ${level} - XP: ${formatNumber(experience ?? 0)}`,
+            userInfo: `${member.username}\nLevel: ${level} - XP: ${container.utils.numbers.format(experience ?? 0)}`,
             avatar
         };
     }

@@ -1,7 +1,7 @@
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
+import { container } from '@sapphire/framework';
 import type { ButtonInteraction } from 'discord.js';
 import { CheckVoiceExperienceEnabled } from '../../lib/decorators/InteractionVoiceExpEnabled';
-import { experienceFormula } from '../../lib/utils';
 import { VoiceRankButtonOnly } from '../../shared/bot/buttons/LevelingButtonts';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { ButtonCooldown } from '../../lib/decorators/HandlersCooldown';
@@ -37,7 +37,7 @@ export class ButtonVoiceLeaderboardHandler extends InteractionHandler {
                 .setGuildLeaderboard(guild_leaderboard)
                 .setUserId(userId)
                 .setBackground('../../../assets/img/Leader_VC_v2.jpg')
-                .setExperienceFormula(experienceFormula)
+                .setExperienceFormula(container.utils.xp.experienceFormula)
                 .setShowHours(true)
                 .setType('voice');
 

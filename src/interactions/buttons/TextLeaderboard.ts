@@ -1,6 +1,5 @@
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import type { ButtonInteraction } from 'discord.js';
-import { textExperienceFormula } from '../../lib/utils';
 import { TextRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { CheckTextExperienceEnabled } from '../../lib/decorators/InteractionTextExpEnabled';
@@ -37,7 +36,7 @@ export class ButtonTextLeaderboardHandler extends InteractionHandler {
                 .setGuildLeaderboard(guild_leaderboard)
                 .setUserId(userId)
                 .setBackground('../../../assets/img/Leader_TXT.png')
-                .setExperienceFormula(textExperienceFormula)
+                .setExperienceFormula(container.utils.xp.textExperienceFormula)
                 .setShowMessages(true)
                 .setType('text');
 
