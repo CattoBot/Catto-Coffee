@@ -8,7 +8,7 @@ import { getRootData } from "@sapphire/pieces";
 import { join } from "path";
 import { ChatInputDeniedCommandHelper } from "../lib/events/commandDenied";
 import { Config } from "../config";
-import { getPrefix } from "../lib/utils";
+import { Utils } from "../lib/utils";
 import { InternationalizationContext } from "@sapphire/plugin-i18next";
 import { CloudinaryService } from "../lib/services/cloudinary";
 
@@ -37,7 +37,7 @@ export class ApplicationClient extends SapphireClient {
             ],
             fetchPrefix: async (message) => {
                 if (message.guild?.id) {
-                    const prefix = await getPrefix(message.guild.id);
+                    const prefix = await container.utils.guilds.getPrefix(message.guild.id);
                     return prefix;
                 }
                 return Config.prefix;
@@ -76,6 +76,7 @@ export class ApplicationClient extends SapphireClient {
         container.console = new ApplicationConsole();
         container.cloudinary = new CloudinaryService();
         container.commandDeniedHelper = new ChatInputDeniedCommandHelper();
+        container.utils = new Utils();
         return super.login(token);
     }
 }

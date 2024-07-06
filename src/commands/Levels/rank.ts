@@ -4,7 +4,6 @@ import { reply } from '@sapphire/plugin-editable-commands';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { type Message } from 'discord.js';
 import { LevelingHelper } from '../../lib/helpers/leveling.helper';
-import { experienceFormula, formatNumber, textExperienceFormula } from '../../lib/utils';
 import { TextRankButtonRow, VoiceRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
 import { Emojis } from '../../shared/enum/Emojis';
 import { RankCardBuilder } from '../../lib/classes/RankCard';
@@ -76,8 +75,8 @@ export class RankCommand extends Command {
 
         const level = this.getLevel(info, type);
         const experience = this.getExperience(info, type);
-        const requiredXP = type === 'voice' ? experienceFormula(level + 1) : textExperienceFormula(level + 1);
-        const formattedRank = formatNumber(rank ?? 0);
+        const requiredXP = type === 'voice' ? this.container.utils.xp.experienceFormula(level + 1) : this.container.utils.xp.textExperienceFormula(level + 1);
+        const formattedRank = this.container.utils.numbers.format(rank ?? 0);
         const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 512 });
 
         const userInfo = {
