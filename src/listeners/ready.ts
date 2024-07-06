@@ -4,7 +4,6 @@ import type { StoreRegistryValue } from '@sapphire/pieces';
 import { blue, cyan, gray, green, magenta, magentaBright, white, yellow } from 'colorette';
 import { ActivityType, PresenceData } from 'discord.js';
 import { DatabaseExperienceEntriesExists } from '../lib/decorators/DatabaseEntriesExists';
-import { bannerLoad } from '../lib/utils';
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -38,7 +37,7 @@ ${llc('Users: ')} ${pad}[${success} ${userCount}]
 ${dev ? ` ${pad}${blc('<')}${llc('/')}${blc('>')} ${llc('DEVELOPMENT MODE')}` : ''}
 		`.trim()
 		);
-		bannerLoad();
+		this.container.utils.bot.bannerLoad();
 	}
 
 	private printStoreDebugInformation() {

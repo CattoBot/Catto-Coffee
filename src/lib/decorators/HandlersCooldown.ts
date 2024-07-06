@@ -1,6 +1,5 @@
 import { container } from "@sapphire/pieces";
 import type { ButtonInteraction } from 'discord.js';
-import { formatTime } from "../utils";
 
 function ButtonCooldown(cooldownTime: number) {
     return function (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
@@ -15,7 +14,7 @@ function ButtonCooldown(cooldownTime: number) {
             const currentCooldown = await container.redis.get(cooldownKey);
 
             if (currentCooldown) {
-                await interaction.reply({ content: `Please wait \`${formatTime(cooldownTime)}\` before using this button again.`, ephemeral: true });
+                await interaction.reply({ content: `Please wait \`${container.utils.time.format(cooldownTime, 'seconds')}\` before using this button again.`, ephemeral: true });
                 return;
             }
 
