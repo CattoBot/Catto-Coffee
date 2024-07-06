@@ -53,7 +53,7 @@ export class VoiceBitrateCommand {
             if (member.voice.channel) {
                 const actualBitrate = bitrate ?? 64;
                 await member.voice.channel.edit({
-                    bitrate: ConvertBitrateToMillions(actualBitrate)
+                    bitrate: container.utils.ConvertBitrateToMillions(actualBitrate)
                 });
             }
             await message.reply({
