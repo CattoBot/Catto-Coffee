@@ -17,7 +17,7 @@ export class ApplicationClient extends SapphireClient {
     constructor() {
         super({
             defaultPrefix: Config.prefix,
-            regexPrefix: /^(hey +)?bot[,! ]/i,
+            regexPrefix: Config.regexPrefix,
             caseInsensitiveCommands: true,
             logger: {
                 level: LogLevel.Debug
@@ -59,7 +59,7 @@ export class ApplicationClient extends SapphireClient {
             i18n: {
                 fetchLanguage: async (context: InternationalizationContext) => {
                     const guild = await container.prisma.guilds.findUnique({ where: { guildId: context.guild?.id } });
-                    return guild?.language || 'es-ES';
+                    return guild?.language || Config.defaultLanguage;
                 }
             },
             loadApplicationCommandRegistriesStatusListeners: true
