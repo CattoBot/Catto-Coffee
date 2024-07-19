@@ -19,6 +19,12 @@ export class VoiceRejectCommand {
             return message.reply(translateKey('commands/replies/commandDenied:voice_member_not_found'));
         }
 
+        if (member.permissions.has(PermissionFlagsBits.MuteMembers || PermissionFlagsBits.ManageMessages)) {
+            return message.reply({
+                content: 'You cannot reject members with moderation permissions.'
+            })
+        }
+
         const memberVoiceChannel = member.voice.channel;
         const authorVoiceChannel = message.member?.voice.channel;
 
