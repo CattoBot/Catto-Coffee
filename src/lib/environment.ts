@@ -31,7 +31,8 @@ declare module '@sapphire/pieces' {
 		console: ApplicationConsole;
 		commandDeniedHelper: ChatInputDeniedCommandHelper
 		cloudinary: CloudinaryService;
-		utils: Utils
+		utils: Utils;
+		version: string;
 	}
 }
 
