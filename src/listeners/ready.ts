@@ -31,7 +31,7 @@ export class ReadyEvent extends Listener {
 		const pad = ' '.repeat(7);
 		console.log(
 			String.raw`
-${llc('Bot Version: ')} ${pad}${blc('2.0.0')}
+${llc('Bot Version: ')} ${pad}${blc(this.container.version)}
 ${llc('Guilds: ')} ${pad}[${success} ${guildCount}]
 ${llc('Users: ')} ${pad}[${success} ${userCount}]
 ${dev ? ` ${pad}${blc('<')}${llc('/')}${blc('>')} ${llc('DEVELOPMENT MODE')}` : ''}

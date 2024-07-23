@@ -314,7 +314,7 @@ export class Utils {
 			setTimeout(() => {
 				const bannerPath = join(__dirname, '../../assets/banner.txt');
 				const bannerText = readFileSync(bannerPath, 'utf8');
-				container.console.watch(cyan(bannerText));
+				container.console.watch(cyan(bannerText.replace("%version%", container.version)));
 			}, 1000);
 		},
 
