@@ -1,30 +1,34 @@
 import { Subcommand } from '@sapphire/plugin-subcommands';
-import { applyLocalizedBuilder } from '@sapphire/plugin-i18next';
-import { ChannelType } from 'discord.js';
+import { CommandRegister } from '../../../classes/CommandRegister';
 
 export class AdminSubCommandsRegistration {
     public static registerCommands(registry: Subcommand.Registry): void {
-        registry.registerChatInputCommand((builder) =>
-            applyLocalizedBuilder(builder, 'commands/names/admin:admin', 'commands/descriptions/admin:admin')
-                .addSubcommandGroup((group) => applyLocalizedBuilder(group, 'commands/names/admin:voice_roles', 'commands/descriptions/admin:voice_roles')
-                    .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:voice_roles_add', 'commands/descriptions/admin:voice_roles_add')
-                        .addRoleOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:role_add_voice', 'commands/options/admin:role_description_add').setRequired(true))
-                        .addIntegerOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:level', 'commands/options/admin:level_description').setRequired(true))
-                    )
-                    .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:voice_roles_remove', 'commands/descriptions/admin:voice_roles_remove')
-                        .addRoleOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:role_remove_voice', 'commands/options/admin:role_description_remove').setRequired(true))
-                        // .addIntegerOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:level', 'commands/options/admin:level_description').setRequired(true))
-                    )
-                )
-                .addSubcommandGroup((group) => applyLocalizedBuilder(group, 'commands/names/admin:text_roles', 'commands/descriptions/admin:text_roles')
-                    .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:text_roles_add', 'commands/descriptions/admin:text_roles_add')
-                        .addRoleOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:role_add_text', 'commands/options/admin:role_description_add_text').setRequired(true))
-                        .addIntegerOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:level', 'commands/options/admin:level_description').setRequired(true))
-                    )
-                    .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:text_roles_remove', 'commands/descriptions/admin:text_roles_remove')
-                        .addRoleOption((option) => applyLocalizedBuilder(option, 'commands/options/admin:role_remove_text', 'commands/options/admin:role_description_remove_text').setRequired(true))
-                    )
-                )
+        registry.registerChatInputCommand((builder) => {
+            const register = new CommandRegister({
+                key: 'admin',
+                subcommandgroups: [
+                    {
+                        key: 'blacklist',
+                        subcommands: [
+                            { key: 'add' },
+                            { key: 'remove' },
+                            { key: '' }
+                        ]
+                    },
+                    {
+                        key: '',
+                        subcommands: [
+                            { key: '' },
+                            { key: '' },
+                            { key: '' },
+                            { key: '' },
+                        ]
+                    },
+                ]
+            })
+            return register.build(builder)
+        })
+        /*
 
                 .addSubcommandGroup((group) => applyLocalizedBuilder(group, 'commands/names/admin:experience', 'commands/descriptions/admin:experience')
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:reset_user', 'commands/descriptions/admin:reset_user')
@@ -181,6 +185,7 @@ export class AdminSubCommandsRegistration {
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:badge_remove', 'commands/descriptions/admin:badge_remove')
                     )
                 )
-        );
+                    
+        );*/
     }
 }
