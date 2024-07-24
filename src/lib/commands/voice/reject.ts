@@ -1,7 +1,7 @@
 import { fetchT } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
-import { GuildMember, InteractionResponse, Message, User } from "discord.js";
+import { GuildMember, InteractionResponse, Message, PermissionFlagsBits, User } from "discord.js";
 import { Args } from "@sapphire/framework";
 
 export class VoiceRejectCommand {
@@ -17,6 +17,12 @@ export class VoiceRejectCommand {
         const member = message.guild?.members.resolve(user.id) as GuildMember | null;
         if (!member) {
             return message.reply(translateKey('commands/replies/commandDenied:voice_member_not_found'));
+        }
+
+        if (member.permissions.has(PermissionFlagsBits.MuteMembers || PermissionFlagsBits.ManageMessages)) {
+            return message.reply({
+                content: 'You cannot reject members with moderation permissions.'
+            })
         }
 
         const memberVoiceChannel = member.voice.channel;
@@ -61,6 +67,12 @@ export class VoiceRejectCommand {
 
         if (!member) {
             return interaction.reply({ content: translateKey('commands/replies/commandDenied:voice_member_not_found'), ephemeral: true });
+        }
+
+        if (member.permissions.has(PermissionFlagsBits.MuteMembers || PermissionFlagsBits.ManageMessages)) {
+            return interaction.reply({
+                content: 'You cannot reject members with moderation permissions.'
+            })
         }
 
         if (interaction.user.id === user.id) {
