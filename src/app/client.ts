@@ -11,6 +11,7 @@ import { Config } from "../config";
 import { getPrefix } from "../lib/utils";
 import { InternationalizationContext } from "@sapphire/plugin-i18next";
 import { CloudinaryService } from "../lib/services/cloudinary";
+import { Services } from "../lib/services";
 
 export class ApplicationClient extends SapphireClient {
     private rootData = getRootData();
@@ -76,6 +77,7 @@ export class ApplicationClient extends SapphireClient {
         container.console = new ApplicationConsole();
         container.cloudinary = new CloudinaryService();
         container.commandDeniedHelper = new ChatInputDeniedCommandHelper();
+        container.services = new Services();
         return super.login(token);
     }
 }
