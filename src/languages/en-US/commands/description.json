@@ -1,13 +1,13 @@
 {
-    "voice": "cmd",
-    "admin": "cmd",
-    "set": "cmd",
-    "manage": "cmd",
-    "bot": "cmd",
-    "mod": "cmd",
-    "server": "cmd",
-    "my": "cmd",
-    "me": "cmd",
-    "blacklist": "cmd",
-    "level": "cmd"
+    "voice": "Comandos de manejo de canales personalizados",
+    "admin": "Comandos para administradores",
+    "set": "Comandos de ajustes para administradores",
+    "manage": "Comandos de gestión para administradores",
+    "bot": "Comandos de información y utilidades del bot",
+    "mod": "Comandos para moderadores",
+    "server": "Comandos del servidor",
+    "my": "Comandos de personalización del perfil",
+    "me": "Accede a tu información en Catto",
+    "blacklist": "Comandos de blacklist",
+    "level": "Comandos de niveles"
 }
