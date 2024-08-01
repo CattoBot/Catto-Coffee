@@ -13,10 +13,10 @@ export class CommandRegister {
     build(commandbuilder: SlashCommandBuilder) {
         let eOpts = [
             this.cmdObj.options,
-            (this.cmdObj.subcommands?.filter(n => n).length||0) > 0,
-            (this.cmdObj.subcommandgroups?.filter(n => n).length||0) > 0
+            (this.cmdObj.subcommands?.filter(n => n).length || 0) > 0,
+            (this.cmdObj.subcommandgroups?.filter(n => n).length || 0) > 0
         ]
-        if ( eOpts.filter(n => !!n).length > 1 )
+        if (eOpts.filter(n => !!n).length > 1)
             throw new Error("O opciones, o grupos de subcomandos o subcomandos, pero más de uno no chico...")
         let cmdLocalName = container.services.i18.getCommandRoute({ commandName: this.cmdObj.key, type: 'name' }),
             cmdLocalDesc = container.services.i18.getCommandRoute({ commandName: this.cmdObj.key, type: 'description' })
@@ -74,6 +74,44 @@ export class CommandRegister {
                     return build_option
                 })
                 break;
+            case 'attachment':
+                builder.addAttachmentOption((build_option) => {
+                    applyLocalizedBuilder(build_option, optLocalName, optLocalDesc)
+                        .setRequired(option.required ? true : false)
+                    return build_option
+                })
+                break
+            case 'boolean':
+                builder.addBooleanOption((build_option) => {
+                    applyLocalizedBuilder(build_option, optLocalName, optLocalDesc)
+                        .setRequired(option.required ? true : false)
+                    return build_option
+                })
+                break
+            case 'mentionable':
+                builder.addMentionableOption((build_option) => {
+                    applyLocalizedBuilder(build_option, optLocalName, optLocalDesc)
+                        .setRequired(option.required ? true : false)
+                    return build_option
+                })
+                break
+            case 'role':
+                builder.addRoleOption((build_option) => {
+                    applyLocalizedBuilder(build_option, optLocalName, optLocalDesc)
+                        .setRequired(option.required ? true : false)
+                    return build_option
+                })
+                break
+            case 'channel':
+                builder.addChannelOption((build_option) => {
+                    var process = applyLocalizedBuilder(build_option, optLocalName, optLocalDesc)
+                        .setRequired(option.required ? true : false)
+                    if (option.channel_types && option.channel_types.length > 0) {
+                        process.addChannelTypes(option.channel_types)
+                    }
+                    return build_option
+                })
+                break
             default:
                 throw new Error(`Unknown option type: ${option.type}`);
         }
@@ -85,8 +123,8 @@ export class CommandRegister {
         builder.addSubcommand((sbcmd) => {
             const subcommandBuilder = applyLocalizedBuilder(
                 sbcmd,
-                container.services.i18.getCommandRoute({commandName: this.cmdObj.key, type:'subcommands', ext:{ type: 'name', key: subcommand.key }}),
-                container.services.i18.getCommandRoute({commandName: this.cmdObj.key, type:'subcommands', ext:{ type: 'description', key: subcommand.key }})
+                container.services.i18.getCommandRoute({ commandName: this.cmdObj.key, type: 'subcommands', ext: { type: 'name', key: subcommand.key } }),
+                container.services.i18.getCommandRoute({ commandName: this.cmdObj.key, type: 'subcommands', ext: { type: 'description', key: subcommand.key } })
             )
             if (subcommand.options) {
                 for (const option of subcommand.options) {
@@ -102,8 +140,8 @@ export class CommandRegister {
         builder.addSubcommandGroup((sbcmdgr) => {
             const subcommandgroupBuilder = applyLocalizedBuilder(
                 sbcmdgr,
-                container.services.i18.getCommandRoute({commandName: this.cmdObj.key, type: 'subcommandgroups', ext: { key: subcommandgroup.key, type: 'name' }}),
-                container.services.i18.getCommandRoute({commandName: this.cmdObj.key, type: 'subcommandgroups', ext: { key: subcommandgroup.key, type: 'description' }})
+                container.services.i18.getCommandRoute({ commandName: this.cmdObj.key, type: 'subcommandgroups', ext: { key: subcommandgroup.key, type: 'name' } }),
+                container.services.i18.getCommandRoute({ commandName: this.cmdObj.key, type: 'subcommandgroups', ext: { key: subcommandgroup.key, type: 'description' } })
             )
             for (const subcommand of subcommandgroup.subcommands) {
                 this.addSubcommand(subcommandgroupBuilder, subcommand)

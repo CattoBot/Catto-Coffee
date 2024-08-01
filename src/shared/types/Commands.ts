@@ -1,3 +1,5 @@
+import { ChannelType } from "discord.js";
+
 type AllowedCommand = 
     'voice bitrate' |
     'voice claim' |
@@ -58,24 +60,19 @@ type CattoCommandOptionObject = {
     min?:number,
     max?:number,
     autocomplete?:boolean,
-    channel_types?:DiscordChannelArray[] | DiscordChannelArrayCode[]
+    channel_types?:DiscordChannelNativeType[]
 }
-
-type DiscordChannelArrayCode = [ 1,2,3,4,5,6,7,8,9,10,11,12 ]
-type DiscordChannelArray = [
-    "GUILD_TEXT",
-    "DM",
-    "GUILD_VOICE",
-    "GROUP_DM",
-    "GUILD_CATEGORY",
-    "GUILD_ANNOUNCEMENT",
-    "ANNOUNCEMENT_THREAD",
-    "PUBLIC_THREAD",
-    "PRIVATE_THREAD",
-    "GUILD_DIRECTORY",
-    "GUILD_FORUM",
-    "GUILD_MEDIA"
-]
+type DiscordChannelNativeType = 
+    ChannelType.GuildText
+    ChannelType.GuildVoice
+    | ChannelType.GuildCategory
+    | ChannelType.GuildAnnouncement
+    | ChannelType.AnnouncementThread
+    | ChannelType.PublicThread
+    | ChannelType.PrivateThread
+    | ChannelType.GuildDirectory
+    | ChannelType.GuildForum
+    | ChannelType.GuildMedia
 
 
 type CattoStringChoiceObject = {
@@ -83,4 +80,4 @@ type CattoStringChoiceObject = {
     value:string
 }
 
-export {AllowedCommand, allowedCommands, CattoCommandObject, CattoSubcommandGroupObject, CattoSubcommandObject, CattoCommandOptionObject, CattoStringChoiceObject}
+export {AllowedCommand, DiscordChannelNativeType, allowedCommands, CattoCommandObject, CattoSubcommandGroupObject, CattoSubcommandObject, CattoCommandOptionObject, CattoStringChoiceObject}
