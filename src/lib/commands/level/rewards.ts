@@ -5,6 +5,7 @@ import { Embed } from "../../classes/Embed";
 import { RoleReward } from "../../../shared/types/Rewards";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { LevelingHelper } from "../../helpers/leveling.helper";
+import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class RewardsCommand extends LevelingHelper {
     public static async run(interaction: Subcommand.ChatInputCommandInteraction) {
@@ -64,4 +65,7 @@ export class RewardsCommand extends LevelingHelper {
         return interaction.editReply({ embeds: [new Embed(rewardStrings.join('\n')).setTitle('Voice Rewards').setAuthor({ name: interaction.guild!.name, iconURL: icon! })], components: [], content: '' });
     }
 
+    public static key:CattoSubcommandObject = {
+        key: 'rewards'
+    }
 }
