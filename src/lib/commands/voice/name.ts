@@ -2,6 +2,7 @@ import { Args, container } from "@sapphire/framework";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { GuildMember, Message } from "discord.js";
 import { Emojis } from "../../../shared/enum/Emojis";
+import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class VoiceNameCommand {
     public static async messageRun(message: Message, args: Args): Promise<void> {
@@ -39,4 +40,6 @@ export class VoiceNameCommand {
             }
         })
     }
+
+    public static key:CattoSubcommandObject = { key: 'name' }
 }
