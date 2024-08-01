@@ -4,6 +4,7 @@ import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
 import { InteractionResponse, Message } from "discord.js";
 import { VoiceHelper } from "../../helpers/voice.helper";
+import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class VoiceClaimCommand extends VoiceHelper {
 
@@ -102,5 +103,9 @@ export class VoiceClaimCommand extends VoiceHelper {
                 ephemeral: false
             });
         }
+    }
+
+    public static key:CattoSubcommandObject = {
+        key: 'claim'
     }
 }
