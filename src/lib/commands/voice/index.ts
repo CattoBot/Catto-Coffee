@@ -3,11 +3,9 @@ import { VoiceTransferCommand } from "./transfer";
 import { VoiceBitrateCommand } from "./bitrate";
 import { VoiceResetCommand } from "./reset";
 import { VoiceTrustCommand } from "./trust";
-import { VoiceGhostCommand } from "./ghost";
-import { VoiceUnghostCommand } from "./unghost";
+import { VoiceGhostedCommand } from "./ghosted";
 import { VoiceLimitCommand } from "./limit";
-import { VoiceLockCommand } from "./lock";
-import { VoiceUnlockCommand } from "./unlock";
+import { VoiceLockedCommand } from "./locked";
 import { VoiceRejectCommand } from "./reject";
 import { VoiceInviteCommand } from "./invite";
 import { VoiceClaimCommand } from "./claim";
@@ -20,11 +18,9 @@ export {
     VoiceBitrateCommand,
     VoiceResetCommand,
     VoiceTrustCommand,
-    VoiceGhostCommand,
-    VoiceUnghostCommand,
+    VoiceGhostedCommand,
     VoiceLimitCommand,
-    VoiceLockCommand,
-    VoiceUnlockCommand,
+    VoiceLockedCommand,
     VoiceRejectCommand,
     VoiceInviteCommand,
     VoiceClaimCommand,

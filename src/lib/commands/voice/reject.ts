@@ -3,6 +3,7 @@ import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
 import { GuildMember, InteractionResponse, Message, PermissionFlagsBits, User } from "discord.js";
 import { Args } from "@sapphire/framework";
+import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class VoiceRejectCommand {
     public static async messageRun(message: Message, args: Args) {
@@ -103,5 +104,10 @@ export class VoiceRejectCommand {
             console.error('Error editing permission overwrites:', error);
             return interaction.reply({ content: translateKey('commands/replies/commandDenied:voice_permission_error'), ephemeral: true });
         }
+    }
+
+    public static key:CattoSubcommandObject = {
+        key: 'reject',
+        options: [{ type: 'user', key: 'userReject', required: true, }]
     }
 }

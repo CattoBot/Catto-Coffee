@@ -1,12 +1,37 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { CacheType, CommandInteraction, InteractionResponse, Message } from 'discord.js';
 import { Subcommand, SubcommandOptions } from '@sapphire/plugin-subcommands';
-import { VoiceShowCommand, VoiceInviteCommand, VoiceClaimCommand, VoiceGhostCommand, VoiceUnghostCommand, VoiceLimitCommand, VoiceLockCommand, VoiceUnlockCommand, VoicePermitCommand, VoiceRejectCommand, VoiceTransferCommand, VoiceBitrateCommand, VoiceResetCommand, VoiceTrustCommand, VoiceUntrustCommand } from '../../lib/commands/voice';
-import { VoiceSubCommandsRegistration } from '../../shared/bot/commands/build/voice';
+import { VoiceShowCommand, VoiceInviteCommand, VoiceClaimCommand, VoiceGhostedCommand, VoiceLimitCommand, VoiceLockedCommand, VoicePermitCommand, VoiceRejectCommand, VoiceTransferCommand, VoiceBitrateCommand, VoiceResetCommand, VoiceTrustCommand, VoiceUntrustCommand } from '../../lib/commands/voice';
 import { VoiceSubCommands } from '../../shared/bot/commands/options/SubCommands/voice';
 import { VoiceNameModal } from '../../shared/bot/modals/VoiceModals';
 import { Args } from '@sapphire/framework';
 import { VoiceNameCommand } from '../../lib/commands/voice/name';
+import { CommandRegister } from '../../shared/classes/CommandRegister';
+
+const register = new CommandRegister({
+    key: 'voice',
+    subcommands: [
+        VoiceBitrateCommand.key,
+        VoiceGhostedCommand.key,
+        VoiceRejectCommand.key,
+        VoicePermitCommand.key,
+        VoiceNameCommand.key,
+        VoiceLockedCommand.key,
+        VoiceClaimCommand.key,
+        VoiceInviteCommand.key,
+        VoiceLimitCommand.key,
+        VoiceTransferCommand.key,
+        VoiceTrustCommand.key,
+        VoiceUntrustCommand.key
+    ]
+
+    /**
+     * TODO: Fix
+     * 
+        VoiceRejectCommand.key,
+     * 
+     */
+})
 
 @ApplyOptions<SubcommandOptions>(VoiceSubCommands.Options)
 export class VoiceCommands extends Subcommand {
@@ -17,7 +42,7 @@ export class VoiceCommands extends Subcommand {
     }
 
     override registerApplicationCommands(registry: Subcommand.Registry) {
-        VoiceSubCommandsRegistration.registerCommands(registry)
+        registry.registerChatInputCommand((r) => register.build(r))
     }
 
     public async messageRunShowError(message: Message): Promise<void> {
@@ -52,24 +77,16 @@ export class VoiceCommands extends Subcommand {
         await VoiceInviteCommand.messageRun(message, args);
     }
 
-    public async messageRunGhost(message: Message): Promise<void> {
-        await VoiceGhostCommand.messageRun(message);
-    }
-
-    public async messageRunUnghost(message: Message): Promise<void> {
-        await VoiceUnghostCommand.messageRun(message);
+    public async messageRunGhosted(message: Message, args: Args): Promise<void> {
+        await VoiceGhostedCommand.messageRun(message, args);
     }
 
     public async messageRunLimit(message: Message, args: Args): Promise<void> {
         await VoiceLimitCommand.messageRun(message, args);
     }
 
-    public async messageRunLock(message: Message): Promise<void> {
-        await VoiceLockCommand.messageRun(message);
-    }
-
-    public async messageRunUnlock(message: Message): Promise<void> {
-        await VoiceUnlockCommand.messageRun(message);
+    public async messageRunLock(message: Message, args: Args): Promise<void> {
+        await VoiceLockedCommand.messageRun(message, args);
     }
 
     public async messageRunPermit(message: Message, args: Args): Promise<void> {
@@ -97,11 +114,7 @@ export class VoiceCommands extends Subcommand {
     }
 
     public chatInputGhost(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse<boolean>> {
-        return VoiceGhostCommand.chatInputRun(interaction);
-    }
-
-    public chatInputUnghost(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse<boolean>> {
-        return VoiceUnghostCommand.chatInputRun(interaction);
+        return VoiceGhostedCommand.chatInputRun(interaction);
     }
 
     public chatInputLimit(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse<boolean>> {
@@ -109,11 +122,7 @@ export class VoiceCommands extends Subcommand {
     }
 
     public chatInputLock(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse<boolean>> {
-        return VoiceLockCommand.chatInputRun(interaction);
-    }
-
-    public chatInputUnlock(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse<boolean>> {
-        return VoiceUnlockCommand.chatInputRun(interaction);
+        return VoiceLockedCommand.chatInputRun(interaction);
     }
 
     public chatInputPermit(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse<boolean>> {

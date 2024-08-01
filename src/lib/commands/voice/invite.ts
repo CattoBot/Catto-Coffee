@@ -3,6 +3,7 @@ import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
 import { GuildMember, InteractionResponse, Message, User } from "discord.js";
 import { Args } from "@sapphire/framework";
+import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class VoiceInviteCommand {
     public static async messageRun(message: Message, args: Args) {
@@ -80,5 +81,12 @@ export class VoiceInviteCommand {
         ]);
 
         return interaction.reply({ content: translateKey('commands/replies/voice:invite_success', { user: user.displayName, emoji: Emojis.SUCCESS }) });
+    }
+
+    public static key: CattoSubcommandObject = {
+        key: 'invite',
+        options: [
+            { type: 'user', key: 'userInvite', required: true, }
+        ]
     }
 }

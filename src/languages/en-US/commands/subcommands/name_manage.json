@@ -1,0 +1,11 @@
+{
+    "xprl-add": "add",
+    "xprl-remove": "remove",
+    "xprl-list": "list",
+    "xp-reset": "reset",
+    "xp-resetall": "resetall",
+    "xp-set": "set",
+    "xp-setall": "setall",
+    "xp-give": "give",
+    "xp-giveall": "giveall"
+}

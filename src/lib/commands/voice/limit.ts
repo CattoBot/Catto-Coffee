@@ -4,6 +4,7 @@ import { Emojis } from "../../../shared/enum/Emojis";
 import { GuildMember, InteractionResponse, Message } from "discord.js";
 import { container } from "@sapphire/pieces";
 import { Args } from "@sapphire/framework";
+import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class VoiceLimitCommand {
     public static async messageRun(message: Message, args: Args) {
@@ -69,5 +70,10 @@ export class VoiceLimitCommand {
                 channelLimit: limit
             }
         })
+    }
+
+    public static key: CattoSubcommandObject = {
+        key: 'limit',
+        options: [{ type: 'integer', key: 'limit', required: true, }]
     }
 }

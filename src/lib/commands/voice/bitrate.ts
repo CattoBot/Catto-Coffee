@@ -5,6 +5,7 @@ import { GuildMember, InteractionResponse, Message } from "discord.js";
 import { ConvertBitrateToMillions } from "../../utils";
 import { container } from "@sapphire/pieces";
 import { Args } from "@sapphire/framework";
+import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class VoiceBitrateCommand {
     private static translateKey = fetchT;
@@ -68,5 +69,12 @@ export class VoiceBitrateCommand {
             });
             return;
         }
+    }
+    
+    public static key:CattoSubcommandObject = {
+        key: 'bitrate',
+        options: [
+            { type: 'integer', key: 'bitrateBitrate', required: true, }
+        ]
     }
 }

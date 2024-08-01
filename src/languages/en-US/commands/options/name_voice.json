@@ -1,0 +1,12 @@
+{
+    "statusGhosted": "status",
+    "statusLocked": "status",
+    "limit": "limite",
+    "userPermit": "user",
+    "userReject": "user",
+    "userTransfer": "user",
+    "userInvite": "user",
+    "bitrateBitrate": "bitrate",
+    "userTrust": "user",
+    "userUntrust": "user"
+}

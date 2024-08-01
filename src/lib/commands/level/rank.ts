@@ -6,6 +6,7 @@ import { LevelingHelper } from "../../helpers/leveling.helper";
 import { Emojis } from "../../../shared/enum/Emojis";
 import { RankCardBuilder } from "../../classes/RankCard";
 import { AvatarExtension } from "../../../shared/interfaces/UserInfo";
+import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class CattoRankCommand extends LevelingHelper {
     public static async run(interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
@@ -113,5 +114,9 @@ export class CattoRankCommand extends LevelingHelper {
             components: [VoiceRankButtonRow],
             files: [{ attachment: rankCard, name: 'rank.png' }]
         });
+    }
+
+    public static key:CattoSubcommandObject = {
+        key: 'rank'
     }
 }

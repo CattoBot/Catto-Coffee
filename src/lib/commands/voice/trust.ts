@@ -4,6 +4,7 @@ import { Emojis } from "../../../shared/enum/Emojis";
 import { GuildMember, InteractionResponse, Message, User } from "discord.js";
 import { VoiceHelper } from "../../helpers/voice.helper";
 import { Args } from "@sapphire/framework";
+import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class VoiceTrustCommand extends VoiceHelper {
     public static async messageRun(message: Message, args: Args) {
@@ -85,4 +86,6 @@ export class VoiceTrustCommand extends VoiceHelper {
             return await interaction.reply({ content: translateKey('commands/replies/voice:trust_success', { user: user!.displayName, emoji: Emojis.SUCCESS }) });
         }
     }
+
+    public static key:CattoSubcommandObject = { key: 'trust', options: [{ type: 'user', key: 'userTrust', required: true, }] }
 }

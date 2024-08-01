@@ -4,6 +4,7 @@ import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
 import { GuildMember, InteractionResponse, Message, User } from "discord.js";
 import { Args } from "@sapphire/framework";
+import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class VoiceTransferCommand {
     public static async messageRun(message: Message, args: Args) {
@@ -69,4 +70,6 @@ export class VoiceTransferCommand {
 
         return await interaction.reply({ content: (await resolveKey(interaction, `commands/replies/voice:transfer_success`, { user: user!.displayName, emoji: Emojis.SUCCESS })), });
     }
+
+    public static key:CattoSubcommandObject = { key: 'transfer', options: [{ type: 'user', key: 'userTransfer', required: true, }] }
 }

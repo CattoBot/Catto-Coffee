@@ -1,0 +1,12 @@
+{
+    "statusGhosted": "Estado de ocultamiento del canal",
+    "statusLocked": "Estado de bloqueo del canal",
+    "limit": "Límite de usuarios en el canal",
+    "userPermit": "Usuario al que permitir el acceso",
+    "userReject": "Usuario al que retirar el permiso de acceso",
+    "userTransfer": "Usuario al que transferir el canal",
+    "userInvite": "Usuario al que invitar al canal",
+    "bitrateBitrate": "Tasa de bits del canal",
+    "userTrust": "Usuario en el que confiar",
+    "userUntrust": "Usuario del que desconfiar"
+}
