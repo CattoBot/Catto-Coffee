@@ -5,6 +5,7 @@ import { experienceFormula, textExperienceFormula } from '../../utils';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { LevelingHelper } from '../../helpers/leveling.helper';
 import { LeaderboardImageBuilder } from '../../classes/LeaderboardCard';
+import { CattoSubcommandObject } from '../../../shared/types/Commands';
 
 export class LeaderboardCommand extends LevelingHelper {
     public static async run(interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
@@ -76,5 +77,9 @@ export class LeaderboardCommand extends LevelingHelper {
         }
 
         return;
+    }
+
+    public static key:CattoSubcommandObject = {
+        key: 'lb'
     }
 }
