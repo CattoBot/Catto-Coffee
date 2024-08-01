@@ -2,6 +2,7 @@ import { resolveKey } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
 import { GuildMember, InteractionResponse, Message, PermissionFlagsBits } from "discord.js";
+import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class VoiceResetCommand {
     public static async messageRun(message: Message) {
@@ -52,6 +53,7 @@ export class VoiceResetCommand {
         return interaction.reply({
             content: (await resolveKey(interaction, `commands/replies/voice:reset_success`, { emoji: Emojis.SUCCESS })),
         });
-
     }
+
+    public static key:CattoSubcommandObject = { key: 'reset' }
 }
