@@ -4,7 +4,6 @@ import type { StoreRegistryValue } from '@sapphire/pieces';
 import { blue, cyan, gray, green, magenta, magentaBright, white, yellow } from 'colorette';
 import { ActivityType, PresenceData } from 'discord.js';
 import { DatabaseExperienceEntriesExists } from '../lib/decorators/DatabaseEntriesExists';
-import { bannerLoad } from '../lib/utils';
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -32,13 +31,13 @@ export class ReadyEvent extends Listener {
 		const pad = ' '.repeat(7);
 		console.log(
 			String.raw`
-${llc('Bot Version: ')} ${pad}${blc('2.0.0')}
+${llc('Bot Version: ')} ${pad}${blc(this.container.version)}
 ${llc('Guilds: ')} ${pad}[${success} ${guildCount}]
 ${llc('Users: ')} ${pad}[${success} ${userCount}]
 ${dev ? ` ${pad}${blc('<')}${llc('/')}${blc('>')} ${llc('DEVELOPMENT MODE')}` : ''}
 		`.trim()
 		);
-		bannerLoad();
+		this.container.utils.bot.bannerLoad();
 	}
 
 	private printStoreDebugInformation() {

@@ -3,7 +3,6 @@ import { Args, Command } from '@sapphire/framework';
 import { reply } from '@sapphire/plugin-editable-commands';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { type Message } from 'discord.js';
-import { textExperienceFormula, experienceFormula } from '../../lib/utils';
 import { LeaderboardImageBuilder } from '../../lib/classes/LeaderboardCard';
 import { TextRankButtonRow, VoiceRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
 import { LevelingHelper } from '../../lib/helpers/leveling.helper';
@@ -52,7 +51,7 @@ export class RankLeaderboardCommand extends Command {
             .setUserId(userId)
             .setShowHours(true)
             .setBackground('../../../assets/img/Leader_VC_v2.jpg')
-            .setExperienceFormula(experienceFormula)
+            .setExperienceFormula(this.container.utils.xp.experienceFormula)
             .setType('voice');
 
         const buffer = await builder.build();
@@ -75,7 +74,7 @@ export class RankLeaderboardCommand extends Command {
             .setGuildLeaderboard(guild_leaderboard)
             .setUserId(userId)
             .setBackground('../../../assets/img/Leader_TXT.png')
-            .setExperienceFormula(textExperienceFormula)
+            .setExperienceFormula(this.container.utils.xp.textExperienceFormula)
             .setShowMessages(true)
             .setType('text');
 

@@ -1,7 +1,6 @@
 import { Precondition } from "@sapphire/framework";
 import { ChatInputCommandInteraction, Message } from "discord.js";
 import { container } from "@sapphire/pieces";
-import { getPrefix } from "../lib/utils";
 import { resolveKey } from "@sapphire/plugin-i18next";
 
 export class EnabledCommandPrecondition extends Precondition {
@@ -33,7 +32,7 @@ export class EnabledCommandPrecondition extends Precondition {
         const guildId = message.guild?.id;
         if (!guildId) return this.ok();
 
-        const prefix = await getPrefix(guildId);
+        const prefix = await container.utils.guilds.getPrefix(guildId);
         const botMention = `<@${message.client.user!.id}>`;
         const botMentionNickname = `<@!${message.client.user!.id}>`;
 

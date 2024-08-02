@@ -1,7 +1,6 @@
 import { container, InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import type { ButtonInteraction } from 'discord.js';
 import { CheckVoiceExperienceEnabled } from '../../lib/decorators/InteractionVoiceExpEnabled';
-import { experienceFormula, formatNumber, registeringFONT } from '../../lib/utils';
 import { TextRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
 import { ButtonCooldown } from '../../lib/decorators/HandlersCooldown';
 import { RankCardBuilder } from '../../lib/classes/RankCard';
@@ -23,7 +22,7 @@ export class ButtonVoiceRankOnlyHandler extends InteractionHandler {
     @ButtonCooldown(60)
     public async run(interaction: ButtonInteraction) {
         try {
-            registeringFONT();
+            container.utils.canvas.registeringFONT();
             await interaction.deferReply();
             const user = interaction.user;
             if (user.bot) {
@@ -40,8 +39,8 @@ export class ButtonVoiceRankOnlyHandler extends InteractionHandler {
             const level = info.voiceLevel ?? 0;
             const experience = info.voiceExperience ?? 0;
             const rank = await this.getRank(user.id, interaction.guildId!);
-            const requiredXP = experienceFormula(level + 1);
-            const formattedRank = formatNumber(rank ?? 0);
+            const requiredXP = container.utils.xp.experienceFormula(level + 1);
+            const formattedRank = container.utils.numbers.format(rank ?? 0);
             const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 512 });
 
             const userInfo = {

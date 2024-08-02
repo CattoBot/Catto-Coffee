@@ -2,7 +2,6 @@ import { ScheduledTask, ScheduledTaskOptions } from '@sapphire/plugin-scheduled-
 import { container } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
 import { Guild, GuildMember, TextChannel, VoiceState } from 'discord.js';
-import { experienceFormula, globalexperienceFormula, retryAsync } from '../lib/utils';
 import { ApplyOptions } from '@sapphire/decorators';
 import { chunk } from 'lodash';
 
@@ -57,7 +56,8 @@ export class VoiceExperienceTask extends ScheduledTask {
 
     private async processUserSession(userId: string, guild: Guild): Promise<void> {
         try {
-            const sessionDataStr = await container.redis.get(`voiceSession:${userId}:${guild.id}`);
+            const key = `voiceSession:${userId}:${guild.id}`
+            const sessionDataStr = await container.redis.get(key);
             if (sessionDataStr) {
                 const sessionData = JSON.parse(sessionDataStr);
                 const joinTime = sessionData.startTime;
@@ -69,12 +69,15 @@ export class VoiceExperienceTask extends ScheduledTask {
                     await this.processVoiceSession(member, guild, `voiceSession:${userId}:${guild.id}`, durationInSeconds);
                 } else {
                     this.container.console.info(`No member found for user ID: ${userId} in guild ID: ${guild.id}`);
+                    this.container.redis.del(key)
                 }
             } else {
                 this.container.console.info(`No session data found for user ID: ${userId}`);
+                this.container.redis.del(key)
             }
         } catch (error) {
             this.container.console.error(`Error processing user session for user ID: ${userId} in guild ID: ${guild.id}: ${error}`);
+            this.container.redis.del(`voiceSession:${userId}:${guild.id}`)
         }
     }
 
@@ -110,8 +113,10 @@ export class VoiceExperienceTask extends ScheduledTask {
             await container.redis.del(sessionId);
         } catch (error) {
             this.container.console.error(`Error processing voice session for member ${member.displayName}: ${error}`);
+            await this.container.redis.del(sessionId);
         }
     }
+
 
     private async calculateExperience(durationInSeconds: number, guild: Guild): Promise<number> {
         const { min, max, cooldown } = await this.getMinMaxEXP(guild);
@@ -177,7 +182,7 @@ export class VoiceExperienceTask extends ScheduledTask {
                 }
             });
 
-        await retryAsync(upsertUserExperience, 3, 500);
+        await container.utils.retryAsync(upsertUserExperience, 3, 500);
         await this.updateGlobalExperience(member.user.id, durationInSeconds);
         const updatedUser = await this.container.prisma.voice_experience.findUnique({
             where: {
@@ -203,11 +208,11 @@ export class VoiceExperienceTask extends ScheduledTask {
         let currentExperience = user?.globalExperience || 0;
         let currentLevel = user?.globalLevel || 1;
         let newExperience = currentExperience + experience;
-        let nextLevelExperience = globalexperienceFormula(currentLevel + 1);
+        let nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel + 1);
         while (newExperience >= nextLevelExperience) {
             newExperience -= nextLevelExperience;
             currentLevel++;
-            nextLevelExperience = globalexperienceFormula(currentLevel + 1);
+            nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel + 1);
         }
 
         await this.container.prisma.users.upsert({
@@ -219,12 +224,12 @@ export class VoiceExperienceTask extends ScheduledTask {
 
     private async calculateLevelUp(userID: string, guildID: string, currentExperience: number, currentLevel: number): Promise<{ levelUp: boolean, newLevel: number, newExperience: number }> {
         let levelUp = false;
-        let xpNeeded = experienceFormula(currentLevel);
+        let xpNeeded = container.utils.xp.experienceFormula(currentLevel);
 
         while (currentExperience >= xpNeeded) {
             currentLevel++;
             currentExperience -= xpNeeded;
-            xpNeeded = experienceFormula(currentLevel);
+            xpNeeded = container.utils.xp.experienceFormula(currentLevel);
             levelUp = true;
         }
 

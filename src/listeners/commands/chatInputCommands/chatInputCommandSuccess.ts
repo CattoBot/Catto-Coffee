@@ -1,10 +1,9 @@
 import { Listener, LogLevel, type ChatInputCommandSuccessPayload } from '@sapphire/framework';
 import type { Logger } from '@sapphire/plugin-logger';
-import { logSuccessCommand } from '../../../lib/utils';
 
 export class ChatInputCommandSuccessListener extends Listener {
 	public override run(payload: ChatInputCommandSuccessPayload) {
-		logSuccessCommand(payload);
+		this.container.utils.logger.logSuccessCommand(payload);
 	}
 
 	public override onLoad() {
