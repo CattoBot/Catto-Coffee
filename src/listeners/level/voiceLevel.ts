@@ -59,6 +59,7 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
             }
         } catch (error) {
             this.container.console.error(`Error processing voice session for member ${member.displayName}: ${error}`);
+            await this.container.redis.del(sessionId);
         }
     }
 

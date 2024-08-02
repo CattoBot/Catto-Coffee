@@ -56,7 +56,8 @@ export class VoiceExperienceTask extends ScheduledTask {
 
     private async processUserSession(userId: string, guild: Guild): Promise<void> {
         try {
-            const sessionDataStr = await container.redis.get(`voiceSession:${userId}:${guild.id}`);
+            const key = `voiceSession:${userId}:${guild.id}`
+            const sessionDataStr = await container.redis.get(key);
             if (sessionDataStr) {
                 const sessionData = JSON.parse(sessionDataStr);
                 const joinTime = sessionData.startTime;
@@ -68,12 +69,15 @@ export class VoiceExperienceTask extends ScheduledTask {
                     await this.processVoiceSession(member, guild, `voiceSession:${userId}:${guild.id}`, durationInSeconds);
                 } else {
                     this.container.console.info(`No member found for user ID: ${userId} in guild ID: ${guild.id}`);
+                    this.container.redis.del(key)
                 }
             } else {
                 this.container.console.info(`No session data found for user ID: ${userId}`);
+                this.container.redis.del(key)
             }
         } catch (error) {
             this.container.console.error(`Error processing user session for user ID: ${userId} in guild ID: ${guild.id}: ${error}`);
+            this.container.redis.del(`voiceSession:${userId}:${guild.id}`)
         }
     }
 
@@ -109,8 +113,10 @@ export class VoiceExperienceTask extends ScheduledTask {
             await container.redis.del(sessionId);
         } catch (error) {
             this.container.console.error(`Error processing voice session for member ${member.displayName}: ${error}`);
+            await this.container.redis.del(sessionId);
         }
     }
+
 
     private async calculateExperience(durationInSeconds: number, guild: Guild): Promise<number> {
         const { min, max, cooldown } = await this.getMinMaxEXP(guild);
