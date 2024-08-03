@@ -58,8 +58,8 @@ export class VoiceExperienceTask extends ScheduledTask {
 
             for (const userId of userIds) {
                 await this.processUserSession(userId, guild, failedKeys);
-                await new Promise(resolve => setTimeout(resolve, 500));
             }
+            
         } catch (error) {
             this.container.console.error(`Error processing guild sessions for guild ID: ${guildId}: ${error}`);
             userIds.forEach(userId => failedKeys.push(`voiceSession:${userId}:${guildId}`));
@@ -88,7 +88,6 @@ export class VoiceExperienceTask extends ScheduledTask {
                 failedKeys.push(key);
             }
         } catch (error) {
-            this.container.console.error(`Error processing user session for user ID: ${userId} in guild ID: ${guild.id}: ${error}`);
             failedKeys.push(key);
         }
     }
