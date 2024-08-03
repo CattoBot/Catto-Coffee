@@ -42,6 +42,13 @@ export class VoiceLimitCommand {
         const member = interaction.guild!.members.resolve(interaction.user.id);
         const channel = member!.voice.channel;
 
+        if (limit < 0 || limit > 99) {
+            return interaction.reply({
+                content: 'Please provide a limit between 0 and 99.',
+                ephemeral: true
+            });
+        }
+
         try {
             await channel!.setUserLimit(limit)
         } catch (error) {
