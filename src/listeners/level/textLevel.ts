@@ -90,8 +90,6 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
                 this.container.console.error(`Failed to send level up notification: ${error}`);
                 await message.reply(replacementMessage);
             }
-        } else {
-            await message.reply(replacementMessage);
         }
     }
 

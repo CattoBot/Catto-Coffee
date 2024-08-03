@@ -30,7 +30,7 @@ export class VoiceExperienceTask extends ScheduledTask {
                 guilds[guildId].push(userId);
             }
 
-            const guildChunks = chunk(Object.keys(guilds), 1000);
+            const guildChunks = chunk(Object.keys(guilds), 2000);
             for (const guildChunk of guildChunks) {
                 const guildPromises = guildChunk.map(guildId => this.processGuildSessions(guildId, guilds[guildId], failedKeys));
                 await Promise.all(guildPromises);
@@ -54,11 +54,9 @@ export class VoiceExperienceTask extends ScheduledTask {
     private async processGuildSessions(guildId: string, userIds: string[], failedKeys: string[]): Promise<void> {
         try {
             const guild = await this.container.client.guilds.fetch(guildId);
-            this.container.console.info(`Starting to process sessions for guild: ${guild.name} (${guild.id}) with ${userIds.length} active sessions.`);
-
-            for (const userId of userIds) {
-                await this.processUserSession(userId, guild, failedKeys);
-            }
+            this.container.console.info(`Processing sessions for guild: ${guild.name} (${guild.id}) with ${userIds.length} active sessions.`);
+            const memberFetchPromises = userIds.map(userId => this.processUserSession(userId, guild, failedKeys));
+            await Promise.all(memberFetchPromises);
             
         } catch (error) {
             this.container.console.error(`Error processing guild sessions for guild ID: ${guildId}: ${error}`);
@@ -75,7 +73,7 @@ export class VoiceExperienceTask extends ScheduledTask {
                 const joinTime = sessionData.startTime;
                 const now = Date.now();
                 const durationInSeconds = (now - joinTime) / 1000;
-                const member = await guild.members.fetch(userId);
+                const member = await guild.members.fetch(userId).catch(() => null);
 
                 if (member) {
                     await this.processVoiceSession(member, guild, key, durationInSeconds);
@@ -88,6 +86,7 @@ export class VoiceExperienceTask extends ScheduledTask {
                 failedKeys.push(key);
             }
         } catch (error) {
+            this.container.console.error(`Error processing user session for user ID: ${userId} in guild ID: ${guild.id}: ${error}`);
             failedKeys.push(key);
         }
     }
@@ -97,11 +96,10 @@ export class VoiceExperienceTask extends ScheduledTask {
         const addSessionPromises = this.container.client.guilds.cache.map(async (guild) => {
             const voiceStates = guild.voiceStates.cache.filter((voiceState: VoiceState) => voiceState.channelId);
             const addSessionPromises = voiceStates.map(async (voiceState) => {
-                if (voiceState.member?.user.bot) return;
+                if (voiceState.member?.user.bot) return; // Skip bots
                 const userId = voiceState.id;
                 const guildId = voiceState.guild.id;
                 const key = `voiceSession:${userId}:${guildId}`;
-
                 await container.redis.set(key, JSON.stringify({ startTime: Date.now() }));
             });
             await Promise.all(addSessionPromises);
@@ -121,6 +119,7 @@ export class VoiceExperienceTask extends ScheduledTask {
             if (updatedUser.levelUp) {
                 await this.handleLevelUp(member, guild.id, updatedUser.voiceLevel);
             }
+
             await container.redis.del(sessionId);
         } catch (error) {
             this.container.console.error(`Error processing voice session for member ${member.displayName}: ${error}`);
