@@ -5,7 +5,7 @@ import { Guild, GuildMember, TextChannel, VoiceState } from 'discord.js';
 import { ApplyOptions } from '@sapphire/decorators';
 import { chunk } from 'lodash';
 
-@ApplyOptions<ScheduledTaskOptions>({ interval: Time.Minute * 15, name: 'VoiceExperienceTask' })
+@ApplyOptions<ScheduledTaskOptions>({ interval: Time.Minute * 20, name: 'VoiceExperienceTask' })
 export class VoiceExperienceTask extends ScheduledTask {
     public constructor(context: ScheduledTask.LoaderContext, options: ScheduledTask.Options) {
         super(context, {
@@ -14,6 +14,8 @@ export class VoiceExperienceTask extends ScheduledTask {
     }
 
     public async run(): Promise<void> {
+        const failedKeys: string[] = [];
+
         try {
             const keys = await container.redis.keys('voiceSession:*');
             this.container.console.info(`Found ${keys.length} active voice sessions to process.`);
@@ -30,7 +32,7 @@ export class VoiceExperienceTask extends ScheduledTask {
 
             const guildChunks = chunk(Object.keys(guilds), 1000);
             for (const guildChunk of guildChunks) {
-                const guildPromises = guildChunk.map(guildId => this.processGuildSessions(guildId, guilds[guildId]));
+                const guildPromises = guildChunk.map(guildId => this.processGuildSessions(guildId, guilds[guildId], failedKeys));
                 await Promise.all(guildPromises);
             }
 
@@ -38,25 +40,35 @@ export class VoiceExperienceTask extends ScheduledTask {
         } catch (error) {
             this.container.console.error(`Error processing scheduled task for voice experience: ${error}`);
         }
+
+        if (failedKeys.length > 0) {
+            try {
+                await container.redis.del(...failedKeys);
+                this.container.console.info(`Cleaned up ${failedKeys.length} failed keys from Redis.`);
+            } catch (error) {
+                this.container.console.error(`Error cleaning up failed keys from Redis: ${error}`);
+            }
+        }
     }
 
-    private async processGuildSessions(guildId: string, userIds: string[]): Promise<void> {
+    private async processGuildSessions(guildId: string, userIds: string[], failedKeys: string[]): Promise<void> {
         try {
             const guild = await this.container.client.guilds.fetch(guildId);
             this.container.console.info(`Starting to process sessions for guild: ${guild.name} (${guild.id}) with ${userIds.length} active sessions.`);
 
             for (const userId of userIds) {
-                await this.processUserSession(userId, guild);
+                await this.processUserSession(userId, guild, failedKeys);
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
         } catch (error) {
             this.container.console.error(`Error processing guild sessions for guild ID: ${guildId}: ${error}`);
+            userIds.forEach(userId => failedKeys.push(`voiceSession:${userId}:${guildId}`));
         }
     }
 
-    private async processUserSession(userId: string, guild: Guild): Promise<void> {
+    private async processUserSession(userId: string, guild: Guild, failedKeys: string[]): Promise<void> {
+        const key = `voiceSession:${userId}:${guild.id}`;
         try {
-            const key = `voiceSession:${userId}:${guild.id}`
             const sessionDataStr = await container.redis.get(key);
             if (sessionDataStr) {
                 const sessionData = JSON.parse(sessionDataStr);
@@ -66,18 +78,18 @@ export class VoiceExperienceTask extends ScheduledTask {
                 const member = await guild.members.fetch(userId);
 
                 if (member) {
-                    await this.processVoiceSession(member, guild, `voiceSession:${userId}:${guild.id}`, durationInSeconds);
+                    await this.processVoiceSession(member, guild, key, durationInSeconds);
                 } else {
                     this.container.console.info(`No member found for user ID: ${userId} in guild ID: ${guild.id}`);
-                    this.container.redis.del(key)
+                    failedKeys.push(key);
                 }
             } else {
                 this.container.console.info(`No session data found for user ID: ${userId}`);
-                this.container.redis.del(key)
+                failedKeys.push(key);
             }
         } catch (error) {
             this.container.console.error(`Error processing user session for user ID: ${userId} in guild ID: ${guild.id}: ${error}`);
-            this.container.redis.del(`voiceSession:${userId}:${guild.id}`)
+            failedKeys.push(key);
         }
     }
 
@@ -113,10 +125,9 @@ export class VoiceExperienceTask extends ScheduledTask {
             await container.redis.del(sessionId);
         } catch (error) {
             this.container.console.error(`Error processing voice session for member ${member.displayName}: ${error}`);
-            await this.container.redis.del(sessionId);
+            await container.redis.del(sessionId);
         }
     }
-
 
     private async calculateExperience(durationInSeconds: number, guild: Guild): Promise<number> {
         const { min, max, cooldown } = await this.getMinMaxEXP(guild);

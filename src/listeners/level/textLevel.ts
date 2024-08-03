@@ -166,7 +166,11 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         const rolesToAssign = Array.from(member.guild.roles.cache.values()).filter(role => roleIdsForLevel.has(role.id) && !currentRoleIds.has(role.id));
 
         if (rolesToAssign.length > 0) {
-            await member.roles.add(rolesToAssign).catch(() => null);
+            try {
+                await member.roles.add(rolesToAssign);
+            } catch (e) {
+                this.container.console.error(`Failed to add roles to ${member.user.username} in guild ${member.guild.id} ${e}`)
+            }
         }
     }
 
