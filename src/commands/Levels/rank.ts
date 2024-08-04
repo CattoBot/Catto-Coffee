@@ -2,7 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Args, Command } from '@sapphire/framework';
 import { reply } from '@sapphire/plugin-editable-commands';
 import { resolveKey } from '@sapphire/plugin-i18next';
-import { type Message } from 'discord.js';
+import { User, type Message } from 'discord.js';
 import { LevelingHelper } from '../../lib/helpers/leveling.helper';
 import { TextRankButtonRow, VoiceRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
 import { Emojis } from '../../shared/enum/Emojis';
@@ -47,7 +47,7 @@ export class RankCommand extends Command {
         await this.buildCard(message, user, type);
     }
 
-    private async buildCard(message: Message, user: any, type: 'voice' | 'text'): Promise<void> {
+    private async buildCard(message: Message, user: User, type: 'voice' | 'text'): Promise<void> {
         if (user.bot) {
             await reply(message, { content: await resolveKey(message, 'commands/replies/level:rank_bot') });
             return;
