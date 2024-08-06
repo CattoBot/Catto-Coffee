@@ -4,7 +4,6 @@ import { TextRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { CheckTextExperienceEnabled } from '../../lib/decorators/InteractionTextExpEnabled';
 import { LeaderboardImageBuilder } from '../../lib/classes/LeaderboardCard';
-import { LevelingHelper } from '../../lib/helpers/leveling.helper';
 import { container } from '@sapphire/framework';
 
 export class ButtonTextLeaderboardHandler extends InteractionHandler {
@@ -25,7 +24,7 @@ export class ButtonTextLeaderboardHandler extends InteractionHandler {
         try {
             await interaction.deferReply();
 
-            const guild_leaderboard = await LevelingHelper.getTextLeaderboard(interaction.guildId!);
+            const guild_leaderboard = await this.container.helpers.leveling.getTextLeaderboard(interaction.guildId!);
             if (guild_leaderboard.length === 0) {
                 await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:lb_not_data`) });
                 return;

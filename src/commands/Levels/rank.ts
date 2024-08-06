@@ -3,7 +3,6 @@ import { Args, Command } from '@sapphire/framework';
 import { reply } from '@sapphire/plugin-editable-commands';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { User, type Message } from 'discord.js';
-import { LevelingHelper } from '../../lib/helpers/leveling.helper';
 import { TextRankButtonRow, VoiceRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
 import { Emojis } from '../../shared/enum/Emojis';
 import { RankCardBuilder } from '../../lib/classes/RankCard';
@@ -19,8 +18,8 @@ export class RankCommand extends Command {
         await message.channel.sendTyping();
         const guildId = message.guildId!;
         const [voiceEnabled, textEnabled] = await Promise.all([
-            LevelingHelper.getVoiceXPEnabled(guildId),
-            LevelingHelper.getTextXPEnabled(guildId),
+            this.container.helpers.leveling.getVoiceXPEnabled(guildId),
+            this.container.helpers.leveling.getTextXPEnabled(guildId),
         ]);
 
         if (!voiceEnabled && !textEnabled) {
@@ -54,14 +53,14 @@ export class RankCommand extends Command {
         }
 
         let info: VoiceExperience | TextExperience | null = type === 'voice' ?
-            await LevelingHelper.getVoiceUserInfo(user.id, message.guildId!) :
-            await LevelingHelper.getTextUserInfo(user.id, message.guildId!);
+            await this.container.helpers.leveling.getVoiceUserInfo(user.id, message.guildId!) :
+            await this.container.helpers.leveling.getTextUserInfo(user.id, message.guildId!);
 
         if (!info) {
             type = type === 'text' ? 'voice' : 'text';
             info = type === 'voice' ?
-                await LevelingHelper.getVoiceUserInfo(user.id, message.guildId!) :
-                await LevelingHelper.getTextUserInfo(user.id, message.guildId!);
+                await this.container.helpers.leveling.getVoiceUserInfo(user.id, message.guildId!) :
+                await this.container.helpers.leveling.getTextUserInfo(user.id, message.guildId!);
 
             if (!info) {
                 await reply(message, { content: await resolveKey(message, 'commands/replies/level:rank_not_data') });
@@ -70,8 +69,8 @@ export class RankCommand extends Command {
         }
 
         const rank = type === 'voice' ?
-            await LevelingHelper.getVoiceRank(user.id, message.guildId!) :
-            await LevelingHelper.getTextRank(user.id, message.guildId!);
+            await this.container.helpers.leveling.getVoiceRank(user.id, message.guildId!) :
+            await this.container.helpers.leveling.getTextRank(user.id, message.guildId!);
 
         const level = this.getLevel(info, type);
         const experience = this.getExperience(info, type);

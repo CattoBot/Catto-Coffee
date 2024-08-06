@@ -5,7 +5,6 @@ import { CheckVoiceExperienceEnabled } from '../../lib/decorators/InteractionVoi
 import { VoiceRankButtonOnly } from '../../shared/bot/buttons/LevelingButtonts';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { ButtonCooldown } from '../../lib/decorators/HandlersCooldown';
-import { LevelingHelper } from '../../lib/helpers/leveling.helper';
 import { LeaderboardImageBuilder } from '../../lib/classes/LeaderboardCard';
 
 export class ButtonVoiceLeaderboardHandler extends InteractionHandler {
@@ -27,7 +26,7 @@ export class ButtonVoiceLeaderboardHandler extends InteractionHandler {
         try {
             await interaction.deferReply();
 
-            const guild_leaderboard = await LevelingHelper.getVoiceLeaderboard(interaction.guildId!);
+            const guild_leaderboard = await this.container.helpers.leveling.getVoiceLeaderboard(interaction.guildId!);
             if (guild_leaderboard.length === 0) {
                 return await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:lb_not_data`) });
             }

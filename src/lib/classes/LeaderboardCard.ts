@@ -4,16 +4,15 @@ import { User } from 'discord.js';
 import { container } from '@sapphire/framework';
 import { LeaderboardUserData } from '../../shared/interfaces/LeaderboardUser';
 import { FetchUserData } from '../../shared/interfaces/UserData';
-import { CanvaHelper } from '../helpers/Canva';
 import { LeaderboardType } from '../../shared/types/LeaderboardType';
 import { secondsToHours } from 'date-fns';
 
 const HOURS_POSITION_Y_OFFSET = -10;
 const MESSAGES_POSITION_Y_OFFSET = -10;
-const HOURS_POSITION_X_OFFSET = 620 ;
+const HOURS_POSITION_X_OFFSET = 620;
 const MESSAGES_POSITION_X_OFFSET = 615;
 
-export class LeaderboardImageBuilder extends CanvaHelper {
+export class LeaderboardImageBuilder {
     private guildLeaderboard: LeaderboardUserData[] = [];
     private userId: string | null = null;
     private backgroundImagePath: string = '';
@@ -225,51 +224,50 @@ export class LeaderboardImageBuilder extends CanvaHelper {
         const userColor = userRank <= 3 ? colors[userRank - 1] : { start: '#12D6DF', end: '#F70FFF' };
         container.utils.canvas.drawProgressBar(context, progressBarForUserX, progressBarForUserY, progressBarForUserWidth, progressBarForUserHeight, progressForUser, userColor.start, userColor.end);
 
-        // Draw optional data
         if (this.showHours) {
             const hours = userdata.totalTimeInVoiceChannel;
-            context.fillStyle = '#000000'; // Color negro
+            context.fillStyle = '#000000';
             context.fillText(`Hours: ${secondsToHours(hours ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET + 5, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
         }
         if (this.showMessages) {
             const messages = userdata.totalMessages;
-            context.fillStyle = '#000000'; // Color negro
+            context.fillStyle = '#000000';
             context.fillText(`Messages: ${container.utils.numbers.format(messages ?? 0)}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
         }
         if (this.showDailyTimeInVoiceChannel) {
             const dailyTime = userdata.dailyTimeInVoiceChannel;
-            context.fillStyle = '#000000'; // Color negro
+            context.fillStyle = '#000000'; 
             context.fillText(`Daily Time: ${secondsToHours(dailyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
         }
         if (this.showWeeklyTimeInVoiceChannel) {
             const weeklyTime = userdata.weeklyTimeInVoiceChannel;
-            context.fillStyle = '#000000'; // Color negro
+            context.fillStyle = '#000000';
             context.fillText(`Weekly Time: ${secondsToHours(weeklyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
         }
         if (this.showMonthlyTimeInVoiceChannel) {
             const monthlyTime = userdata.monthlyTimeInVoiceChannel;
-            context.fillStyle = '#000000'; // Color negro
+            context.fillStyle = '#000000'; 
             context.fillText(`Monthly Time: ${secondsToHours(monthlyTime ?? 0)}h`, userDataX + HOURS_POSITION_X_OFFSET, progressBarForUserY + HOURS_POSITION_Y_OFFSET);
         }
         if (this.showDailyMessages) {
             const dailyMessages = userdata.totalMessagesDaily;
-            context.fillStyle = '#000000'; // Color negro
+            context.fillStyle = '#000000';
             context.fillText(`Daily Messages: ${dailyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
         }
         if (this.showWeeklyMessages) {
             const weeklyMessages = userdata.totalMessagesWeekly;
-            context.fillStyle = '#000000'; // Color negro
+            context.fillStyle = '#000000'; 
             context.fillText(`Weekly Messages: ${weeklyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
         }
         if (this.showMonthlyMessages) {
             const monthlyMessages = userdata.totalMessagesMonthly;
-            context.fillStyle = '#000000'; // Color negro
+            context.fillStyle = '#000000';
             context.fillText(`Monthly Messages: ${monthlyMessages}`, userDataX + MESSAGES_POSITION_X_OFFSET, progressBarForUserY + MESSAGES_POSITION_Y_OFFSET);
         }
     }
 
     public async build(): Promise<Buffer | null> {
-        this.registerFonts();
+        container.helpers.canva.registerFonts();
         if (!this.guildLeaderboard.length || !this.backgroundImagePath) {
             throw new Error('Guild leaderboard and background image path must be set.');
         }

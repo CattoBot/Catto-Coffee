@@ -1,16 +1,17 @@
 import { LogLevel, SapphireClient, container } from "@sapphire/framework";
 import { envParseInteger, envParseString } from "@skyra/env-utilities";
+import { InternationalizationContext } from "@sapphire/plugin-i18next";
 import { GatewayIntentBits, Partials } from "discord.js";
 import { PrismaClient } from "@prisma/client";
-import { Redis } from "ioredis";
-import { ApplicationConsole } from "../lib/console";
 import { getRootData } from "@sapphire/pieces";
 import { join } from "path";
+import { Redis } from "ioredis";
+import { ApplicationConsole } from "../lib/console";
 import { ChatInputDeniedCommandHelper } from "../lib/events/commandDenied";
 import { Config } from "../config";
 import { Utils } from "../lib/utils";
-import { InternationalizationContext } from "@sapphire/plugin-i18next";
 import { CloudinaryService } from "../lib/services/cloudinary";
+import Helper from "../lib/helpers/main";
 
 export class ApplicationClient extends SapphireClient {
     private rootData = getRootData();
@@ -76,6 +77,7 @@ export class ApplicationClient extends SapphireClient {
         container.cloudinary = new CloudinaryService();
         container.commandDeniedHelper = new ChatInputDeniedCommandHelper();
         container.utils = new Utils();
+        container.helpers = new Helper();
         container.version = Config.version
         return super.login(token);
     }

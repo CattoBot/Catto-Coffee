@@ -2,17 +2,16 @@ import { Subcommand } from "@sapphire/plugin-subcommands";
 import { TextRankButtonRow, VoiceRankButtonRow } from "../../../shared/bot/buttons/LevelingButtonts";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { container } from "@sapphire/pieces";
-import { LevelingHelper } from "../../helpers/leveling.helper";
 import { Emojis } from "../../../shared/enum/Emojis";
 import { RankCardBuilder } from "../../classes/RankCard";
 import { AvatarExtension } from "../../../shared/interfaces/UserInfo";
 
-export class CattoRankCommand extends LevelingHelper {
+export class CattoRankCommand {
     public static async run(interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
         await interaction.deferReply();
         const guildId = interaction.guildId!;
-        const voiceEnabled = await this.getVoiceXPEnabled(guildId);
-        const textEnabled = await this.getTextXPEnabled(guildId);
+        const voiceEnabled = await container.helpers.leveling.getVoiceXPEnabled(guildId);
+        const textEnabled = await container.helpers.leveling.getTextXPEnabled(guildId);
 
         if (!voiceEnabled && !textEnabled) {
             await interaction.followUp({ content: await resolveKey(interaction, `commands/replies/level:rank_not_enabled`), ephemeral: true });
@@ -34,13 +33,13 @@ export class CattoRankCommand extends LevelingHelper {
             return;
         }
 
-        const info = await this.getVoiceUserInfo(user.id, interaction.guildId!);
+        const info = await container.helpers.leveling.getVoiceUserInfo(user.id, interaction.guildId!);
         if (!info) {
             await this.buildTextCard(interaction);
             return;
         }
 
-        const rank = await this.getVoiceRank(user.id, interaction.guildId!);
+        const rank = await container.helpers.leveling.getVoiceRank(user.id, interaction.guildId!);
         const level = info.voiceLevel ?? 0;
         const experience = info.voiceExperience ?? 0;
         const requiredXP = container.utils.xp.experienceFormula(level + 1);
@@ -79,13 +78,13 @@ export class CattoRankCommand extends LevelingHelper {
             return;
         }
 
-        const info = await this.getTextUserInfo(user.id, interaction.guildId!);
+        const info = await container.helpers.leveling.getTextUserInfo(user.id, interaction.guildId!);
         if (!info) {
             await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:rank_not_data`) });
             return;
         }
 
-        const rank = await this.getTextRank(user.id, interaction.guildId!);
+        const rank = await container.helpers.leveling.getTextRank(user.id, interaction.guildId!);
         const level = info.textLevel ?? 0;
         const experience = info.textExperience ?? 0;
         const requiredXP = container.utils.xp.textExperienceFormula(level + 1);
