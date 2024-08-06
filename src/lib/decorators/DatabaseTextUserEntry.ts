@@ -10,7 +10,7 @@ export function TextUserEntry() {
             const userId = message.author.id;
 
             if (!userId) {
-                throw new Error("User ID is missing from message.");
+                container.logger.error("User ID is missing from message.");
             }
 
             const user = await container.prisma.users.findUnique({
