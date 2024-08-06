@@ -57,7 +57,12 @@ export class VoiceUntrustCommand extends VoiceHelper {
         const translateKey = await fetchT(interaction);
         const user = interaction.options.getUser(translateKey('commands/options/voice:reject_name'));
         const member = interaction.guild!.members.resolve(user!.id) as GuildMember;
-        const getOwner = await container.helpers.voice.getVoiceChannelOwner(member.voice.channelId!, interaction.guild!.id)
+        const memberInteraction = interaction.guild!.members.resolve(interaction.user.id) as GuildMember;
+        const getOwner = await container.helpers.voice.getVoiceChannelOwner(
+            memberInteraction.voice.channel?.id!,
+            interaction.guild!.id
+        );
+
         const owner = interaction.guild!.members.resolve(getOwner!) as GuildMember;
 
         if (interaction.user.id !== owner.id) {

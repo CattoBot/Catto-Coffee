@@ -171,8 +171,8 @@ export class CanvaHelper extends Helper {
     }
 
     registeringFONT() {
-        registerFont(join(__dirname, '../../assets/fonts/Poppins-SemiBold.ttf'), { family: 'Poppins SemiBold' });
-        registerFont(join(__dirname, '../../assets/fonts/Poppins-Bold.ttf'), { family: 'Poppins Bold' });
-        registerFont(join(__dirname, '../../assets/fonts/Bahnschrift.ttf'), { family: 'Bahnschrift' });
+        registerFont(join(__dirname, '../../../assets/fonts/Poppins-SemiBold.ttf'), { family: 'Poppins SemiBold' });
+        registerFont(join(__dirname, '../../../assets/fonts/Poppins-Bold.ttf'), { family: 'Poppins Bold' });
+        registerFont(join(__dirname, '../../../assets/fonts/Bahnschrift.ttf'), { family: 'Bahnschrift' });
     }
 }
