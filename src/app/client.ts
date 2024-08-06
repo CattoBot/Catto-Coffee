@@ -11,7 +11,7 @@ import { ChatInputDeniedCommandHelper } from "../lib/events/commandDenied";
 import { Config } from "../config";
 import { Utils } from "../lib/utils";
 import { CloudinaryService } from "../lib/services/cloudinary";
-import Helper from "../lib/helpers/main";
+import Helper from "../lib/helpers/index";
 
 export class ApplicationClient extends SapphireClient {
     private rootData = getRootData();

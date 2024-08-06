@@ -23,7 +23,7 @@ export class ButtonVoiceRankHandler extends InteractionHandler {
     @CheckVoiceExperienceEnabled
     @ButtonCooldown(60)
     public async run(interaction: ButtonInteraction) {
-        container.utils.canvas.registeringFONT();
+        container.helpers.canvas.registeringFONT();
         await interaction.deferReply();
         const user = interaction.user;
         if (user.bot) {

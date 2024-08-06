@@ -6,6 +6,7 @@ import { CanvaHelper } from "./Canva";
 import { VoiceHelper } from "./voice.helper";
 import { LevelingHelper } from "./leveling.helper";
 import { RoleReward } from "../../shared/types/Rewards";
+import { CanvasRenderingContext2D, Image } from "canvas";
 
 export default class CoreHelper {
     private voiceDeleteHelper: VoiceDeleteHelper;
@@ -26,10 +27,18 @@ export default class CoreHelper {
             initChannel: this.voiceCreateHelper.initChannel.bind(this.voiceCreateHelper),
         };
 
-        this.canva = {
+        this.canvas = {
             getUserBadges: this.canvaHelper.getUserBadges.bind(this.canvaHelper),
             getGuildBadges: this.canvaHelper.getGuildBadges.bind(this.canvaHelper),
             registerFonts: this.canvaHelper.registerFonts.bind(this.canvaHelper),
+            drawProgressBar: this.canvaHelper.drawProgressBar.bind(this.canvaHelper),
+            wrapText: this.canvaHelper.wrapText.bind(this.canvaHelper),
+            drawFormattedRank: this.canvaHelper.drawFormattedRank.bind(this.canvaHelper),
+            drawUserAvatar: this.canvaHelper.drawUserAvatar.bind(this.canvaHelper),
+            drawRoundedImage: this.canvaHelper.drawRoundedImage.bind(this.canvaHelper),
+            drawUserData: this.canvaHelper.drawUserData.bind(this.canvaHelper),
+            drawProgressBarForUser: this.canvaHelper.drawProgressBarForUser.bind(this.canvaHelper),
+            registeringFONT: this.canvaHelper.registeringFONT.bind(this.canvaHelper)
         };
 
         this.voice = {
@@ -60,10 +69,68 @@ export default class CoreHelper {
         queueEvent: (oldState: VoiceState, newState: VoiceState) => Promise<void>;
     };
 
-    canva: {
+    canvas: {
         getUserBadges: (userId: string) => Promise<any>;
         getGuildBadges: (guildId: string) => Promise<any>;
         registerFonts: () => void;
+        drawProgressBar: (
+            context: CanvasRenderingContext2D,
+            x: number,
+            y: number,
+            width: number,
+            height: number,
+            progress: number,
+            startColor?: string,
+            endColor?: string
+        ) => void;
+        wrapText: (
+            context: CanvasRenderingContext2D,
+            text: string,
+            x: number,
+            y: number,
+            maxWidth: number,
+            maxHeight: number,
+            lineHeight: number
+        ) => void;
+        drawFormattedRank: (
+            context: CanvasRenderingContext2D,
+            rank: string,
+            x: number,
+            y: number
+        ) => void;
+        drawUserAvatar: (
+            context: CanvasRenderingContext2D,
+            image: Image,
+            x: number,
+            y: number,
+            size: number
+        ) => void;
+        drawRoundedImage: (
+            context: CanvasRenderingContext2D,
+            image: Image,
+            x: number,
+            y: number,
+            size: number
+        ) => void;
+        drawUserData: (
+            context: CanvasRenderingContext2D,
+            username: string,
+            level: string,
+            xp: string,
+            x: number,
+            y: number
+        ) => void;
+        drawProgressBarForUser: (
+            context: CanvasRenderingContext2D,
+            progress: number,
+            x: number,
+            y: number,
+            width: number,
+            height: number,
+            startColor?: string,
+            endColor?: string
+        ) => void;
+        registeringFONT: () => void;
     };
 
     voice: {

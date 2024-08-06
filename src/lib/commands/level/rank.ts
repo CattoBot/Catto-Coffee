@@ -26,7 +26,7 @@ export class CattoRankCommand {
     }
 
     private static async buildVoiceCard(interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
-        container.utils.canvas.registeringFONT();
+        container.helpers.canvas.registeringFONT();
         const user = interaction.options.getUser('user') ?? interaction.user;
         if (user.bot) {
             await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:rank_not_bots`) });
@@ -71,7 +71,7 @@ export class CattoRankCommand {
     }
 
     private static async buildTextCard(interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
-        container.utils.canvas.registeringFONT();
+        container.helpers.canvas.registeringFONT();
         const user = interaction.options.getUser('user') ?? interaction.user;
         if (user.bot) {
             await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:rank_not_bots`) });

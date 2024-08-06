@@ -22,7 +22,7 @@ export class ButtonVoiceRankOnlyHandler extends InteractionHandler {
     @ButtonCooldown(60)
     public async run(interaction: ButtonInteraction) {
         try {
-            container.utils.canvas.registeringFONT();
+            container.helpers.canvas.registeringFONT();
             await interaction.deferReply();
             const user = interaction.user;
             if (user.bot) {
