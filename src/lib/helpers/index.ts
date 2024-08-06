@@ -1,8 +1,8 @@
 import { VoiceState } from "discord.js";
-import { VoiceDeleteHelper } from "./voice/voiceDelete";
-import { VoiceCreateHelper } from "./voice/voiceCreate";
+import { VoiceDeleteHelper } from "./voice/voice.delete.helper";
+import { VoiceCreateHelper } from "./voice/voice.create.helper";
 import { trusted_voice_users } from "@prisma/client";
-import { CanvaHelper } from "./Canva";
+import { CanvaHelper } from "./canva.helper";
 import { VoiceHelper } from "./voice.helper";
 import { LevelingHelper } from "./leveling.helper";
 import { RoleReward } from "../../shared/types/Rewards";
