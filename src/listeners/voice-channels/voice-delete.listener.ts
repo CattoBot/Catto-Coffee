@@ -11,6 +11,6 @@ export class VoiceDeleteListener extends Listener {
     }
 
     public async run(oldState: VoiceState, newState: VoiceState) {
-        this.container.helpers.voiceChannels.queueEvent(oldState, newState);
+        this.container.helpers.voiceChannels.queueChannelDeleteEvent(oldState, newState);
     }
 }

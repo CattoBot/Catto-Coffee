@@ -42,7 +42,7 @@ export class CattoRankCommand {
         const rank = await container.helpers.leveling.getVoiceRank(user.id, interaction.guildId!);
         const level = info.voiceLevel ?? 0;
         const experience = info.voiceExperience ?? 0;
-        const requiredXP = container.utils.xp.experienceFormula(level + 1);
+        const requiredXP = container.helpers.leveling.xp.experienceFormula(level + 1);
         const formattedRank = container.utils.numbers.format(rank ?? 0);
 
         const userInfo = {
@@ -87,7 +87,7 @@ export class CattoRankCommand {
         const rank = await container.helpers.leveling.getTextRank(user.id, interaction.guildId!);
         const level = info.textLevel ?? 0;
         const experience = info.textExperience ?? 0;
-        const requiredXP = container.utils.xp.textExperienceFormula(level + 1);
+        const requiredXP = container.helpers.leveling.xp.textExperienceFormula(level + 1);
         const formattedRank = container.utils.numbers.format(rank ?? 0);
 
         const userInfo = {

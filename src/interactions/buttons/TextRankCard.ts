@@ -39,7 +39,7 @@ export class ButtonTextRankHandler extends InteractionHandler {
             const level = info.textLevel ?? 0;
             const experience = info.textExperience ?? 0;
             const rank = await this.getRank(user.id, interaction.guildId!);
-            const requiredXP = container.utils.xp.textExperienceFormula(level + 1);
+            const requiredXP = container.helpers.leveling.xp.textExperienceFormula(level + 1);
             const formattedRank = container.utils.numbers.format(rank ?? 0);
             const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 512 });
 

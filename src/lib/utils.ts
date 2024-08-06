@@ -425,24 +425,6 @@ export class Utils {
 	}
 
 	/**
-	 *    _____                          
-	 *   / ____|                         
-	 *  | |     __ _ _ ____   ____ _ ___ 
-	 *  | |    / _` | '_ \ \ / / _` / __|
-	 *  | |___| (_| | | | \ V / (_| \__ \
-	 *   \_____\__,_|_| |_|\_/ \__,_|___/
-	 * 
-	 * Made by @gacarbla and @arestosora
-	 */
-
-	/**
-	 * Herramientas y utilidades para Canvas
-	 */
-	canvas = {
-
-	}
-
-	/**
 	 *   _                                 
 	 *  | |                                
 	 *  | |     ___   __ _  __ _  ___ _ __ 
@@ -479,18 +461,5 @@ export class Utils {
 		shardsInfo: (id: number) => `[${cyan(id.toString())}]`,
 		commandsInfo: (command: Command) => cyan(command.name),
 		guildsInfo: (guild: Guild | null) => (guild === null) ? `[${cyan('DM')}]` : `${guild.name}[${cyan(guild.id)}]`,
-	}
-
-	/**
-	 * 
-	 */
-
-	/**
-	 * 
-	 */
-	xp = {
-		experienceFormula: (level: number) => Math.floor(100 * Math.pow(level, 1.5)),
-		textExperienceFormula: (level: number) => 170 * level,
-		globalexperienceFormula: (level: number) => Math.floor(2000 * Math.pow(level, 1.5)),
 	}
 }

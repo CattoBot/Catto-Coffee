@@ -74,7 +74,7 @@ export class RankCommand extends Command {
 
         const level = this.getLevel(info, type);
         const experience = this.getExperience(info, type);
-        const requiredXP = type === 'voice' ? this.container.utils.xp.experienceFormula(level + 1) : this.container.utils.xp.textExperienceFormula(level + 1);
+        const requiredXP = type === 'voice' ? this.container.helpers.leveling.xp.experienceFormula(level + 1) : this.container.helpers.leveling.xp.textExperienceFormula(level + 1);
         const formattedRank = this.container.utils.numbers.format(rank ?? 0);
         const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 512 });
 

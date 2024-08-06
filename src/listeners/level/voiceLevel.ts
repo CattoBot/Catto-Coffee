@@ -103,11 +103,11 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
         let currentExperience = user?.globalExperience || 0;
         let currentLevel = user?.globalLevel || 1;
         let newExperience = currentExperience + experience;
-        let nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel + 1);
+        let nextLevelExperience = container.helpers.leveling.xp.globalExperienceFormula(currentLevel + 1);
         while (newExperience >= nextLevelExperience) {
             newExperience -= nextLevelExperience;
             currentLevel++;
-            nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel + 1);
+            nextLevelExperience = container.helpers.leveling.xp.globalExperienceFormula(currentLevel + 1);
         }
 
         await this.container.prisma.users.upsert({
@@ -164,12 +164,12 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
 
     private async calculateLevelUp(userID: string, guildID: string, currentExperience: number, currentLevel: number): Promise<{ levelUp: boolean, newLevel: number, newExperience: number }> {
         let levelUp = false;
-        let xpNeeded = container.utils.xp.experienceFormula(currentLevel);
+        let xpNeeded = container.helpers.leveling.xp.experienceFormula(currentLevel);
 
         while (currentExperience >= xpNeeded) {
             currentLevel++;
             currentExperience -= xpNeeded;
-            xpNeeded = container.utils.xp.experienceFormula(currentLevel);
+            xpNeeded = container.helpers.leveling.xp.experienceFormula(currentLevel);
             levelUp = true;
         }
 

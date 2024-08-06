@@ -37,7 +37,7 @@ export class LeaderboardCommand  {
             .setGuildLeaderboard(guild_leaderboard)
             .setUserId(userId)
             .setBackground('../../../assets/img/Leader_VC_v2.jpg')
-            .setExperienceFormula(container.utils.xp.experienceFormula)
+            .setExperienceFormula(container.helpers.leveling.xp.experienceFormula)
             .setShowHours(true)
             .setType('voice');
 
@@ -63,7 +63,7 @@ export class LeaderboardCommand  {
             .setGuildLeaderboard(guild_leaderboard)
             .setUserId(userId)
             .setBackground('../../../assets/img/Leader_TXT.png')
-            .setExperienceFormula(container.utils.xp.textExperienceFormula)
+            .setExperienceFormula(container.helpers.leveling.xp.textExperienceFormula)
             .setShowMessages(true)
             .setType('text');
 

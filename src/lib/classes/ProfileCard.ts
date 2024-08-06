@@ -192,7 +192,7 @@ export class ProfileCardBuilder {
         const { bg, avatar } = await this.loadImages();
         this.drawBackground(bg);
         const experience = this.user.experience!;
-        const requiredXP = container.utils.xp.globalexperienceFormula(this.user.level! + 1);
+        const requiredXP = container.helpers.leveling.xp.globalExperienceFormula(this.user.level! + 1);
         this.drawProgressBar(experience, requiredXP);
         await this.drawBadges();
         this.drawRank();

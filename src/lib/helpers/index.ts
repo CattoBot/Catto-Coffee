@@ -23,7 +23,7 @@ export default class CoreHelper {
         this.levelingHelper = new LevelingHelper();
 
         this.voiceChannels = {
-            queueEvent: this.voiceDeleteHelper.queueEvent.bind(this.voiceDeleteHelper),
+            queueChannelDeleteEvent: this.voiceDeleteHelper.queueChannelDeleteEvent.bind(this.voiceDeleteHelper),
             initChannel: this.voiceCreateHelper.initChannel.bind(this.voiceCreateHelper),
         };
 
@@ -61,12 +61,17 @@ export default class CoreHelper {
             getTextRank: this.levelingHelper.getTextRank.bind(this.levelingHelper),
             getVoiceUserInfo: this.levelingHelper.getVoiceUserInfo.bind(this.levelingHelper),
             getTextUserInfo: this.levelingHelper.getTextUserInfo.bind(this.levelingHelper),
+            xp: {
+                experienceFormula: (level: number): number => Math.floor(100 * Math.pow(level, 1.5)),
+                textExperienceFormula: (level: number): number => 170 * level,
+                globalExperienceFormula: (level: number): number => Math.floor(2000 * Math.pow(level, 1.5)),
+            }
         }
     }
 
     voiceChannels: {
         initChannel: (newState: VoiceState, oldState: VoiceState) => Promise<void>;
-        queueEvent: (oldState: VoiceState, newState: VoiceState) => Promise<void>;
+        queueChannelDeleteEvent: (oldState: VoiceState, newState: VoiceState) => Promise<void>;
     };
 
     canvas: {
@@ -153,5 +158,11 @@ export default class CoreHelper {
         getTextRank: (userId: string, guildId: string) => Promise<number | undefined>;
         getVoiceUserInfo: (userId: string, guildId: string) => Promise<any>;
         getTextUserInfo: (userId: string, guildId: string) => Promise<any>;
+
+        xp: {
+            experienceFormula: (level: number) => number;
+            textExperienceFormula: (level: number) => number;
+            globalExperienceFormula: (level: number) => number;
+        };
     }
 }

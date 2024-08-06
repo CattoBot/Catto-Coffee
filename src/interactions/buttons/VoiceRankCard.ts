@@ -41,7 +41,7 @@ export class ButtonVoiceRankHandler extends InteractionHandler {
         const experience = info.voiceExperience ?? 0;
 
         const rank = await this.getRank(user.id, interaction.guildId!);
-        const requiredXP = container.utils.xp.experienceFormula(level + 1);
+        const requiredXP = container.helpers.leveling.xp.experienceFormula(level + 1);
         const formattedRank = container.utils.numbers.format(rank ?? 0);
         const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 512 });
 

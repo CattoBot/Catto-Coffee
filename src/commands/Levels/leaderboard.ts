@@ -50,7 +50,7 @@ export class RankLeaderboardCommand extends Command {
             .setUserId(userId)
             .setShowHours(true)
             .setBackground('../../../assets/img/Leader_VC_v2.jpg')
-            .setExperienceFormula(this.container.utils.xp.experienceFormula)
+            .setExperienceFormula(this.container.helpers.leveling.xp.experienceFormula)
             .setType('voice');
 
         const buffer = await builder.build();
@@ -73,7 +73,7 @@ export class RankLeaderboardCommand extends Command {
             .setGuildLeaderboard(guild_leaderboard)
             .setUserId(userId)
             .setBackground('../../../assets/img/Leader_TXT.png')
-            .setExperienceFormula(this.container.utils.xp.textExperienceFormula)
+            .setExperienceFormula(this.container.helpers.leveling.xp.textExperienceFormula)
             .setShowMessages(true)
             .setType('text');
 

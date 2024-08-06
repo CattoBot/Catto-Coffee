@@ -35,7 +35,7 @@ export class ButtonTextLeaderboardHandler extends InteractionHandler {
                 .setGuildLeaderboard(guild_leaderboard)
                 .setUserId(userId)
                 .setBackground('../../../assets/img/Leader_TXT.png')
-                .setExperienceFormula(container.utils.xp.textExperienceFormula)
+                .setExperienceFormula(container.helpers.leveling.xp.textExperienceFormula)
                 .setShowMessages(true)
                 .setType('text');
 

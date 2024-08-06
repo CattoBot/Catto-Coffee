@@ -6,7 +6,7 @@ export class VoiceDeleteHelper extends Helper {
     private eventQueue: Array<{ oldState: VoiceState, newState: VoiceState }> = [];
     private isProcessingQueue: boolean = false;
 
-    public async queueEvent(oldState: VoiceState, newState: VoiceState) {
+    public async queueChannelDeleteEvent(oldState: VoiceState, newState: VoiceState) {
         this.eventQueue.push({ oldState, newState });
         if (!this.isProcessingQueue) {
             this.processQueue();

@@ -36,7 +36,7 @@ export class ButtonVoiceLeaderboardHandler extends InteractionHandler {
                 .setGuildLeaderboard(guild_leaderboard)
                 .setUserId(userId)
                 .setBackground('../../../assets/img/Leader_VC_v2.jpg')
-                .setExperienceFormula(container.utils.xp.experienceFormula)
+                .setExperienceFormula(container.helpers.leveling.xp.experienceFormula)
                 .setShowHours(true)
                 .setType('voice');
 
