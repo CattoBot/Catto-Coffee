@@ -35,7 +35,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         }
 
         let { updatedExp, currentLevel } = this.calculateUpdatedExperience(userExp, randomXP);
-        const nextLevelExp = container.utils.xp.textExperienceFormula(currentLevel);
+        const nextLevelExp = container.helpers.leveling.xp.textExperienceFormula(currentLevel);
 
         if (updatedExp >= nextLevelExp) {
             currentLevel += 1;
@@ -126,12 +126,12 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         let currentExperience = user?.globalExperience || 0;
         let currentLevel = user?.globalLevel || 1;
         let newExperience = currentExperience + experience;
-        let nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel);
+        let nextLevelExperience = container.helpers.leveling.xp.globalExperienceFormula(currentLevel);
 
         while (newExperience >= nextLevelExperience) {
             newExperience -= nextLevelExperience;
             currentLevel++;
-            nextLevelExperience = container.utils.xp.globalexperienceFormula(currentLevel);
+            nextLevelExperience = container.helpers.leveling.xp.globalExperienceFormula(currentLevel);
         }
 
         await this.container.prisma.users.upsert({

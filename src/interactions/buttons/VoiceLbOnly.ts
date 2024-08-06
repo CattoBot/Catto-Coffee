@@ -22,7 +22,7 @@ export class ButtonVoiceRankOnlyHandler extends InteractionHandler {
     @ButtonCooldown(60)
     public async run(interaction: ButtonInteraction) {
         try {
-            container.utils.canvas.registeringFONT();
+            container.helpers.canvas.registeringFONT();
             await interaction.deferReply();
             const user = interaction.user;
             if (user.bot) {
@@ -39,7 +39,7 @@ export class ButtonVoiceRankOnlyHandler extends InteractionHandler {
             const level = info.voiceLevel ?? 0;
             const experience = info.voiceExperience ?? 0;
             const rank = await this.getRank(user.id, interaction.guildId!);
-            const requiredXP = container.utils.xp.experienceFormula(level + 1);
+            const requiredXP = container.helpers.leveling.xp.experienceFormula(level + 1);
             const formattedRank = container.utils.numbers.format(rank ?? 0);
             const avatarURL = user.displayAvatarURL({ extension: 'jpg', size: 512 });
 

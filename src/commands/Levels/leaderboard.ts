@@ -5,7 +5,6 @@ import { resolveKey } from '@sapphire/plugin-i18next';
 import { type Message } from 'discord.js';
 import { LeaderboardImageBuilder } from '../../lib/classes/LeaderboardCard';
 import { TextRankButtonRow, VoiceRankButtonRow } from '../../shared/bot/buttons/LevelingButtonts';
-import { LevelingHelper } from '../../lib/helpers/leveling.helper';
 
 @ApplyOptions<Command.Options>({
     description: 'Check the server leaderboard.',
@@ -21,8 +20,8 @@ export class RankLeaderboardCommand extends Command {
         } else if (args === 'text') {
             await this.buildTextLeaderboard(message);
         } else {
-            const voiceEnabled = await LevelingHelper.getVoiceXPEnabled(message.guild!.id);
-            const textEnabled = await LevelingHelper.getTextXPEnabled(message.guild!.id);
+            const voiceEnabled = await this.container.helpers.leveling.getVoiceXPEnabled(message.guild!.id);
+            const textEnabled = await this.container.helpers.leveling.getTextXPEnabled(message.guild!.id);
 
             if (!voiceEnabled && !textEnabled) {
                 await reply(message, { content: await resolveKey(message, `commands/replies/level:rank_not_enabled`) });
@@ -38,7 +37,7 @@ export class RankLeaderboardCommand extends Command {
     }
 
     private async buildVoiceLeaderboard(message: Message) {
-        const guild_leaderboard = await LevelingHelper.getVoiceLeaderboard(message.guildId!);
+        const guild_leaderboard = await this.container.helpers.leveling.getVoiceLeaderboard(message.guildId!);
         if (guild_leaderboard.length === 0) {
             await this.buildTextLeaderboard(message);
             await reply(message, { content: await resolveKey(message, `commands/replies/level:lb_not_data`) });
@@ -51,7 +50,7 @@ export class RankLeaderboardCommand extends Command {
             .setUserId(userId)
             .setShowHours(true)
             .setBackground('../../../assets/img/Leader_VC_v2.jpg')
-            .setExperienceFormula(this.container.utils.xp.experienceFormula)
+            .setExperienceFormula(this.container.helpers.leveling.xp.experienceFormula)
             .setType('voice');
 
         const buffer = await builder.build();
@@ -63,7 +62,7 @@ export class RankLeaderboardCommand extends Command {
     }
 
     private async buildTextLeaderboard(message: Message) {
-        const guild_leaderboard = await LevelingHelper.getTextLeaderboard(message.guildId!);
+        const guild_leaderboard = await this.container.helpers.leveling.getTextLeaderboard(message.guildId!);
         if (guild_leaderboard.length === 0) {
             await reply(message, { content: await resolveKey(message, `commands/replies/level:lb_not_data`) });
             return;
@@ -74,7 +73,7 @@ export class RankLeaderboardCommand extends Command {
             .setGuildLeaderboard(guild_leaderboard)
             .setUserId(userId)
             .setBackground('../../../assets/img/Leader_TXT.png')
-            .setExperienceFormula(this.container.utils.xp.textExperienceFormula)
+            .setExperienceFormula(this.container.helpers.leveling.xp.textExperienceFormula)
             .setShowMessages(true)
             .setType('text');
 

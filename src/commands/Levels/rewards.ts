@@ -2,7 +2,6 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Args, Command } from '@sapphire/framework';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { ButtonInteraction, CommandInteraction, Message } from 'discord.js';
-import { LevelingHelper } from '../../lib/helpers/leveling.helper';
 import { RewardButtons } from '../../shared/bot/buttons/LevelingButtonts';
 import { RoleReward } from '../../shared/types/Rewards';
 import { Embed } from '../../lib/classes/Embed';
@@ -29,8 +28,8 @@ export class RankLeaderboardCommand extends Command {
             await context.deferReply();
         }
 
-        const voiceEnabled = await LevelingHelper.getVoiceXPEnabled(guildId);
-        const textEnabled = await LevelingHelper.getTextXPEnabled(guildId);
+        const voiceEnabled = await this.container.helpers.leveling.getVoiceXPEnabled(guildId);
+        const textEnabled = await this.container.helpers.leveling.getTextXPEnabled(guildId);
 
         if (!voiceEnabled && !textEnabled) {
             const content = await resolveKey(context, `commands/replies/level:rank_not_enabled`);
@@ -38,8 +37,8 @@ export class RankLeaderboardCommand extends Command {
             return;
         }
 
-        const textRewards = await LevelingHelper.getTextRewards(guildId);
-        const voiceRewards = await LevelingHelper.getVoiceRewards(guildId);
+        const textRewards = await this.container.helpers.leveling.getTextRewards(guildId);
+        const voiceRewards = await this.container.helpers.leveling.getVoiceRewards(guildId);
 
         if (textRewards.length === 0 && voiceRewards.length === 0) {
             const content = await resolveKey(context, `commands/replies/level:not_rewards`);

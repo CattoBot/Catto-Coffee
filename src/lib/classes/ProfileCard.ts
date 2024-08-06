@@ -2,10 +2,8 @@ import { createCanvas, Canvas, CanvasRenderingContext2D, loadImage, Image } from
 import { join } from 'path';
 import { container } from '@sapphire/pieces';
 import { UserInfo } from '../../shared/interfaces/UserInfo';
-import { CanvaHelper } from '../helpers/Canva';
 
-
-export class ProfileCardBuilder extends CanvaHelper {
+export class ProfileCardBuilder {
     private user: UserInfo;
     private canvas: Canvas;
     private ctx: CanvasRenderingContext2D;
@@ -54,7 +52,6 @@ export class ProfileCardBuilder extends CanvaHelper {
     private ABOUT_ME_COLOR = '#3D3D3D';
 
     constructor(user: UserInfo) {
-        super();
         this.user = user;
         this.canvas = createCanvas(this.IMAGE_WIDTH, this.IMAGE_HEIGHT);
         this.ctx = this.canvas.getContext('2d');
@@ -89,7 +86,7 @@ export class ProfileCardBuilder extends CanvaHelper {
     }
 
     private async drawBadges() {
-        const userBadges = await this.getUserBadges(this.user.userId);
+        const userBadges = await container.helpers.canvas.getUserBadges(this.user.userId);
         if (userBadges.length > 0) {
             const numBadges = userBadges.length;
             const containerWidth = (numBadges * (this.BADGE_SIZE + this.BADGE_SPACING)) - this.BADGE_SPACING + 20;
@@ -179,7 +176,7 @@ export class ProfileCardBuilder extends CanvaHelper {
         this.ctx.font = this.ABOUT_ME_FONT;
         this.ctx.textBaseline = 'top';
         const aboutMeText = this.user.aboutMe || "No information given";
-        container.utils.canvas.wrapText(this.ctx, aboutMeText, this.ABOUT_ME_X, this.ABOUT_ME_Y, this.ABOUT_ME_WIDTH, this.ABOUT_ME_HEIGHT, 40);
+        container.helpers.canvas.wrapText(this.ctx, aboutMeText, this.ABOUT_ME_X, this.ABOUT_ME_Y, this.ABOUT_ME_WIDTH, this.ABOUT_ME_HEIGHT, 40);
     }
 
     private drawAvatar(avatar: Image) {
@@ -191,11 +188,11 @@ export class ProfileCardBuilder extends CanvaHelper {
     }
 
     public async build(): Promise<Buffer> {
-        this.registerFonts();
+        container.helpers.canvas.registerFonts();
         const { bg, avatar } = await this.loadImages();
         this.drawBackground(bg);
         const experience = this.user.experience!;
-        const requiredXP = container.utils.xp.globalexperienceFormula(this.user.level! + 1);
+        const requiredXP = container.helpers.leveling.xp.globalExperienceFormula(this.user.level! + 1);
         this.drawProgressBar(experience, requiredXP);
         await this.drawBadges();
         this.drawRank();

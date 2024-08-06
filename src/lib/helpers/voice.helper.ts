@@ -3,7 +3,7 @@ import { Helper } from "./helper";
 import { trusted_voice_users } from "@prisma/client";
 
 export class VoiceHelper extends Helper {
-    public static async find(channel_id: string, guild_id: string) {
+    public async find(channel_id: string, guild_id: string) {
         const channel = await container.prisma.voice_temp_channels.findUnique({
             where: {
                 guildId_channelId: {
@@ -17,7 +17,7 @@ export class VoiceHelper extends Helper {
     }
 
     
-    public static async findTrusted(channelId: string, guildId: string, userId: string) {
+    public async findTrusted(channelId: string, guildId: string, userId: string) {
         const user = await container.prisma.trusted_voice_users.findUnique({
             where: {
                 guildId_channelId_userId: {
@@ -29,7 +29,7 @@ export class VoiceHelper extends Helper {
         return user;
     }
 
-    public static async store(channelId: string, userId: string, guildId: string): Promise<trusted_voice_users> {
+    public async store(channelId: string, userId: string, guildId: string): Promise<trusted_voice_users> {
         return await container.prisma.trusted_voice_users.create({
             data: {
                 userId: userId,
@@ -39,7 +39,7 @@ export class VoiceHelper extends Helper {
         })
     }
 
-    public static async getVoiceChannelOwner(channelId: string, guildId: string) {
+    public async getVoiceChannelOwner(channelId: string, guildId: string) {
         const owner = await container.prisma.voice_temp_channels.findUnique({
             where: {
                 guildId_channelId: {
@@ -51,7 +51,7 @@ export class VoiceHelper extends Helper {
         return owner!.channelOwnerId ?? null;
     }
     
-    public static async findUser(channelId: string, guildId: string, userId: string) {
+    public async findUser(channelId: string, guildId: string, userId: string) {
         const user = await container.prisma.trusted_voice_users.findUnique({
             where: {
                 guildId_channelId_userId: {
@@ -63,7 +63,7 @@ export class VoiceHelper extends Helper {
         return user;
     }
 
-    public static async delete(channelId: string, userId: string, guildId: string): Promise<trusted_voice_users> {
+    public async delete(channelId: string, userId: string, guildId: string): Promise<trusted_voice_users> {
         return await container.prisma.trusted_voice_users.delete({
             where: {
                 guildId_channelId_userId: {
@@ -72,5 +72,4 @@ export class VoiceHelper extends Helper {
             }
         })
     }
-
 }

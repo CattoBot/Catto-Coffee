@@ -5,6 +5,7 @@ import { ArrayString, IntegerString } from '@skyra/env-utilities';
 import { ChatInputDeniedCommandHelper } from './events/commandDenied';
 import { CloudinaryService } from './services/cloudinary';
 import { Utils } from './utils';
+import CoreHelper from './helpers';
 
 declare module '@sapphire/framework' {
 	interface Preconditions {
@@ -32,6 +33,7 @@ declare module '@sapphire/pieces' {
 		commandDeniedHelper: ChatInputDeniedCommandHelper
 		cloudinary: CloudinaryService;
 		utils: Utils;
+		helpers: CoreHelper;
 		version: string;
 	}
 }
