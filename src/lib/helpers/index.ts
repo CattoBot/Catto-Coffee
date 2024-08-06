@@ -38,7 +38,6 @@ export default class CoreHelper {
             drawRoundedImage: this.canvaHelper.drawRoundedImage.bind(this.canvaHelper),
             drawUserData: this.canvaHelper.drawUserData.bind(this.canvaHelper),
             drawProgressBarForUser: this.canvaHelper.drawProgressBarForUser.bind(this.canvaHelper),
-            registeringFONT: this.canvaHelper.registeringFONT.bind(this.canvaHelper)
         };
 
         this.voice = {
@@ -135,7 +134,6 @@ export default class CoreHelper {
             startColor?: string,
             endColor?: string
         ) => void;
-        registeringFONT: () => void;
     };
 
     voice: {
