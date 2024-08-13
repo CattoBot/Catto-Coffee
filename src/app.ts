@@ -1,7 +1,7 @@
 import './lib/setup';
 import { ApplicationClient } from './app/client';
 
-async function main(): Promise<void> {
+const main = async () => {
 	const client = new ApplicationClient();
 	try {
 		client.logger.info('Logging in');
