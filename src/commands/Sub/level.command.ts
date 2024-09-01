@@ -4,8 +4,17 @@ import { Subcommand, SubcommandOptions } from '@sapphire/plugin-subcommands';
 import { LeaderboardCommand } from '../../lib/commands/level/lb';
 import { CattoRankCommand } from '../../lib/commands/level/rank';
 import { RewardsCommand } from '../../lib/commands/level/rewards';
-import { LevelingCommandsRegistry } from '../../shared/bot/commands/build/leveling';
 import { LevelSubCommands } from '../../shared/bot/commands/options/SubCommands/levels';
+import { CommandRegister } from '../../shared/classes/CommandRegister';
+
+const register = new CommandRegister({
+    key: 'level',
+    subcommands: [
+        CattoRankCommand.key,
+        LeaderboardCommand.key,
+        RewardsCommand.key
+    ]
+})
 
 @ApplyOptions<SubcommandOptions>(LevelSubCommands.Options)
 export class LevelingCommands extends Subcommand {
@@ -16,7 +25,7 @@ export class LevelingCommands extends Subcommand {
     }
 
     override registerApplicationCommands(registry: Subcommand.Registry) {
-        LevelingCommandsRegistry.registerCommands(registry);
+        registry.registerChatInputCommand((r) => register.build(r));
     }
 
     public async ChatInputRank(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {

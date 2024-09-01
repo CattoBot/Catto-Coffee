@@ -1,33 +1,86 @@
-import { ApplyOptions, RequiresUserPermissions } from '@sapphire/decorators';
-import { CacheType, InteractionResponse, Message, MessageResolvable, PermissionFlagsBits } from 'discord.js';
+import { ApplyOptions } from '@sapphire/decorators';
+import { CacheType, Message, MessageResolvable } from 'discord.js';
 import { Subcommand, SubcommandOptions } from '@sapphire/plugin-subcommands';
-import { AddUserToGuildBlacklistCommand } from '../../lib/commands/manage/bl-add-user';
-import {
-    ResetUserCommand,
-    BonusVoiceRolesCommand,
-    DisableCommand,
-    EnableCommand,
-    FilterVoiceChannelCommand,
-    GuildBadgesCommand,
-    IntervalLeaderboardCommand,
-    LanguageCommand,
-    PrefixCommand,
-    RemoveUserFromGuildBlacklistCommand,
-    TextExperienceCommand,
-    TextRoleCommands,
-    VoiceBonusChannelCommand,
-    VoiceExperienceCommand,
-    VoiceRoleCommands,
-    ResetServerCommand
-} from '../../lib/commands/manage';
-import { AdminSubCommandsRegistration } from '../../shared/bot/commands/build/admin';
 import { AdminSubCommandOptions } from '../../shared/bot/commands/options/SubCommands/manage';
 import { VoiceSetupModalHandler } from '../../shared/bot/modals/VoiceModals';
-import { Args } from '@sapphire/framework';
 import { reply } from '@sapphire/plugin-editable-commands';
 import { Embed } from '../../lib/classes/Embed';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { Emojis } from '../../shared/enum/Emojis';
+import { CommandRegister } from "../../shared/classes/CommandRegister";
+
+const register = new CommandRegister({
+    key: 'manage',
+    subcommandgroups: [
+        
+        // `/manage xp-role ...`
+        {
+            key: 'xp-role',
+            subcommands: [
+
+                //  `/manage xp-role add <type> <role> <level>`
+                { key: 'xprl-add', options: [
+                    { key: 'xprl-type', type: 'string', required: true, choices: [
+                        { key: 'vc', value: 'vc' },
+                        { key: 'txt', value: 'txt' }
+                    ]},
+                    { key: 'xprladd-select', type: 'string', required: true, autocomplete: true },
+                    { key: 'xprl-level', type: 'integer', required: true, min: 0, max: 512 }
+                ]},
+
+                //  `/manage xp-role remove <type> <role>`
+                { key: 'xprl-remove', options: [
+                    { key: 'xprl-type', type: 'string', required: true, choices: [
+                        { key: 'vc', value: 'vc' },
+                        { key: 'txt', value: 'txt' }
+                    ]},
+                    { key: 'xprlrm-select', type: 'string', required: true, autocomplete: true }
+                ]},
+
+                //  `/manage xp-role list <type>`
+                { key: 'xprl-list', options: [
+                    { key: 'xprl-type', type: 'string', required: true, choices: [
+                        { key: 'vc', value: 'vc' },
+                        { key: 'txt', value: 'txt' }
+                    ]}
+                ]}
+            ]
+        },
+
+        // `/manage xp ...`
+        {
+            key: 'xp',
+            subcommands: [
+                { key: 'xp-reset', options: [
+                    { key: 'xprst-user', type: "user", required: true }
+                ]},
+                { key: 'xp-resetall' },
+                { key: 'xp-set', options: [
+                    { key: 'xpst-user', type: "user", required: true },
+                    { key: 'xpst-type', type: "string", required: true, choices: [
+                        { key: 'points', value: 'p' },
+                        { key: 'levels', value: 'l' }
+                    ]},
+                    { key: 'xpst-amount', type: "integer", required: true }
+                ]},
+                { key: 'xp-setall', options: [
+                    { key: 'xpsta-type', type: "string", required: true, choices: [
+                        { key: 'points', value: 'p' },
+                        { key: 'levels', value: 'l' }
+                    ]},
+                    { key: 'xpsta-amount', type: "integer", required: true }
+                ]},
+                { key: 'xp-give', options: [
+                    { key: 'xpgv-user', type: "user", required: true },
+                    { key: 'xpgv-amount', type: "integer", required: true }
+                ]},
+                { key: 'xp-giveall', options: [
+                    { key: 'xpgv-amount', type: "integer", required: true }
+                ]}
+            ]
+        }
+    ]
+})
 
 @ApplyOptions<SubcommandOptions>(AdminSubCommandOptions.Options)
 export class AdminCommands extends Subcommand {
@@ -38,7 +91,7 @@ export class AdminCommands extends Subcommand {
     }
 
     override registerApplicationCommands(registry: Subcommand.Registry) {
-        AdminSubCommandsRegistration.registerCommands(registry);
+        registry.registerChatInputCommand((r) => register.build(r))
     }
 
     public async messageRunShow(message: Message): Promise<MessageResolvable> {
@@ -64,143 +117,5 @@ export class AdminCommands extends Subcommand {
             }
         }
         await interaction.showModal(VoiceSetupModalHandler);
-    }
-
-    @RequiresUserPermissions(PermissionFlagsBits.Administrator)
-    public async ChatInputAddUserToGuildBlacklist(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return AddUserToGuildBlacklistCommand.run(interaction);
-    }
-
-    @RequiresUserPermissions(PermissionFlagsBits.Administrator)
-    public async ChatRemoveUserFromGuildBlacklist(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return RemoveUserFromGuildBlacklistCommand.run(interaction);
-    }
-
-    public async ChatInputAddVoiceRole(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
-        await VoiceRoleCommands.add(interaction);
-    }
-
-    public async ChatInputRemoveVoiceRole(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return VoiceRoleCommands.remove(interaction);
-    }
-
-    public async ChatInputAddTextRole(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
-        await TextRoleCommands.add(interaction);
-    }
-
-    public async ChatInputRemoveTextRole(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
-        await TextRoleCommands.add(interaction);
-    }
-
-    public async ChatInputTextExperience(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return TextExperienceCommand.run(interaction);
-    }
-
-    public async ChatInputVoiceExperience(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return VoiceExperienceCommand.run(interaction);
-    }
-
-    public async ChatInputBonusChannel(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return VoiceBonusChannelCommand.run(interaction);
-    }
-
-    public async ChatInputBonusRoleAdd(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return BonusVoiceRolesCommand.add(interaction);
-    }
-
-    public async ChatInputBonusRoleRemove(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return BonusVoiceRolesCommand.remove(interaction);
-    }
-
-    public async ChatInputFilteredChannelAdd(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return FilterVoiceChannelCommand.add(interaction);
-    }
-
-    public async ChatInputFilteredChannelRemove(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return FilterVoiceChannelCommand.remove(interaction);
-    }
-
-    public async ChatInputAddDailyLeaderboard(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return IntervalLeaderboardCommand.dailyRun(interaction);
-    }
-
-    public async ChatInputAddWeeklyLeaderboard(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return IntervalLeaderboardCommand.weeklyRun(interaction);
-    }
-
-    public async ChatInputAddMonthlyLeaderboard(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return IntervalLeaderboardCommand.monthlyRun(interaction);
-    }
-
-    // public async ChatInputLogs(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-    //     return LogsCommand.run(interaction);
-    // }
-
-    // public async MessageRunLogs(interaction: Subcommand.MessageCommandInteraction): Promise<InteractionResponse> {
-    //     return LogsCommand.run(interaction);
-    // }
-
-    public async ChatInputPrefix(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return PrefixCommand.chatInputRun(interaction);
-    }
-
-    public async MessageRunPrefix(message: Message, args: Args): Promise<MessageResolvable> {
-        return PrefixCommand.messageRun(message, args);
-    }
-
-    public async ChatInputLanguage(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return LanguageCommand.chatInputRun(interaction);
-    }
-
-    public async MessageRunLanguage(message: Message): Promise<MessageResolvable> {
-        return LanguageCommand.messageRun(message);
-    }
-
-    public async ChatInputEnableCommand(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return EnableCommand.commandRun(interaction);
-    }
-
-    // public async MessageEnableCommand(interaction: Subcommand.MessageCommandInteraction): Promise<InteractionResponse> {
-    //     return EnableCommand.run(interaction);
-    // }
-
-    public async ChatInputEnableModule(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return EnableCommand.moduleRun(interaction);
-    }
-
-    // public async MessageEnableModule(interaction: Subcommand.MessageCommandInteraction): Promise<InteractionResponse> {
-    //     return EnableModule.run(interaction);
-    // }
-
-    public async ChatInputDisableCommand(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return DisableCommand.commandRun(interaction);
-    }
-
-    // public async MessageDisableCommand(interaction: Subcommand.MessageCommandInteraction): Promise<InteractionResponse> {
-    //     return DisableCommand.run(interaction);
-    // }
-
-    public async ChatInputDisableModule(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return DisableCommand.moduleRun(interaction);
-    }
-
-    // public async MessageDisableModule(interaction: Subcommand.MessageCommandInteraction): Promise<InteractionResponse> {
-    //     return DisableModule.run(interaction);
-    // }
-
-    public async ChatInputAddBadge(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
-        await GuildBadgesCommand.chatInputRun(interaction);
-    }
-
-    public async ChatInputRemoveBadge(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<InteractionResponse> {
-        return GuildBadgesCommand.chatInputRemove(interaction);
-    }
-
-    public async ChatInputResetUserExperience(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
-        await ResetUserCommand.chatInputRun(interaction);
-    }
-
-    public async ChatInputResetGuildExperience(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
-        await ResetServerCommand.chatInputRun(interaction);
     }
 }
