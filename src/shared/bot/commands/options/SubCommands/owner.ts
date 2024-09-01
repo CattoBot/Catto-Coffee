@@ -1,33 +1,33 @@
 import { SubcommandOptions } from "@sapphire/plugin-subcommands";
 import { PermissionFlagsBits } from "discord.js";
 
-export class OwnerOnlyCommandsOptions {
+export class OwnerSubCommandOptions {
     public static Options: SubcommandOptions = {
-        name: 'blacklist',
+        name: 'owner',
         requiredClientPermissions: [PermissionFlagsBits.Administrator],
         requiredUserPermissions: [PermissionFlagsBits.Administrator],
         subcommands: [
             {
-                name: "add",
+                name: "sanction",
                 type: "group",
                 entries: [
                     {
-                        name: "server", chatInputRun: "ChatInputServer",
+                        name: "add", chatInputRun: "ChatInputOwnerSanctionAdd",
                     },
                     {
-                        name: "user", chatInputRun: "ChatInputUser"
+                        name: "remove", chatInputRun: "ChatInputOwnerSanctionRemove"
                     },
                 ],
             },
             {
-                name: "remove",
+                name: "badges",
                 type: "group",
                 entries: [
                     {
-                        name: "server", chatInputRun: "ChatInputRemoveServer"
+                        name: "add", chatInputRun: "ChatInputOwnerBadgesAdd"
                     },
                     {
-                        name: "user", chatInputRun: "ChatInputRemoveUser"
+                        name: "remove", chatInputRun: "ChatInputOwnerBadgesRemove"
                     }
                 ]
             }
