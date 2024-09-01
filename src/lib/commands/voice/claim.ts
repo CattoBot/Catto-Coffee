@@ -6,6 +6,7 @@ import { InteractionResponse, Message } from "discord.js";
 import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class VoiceClaimCommand {
+export class VoiceClaimCommand {
     public static async messageRun(message: Message) {
         await message.channel.sendTyping();
         const member = message.member;
@@ -15,6 +16,7 @@ export class VoiceClaimCommand {
             });
         }
 
+        const channel = await container.helpers.voice.find(member!.voice.channel.id, message.guild!.id);
         const channel = await container.helpers.voice.find(member!.voice.channel.id, message.guild!.id);
 
         if (!channel) {
@@ -62,6 +64,7 @@ export class VoiceClaimCommand {
             });
         }
 
+        const channel = await container.helpers.voice.find(member!.voice.channel.id, interaction.guild!.id);
         const channel = await container.helpers.voice.find(member!.voice.channel.id, interaction.guild!.id);
 
         if (!channel) {

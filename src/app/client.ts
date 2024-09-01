@@ -1,14 +1,18 @@
 import { LogLevel, SapphireClient, container } from "@sapphire/framework";
 import { envParseInteger, envParseString } from "@skyra/env-utilities";
 import { InternationalizationContext } from "@sapphire/plugin-i18next";
+import { InternationalizationContext } from "@sapphire/plugin-i18next";
 import { GatewayIntentBits, Partials } from "discord.js";
 import { PrismaClient } from "@prisma/client";
+import { getRootData } from "@sapphire/pieces";
+import { join } from "path";
 import { getRootData } from "@sapphire/pieces";
 import { join } from "path";
 import { Redis } from "ioredis";
 import { ApplicationConsole } from "../lib/console";
 import { ChatInputDeniedCommandHelper } from "../lib/events/commandDenied";
 import { Config } from "../config";
+import { Utils } from "../lib/utils";
 import { Utils } from "../lib/utils";
 import { CloudinaryService } from "../lib/services/cloudinary";
 import Helper from "../lib/helpers/index";
@@ -19,7 +23,7 @@ export class ApplicationClient extends SapphireClient {
     constructor() {
         super({
             defaultPrefix: Config.prefix,
-            regexPrefix: /^(hey +)?bot[,! ]/i,
+            regexPrefix: Config.regexPrefix,
             caseInsensitiveCommands: true,
             logger: {
                 level: LogLevel.Debug
@@ -39,6 +43,7 @@ export class ApplicationClient extends SapphireClient {
             ],
             fetchPrefix: async (message) => {
                 if (message.guild?.id) {
+                    const prefix = await container.utils.guilds.getPrefix(message.guild.id);
                     const prefix = await container.utils.guilds.getPrefix(message.guild.id);
                     return prefix;
                 }
@@ -61,6 +66,7 @@ export class ApplicationClient extends SapphireClient {
             i18n: {
                 fetchLanguage: async (context: InternationalizationContext) => {
                     const guild = await container.prisma.guilds.findUnique({ where: { guildId: context.guild?.id } });
+                    return guild?.language || Config.defaultLanguage;
                     return guild?.language || Config.defaultLanguage;
                 }
             },
