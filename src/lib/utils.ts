@@ -96,7 +96,7 @@ async function getPrefix(guildId: string): Promise<string> {
 
 function bannerLoad() {
 	setTimeout(() => {
-		const bannerPath = join(__dirname, '../../assets/banner.txt');
+		const bannerPath = join(__dirname, '../../assets/console/banner.format.catto');
 		const bannerText = readFileSync(bannerPath, 'utf8');
 		container.console.watch(cyan(bannerText));
 	}, 1000);
