@@ -3,17 +3,17 @@ import { Helper } from "./helper";
 import { RoleReward } from "../../shared/types/Rewards";
 
 export class LevelingHelper extends Helper {
-    public static async getVoiceXPEnabled(guildId: string) {
+    public async getVoiceXPEnabled(guildId: string) {
         const result = await container.prisma.i_voice_experience.findUnique({ where: { guildId } });
         return result?.isEnabled ?? false;
     }
 
-    public static async getTextXPEnabled(guildId: string) {
+    public async getTextXPEnabled(guildId: string) {
         const result = await container.prisma.i_text_experience.findUnique({ where: { guildId } });
         return result?.isEnabled ?? false;
     }
 
-    public static async getTextLeaderboard(guildId: string) {
+    public async getTextLeaderboard(guildId: string) {
         const lb = await container.prisma.text_experience.findMany({
             where: {
                 guildId: guildId
@@ -30,7 +30,7 @@ export class LevelingHelper extends Helper {
         return lb;
     }
 
-    public static async getVoiceLeaderboard(guildId: string) {
+    public async getVoiceLeaderboard(guildId: string) {
         const lb = await container.prisma.voice_experience.findMany({
             where: {
                 guildId: guildId
@@ -46,21 +46,21 @@ export class LevelingHelper extends Helper {
         return lb;
     }
 
-    public static async getTextRewards(guildId: string): Promise<RoleReward[]> {
+    public async getTextRewards(guildId: string): Promise<RoleReward[]> {
         const rewards = await container.prisma.experience_role_rewards.findMany({
             where: { guildId }
         });
         return rewards.filter(reward => reward.roleType === 'text') as RoleReward[];
     }
 
-    public static async getVoiceRewards(guildId: string): Promise<RoleReward[]> {
+    public async getVoiceRewards(guildId: string): Promise<RoleReward[]> {
         const rewards = await container.prisma.experience_role_rewards.findMany({
             where: { guildId }
         });
         return rewards.filter(reward => reward.roleType === 'voice') as RoleReward[];
     }
 
-    public static async getVoiceRank(userId: string, guildId: string) {
+    public async getVoiceRank(userId: string, guildId: string) {
         const users = await container.prisma.voice_experience.findMany({
             where: { guildId },
             orderBy: [
@@ -76,7 +76,7 @@ export class LevelingHelper extends Helper {
         return userIndex !== -1 ? userIndex + 1 : undefined;
     }
 
-    public static async getTextRank(userId: string, guildId: string) {
+    public async getTextRank(userId: string, guildId: string) {
         const users = await container.prisma.text_experience.findMany({
             where: { guildId },
             orderBy: [
@@ -92,7 +92,7 @@ export class LevelingHelper extends Helper {
         return userIndex !== -1 ? userIndex + 1 : undefined;
     }
 
-    public static async getVoiceUserInfo(userId: string, guildId: string) {
+    public async getVoiceUserInfo(userId: string, guildId: string) {
         return await container.prisma.voice_experience.findUnique({
             where: {
                 guildId_userId: {
@@ -103,7 +103,7 @@ export class LevelingHelper extends Helper {
         });
     }
 
-    public static async getTextUserInfo(userId: string, guildId: string) {
+    public async getTextUserInfo(userId: string, guildId: string) {
         return await container.prisma.text_experience.findUnique({
             where: {
                 guildId_userId: {
@@ -113,5 +113,4 @@ export class LevelingHelper extends Helper {
             }
         });
     }
-
 }

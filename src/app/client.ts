@@ -1,16 +1,17 @@
 import { LogLevel, SapphireClient, container } from "@sapphire/framework";
 import { envParseInteger, envParseString } from "@skyra/env-utilities";
+import { InternationalizationContext } from "@sapphire/plugin-i18next";
 import { GatewayIntentBits, Partials } from "discord.js";
 import { PrismaClient } from "@prisma/client";
-import { Redis } from "ioredis";
-import { ApplicationConsole } from "../lib/console";
 import { getRootData } from "@sapphire/pieces";
 import { join } from "path";
+import { Redis } from "ioredis";
+import { ApplicationConsole } from "../lib/console";
 import { ChatInputDeniedCommandHelper } from "../lib/events/commandDenied";
 import { Config } from "../config";
-import { getPrefix } from "../lib/utils";
-import { InternationalizationContext } from "@sapphire/plugin-i18next";
+import { Utils } from "../lib/utils";
 import { CloudinaryService } from "../lib/services/cloudinary";
+import Helper from "../lib/helpers/index";
 import { Services } from "../lib/services";
 
 export class ApplicationClient extends SapphireClient {
@@ -18,7 +19,7 @@ export class ApplicationClient extends SapphireClient {
     constructor() {
         super({
             defaultPrefix: Config.prefix,
-            regexPrefix: /^(hey +)?catto[,! ]/i,
+            regexPrefix: /^(hey +)?bot[,! ]/i,
             caseInsensitiveCommands: true,
             logger: {
                 level: LogLevel.Debug
@@ -38,7 +39,7 @@ export class ApplicationClient extends SapphireClient {
             ],
             fetchPrefix: async (message) => {
                 if (message.guild?.id) {
-                    const prefix = await getPrefix(message.guild.id);
+                    const prefix = await container.utils.guilds.getPrefix(message.guild.id);
                     return prefix;
                 }
                 return Config.prefix;
@@ -60,7 +61,7 @@ export class ApplicationClient extends SapphireClient {
             i18n: {
                 fetchLanguage: async (context: InternationalizationContext) => {
                     const guild = await container.prisma.guilds.findUnique({ where: { guildId: context.guild?.id } });
-                    return guild?.language || 'es-ES';
+                    return guild?.language || Config.defaultLanguage;
                 }
             },
             loadApplicationCommandRegistriesStatusListeners: true
@@ -68,7 +69,6 @@ export class ApplicationClient extends SapphireClient {
 
         this.stores.get('interaction-handlers').registerPath(join(this.rootData.root, 'interactions'));
         this.stores.get('scheduled-tasks').registerPath(join(this.rootData.root, 'tasks'));
-        this.stores.get('pattern-commands').registerPath(join(this.rootData.root, 'commands/pattern'));
     }
 
     public override async login(token?: string): Promise<string> {
@@ -77,6 +77,9 @@ export class ApplicationClient extends SapphireClient {
         container.console = new ApplicationConsole();
         container.cloudinary = new CloudinaryService();
         container.commandDeniedHelper = new ChatInputDeniedCommandHelper();
+        container.utils = new Utils();
+        container.helpers = new Helper();
+        container.version = Config.version
         container.services = new Services();
         return super.login(token);
     }

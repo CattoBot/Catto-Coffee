@@ -2,7 +2,6 @@ import { Precondition } from "@sapphire/framework";
 import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 import { Emojis } from "../shared/enum/Emojis";
 import { resolveKey } from "@sapphire/plugin-i18next";
-import { getPrefix } from "../lib/utils";
 
 export class RoleCommandPermitPrecondition extends Precondition {
     public override async chatInputRun(interaction: ChatInputCommandInteraction) {
@@ -68,7 +67,7 @@ export class RoleCommandPermitPrecondition extends Precondition {
             return this.error({ message: Emojis.ERROR });
         }
 
-        const prefix = await getPrefix(guildId);
+        const prefix = await this.container.utils.guilds.getPrefix(guildId);
         const botMention = `<@${message.client.user!.id}>`;
         const botMentionNickname = `<@!${message.client.user!.id}>`;
 

@@ -1,8 +1,8 @@
 import { ApplyOptions } from "@sapphire/decorators";
+import { container } from "@sapphire/framework";
 import { Events, Listener } from "@sapphire/framework";
-import { Guild, GuildMember, Message, TextChannel } from "discord.js";
+import { Guild, GuildMember, Message, TextChannel, PermissionResolvable, PermissionFlagsBits } from "discord.js";
 import { EnabledTextListenerExperience } from "../../lib/decorators/ListenerTextExpEnabled";
-import { globalexperienceFormula, textExperienceFormula } from "../../lib/utils";
 import { FilteredTextChannel } from "../../lib/decorators/FilteredTextChannel";
 
 @ApplyOptions<Listener.Options>({ event: Events.MessageCreate })
@@ -15,6 +15,7 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
     @FilteredTextChannel()
     public async run(message: Message) {
         if (!message.guild || message.author.bot || !message.inGuild()) return;
+
         const { min, max, cooldown } = await this.getMinMaxEXP(message);
         const cooldownKey = this.getCooldownKey(message.guild.id, message.author.id);
         const remainingCooldown = await this.container.redis.ttl(cooldownKey);
@@ -24,14 +25,17 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         }
 
         await this.setCooldown(cooldownKey, cooldown);
+
         const userExp = await this.getUserExperience(message.guild.id, message.author.id);
         let randomXP = this.getRandomXP(min, max);
+
         const bonusPercentage = await this.getUserBonusPercentage(message.member as GuildMember);
         if (bonusPercentage > 0) {
             randomXP += randomXP * (bonusPercentage / 100);
         }
+
         let { updatedExp, currentLevel } = this.calculateUpdatedExperience(userExp, randomXP);
-        const nextLevelExp = textExperienceFormula(currentLevel);
+        const nextLevelExp = container.helpers.leveling.xp.textExperienceFormula(currentLevel);
 
         if (updatedExp >= nextLevelExp) {
             currentLevel += 1;
@@ -73,15 +77,19 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
             try {
                 const notificationChannel = await message.guild!.channels.fetch(notificationChannelId);
                 if (notificationChannel && notificationChannel.isTextBased()) {
+                    if (!this.hasPermissions(notificationChannel as TextChannel, [PermissionFlagsBits.SendMessages])) {
+                        this.container.console.error(`Missing SEND_MESSAGES permission in channel ${notificationChannelId}`);
+                        return;
+                    }
+
                     await (notificationChannel as TextChannel).send(replacementMessage);
                 } else {
                     await message.reply(replacementMessage);
                 }
             } catch (error) {
+                this.container.console.error(`Failed to send level up notification: ${error}`);
                 await message.reply(replacementMessage);
             }
-        } else {
-            await message.reply(replacementMessage);
         }
     }
 
@@ -118,12 +126,14 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         let currentExperience = user?.globalExperience || 0;
         let currentLevel = user?.globalLevel || 1;
         let newExperience = currentExperience + experience;
-        let nextLevelExperience = globalexperienceFormula(currentLevel);
+        let nextLevelExperience = container.helpers.leveling.xp.globalExperienceFormula(currentLevel);
+
         while (newExperience >= nextLevelExperience) {
             newExperience -= nextLevelExperience;
             currentLevel++;
-            nextLevelExperience = globalexperienceFormula(currentLevel);
+            nextLevelExperience = container.helpers.leveling.xp.globalExperienceFormula(currentLevel);
         }
+
         await this.container.prisma.users.upsert({
             where: { userId },
             create: {
@@ -166,7 +176,24 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         const rolesToAssign = Array.from(member.guild.roles.cache.values()).filter(role => roleIdsForLevel.has(role.id) && !currentRoleIds.has(role.id));
 
         if (rolesToAssign.length > 0) {
-            await member.roles.add(rolesToAssign).catch(() => null);
+            try {
+                const botMember = member.guild.members.me;
+                if (!botMember?.permissions.has(PermissionFlagsBits.ManageRoles)) {
+                    this.container.console.error(`Bot does not have MANAGE_ROLES permission in guild ${guildID}`);
+                    return;
+                }
+
+                const highestBotRole = botMember.roles.highest;
+                const canManageRoles = rolesToAssign.every(role => highestBotRole.position > role.position);
+                if (!canManageRoles) {
+                    this.container.console.error(`Bot cannot manage one or more roles due to role hierarchy in guild ${guildID}`);
+                    return;
+                }
+
+                await member.roles.add(rolesToAssign);
+            } catch (e) {
+                this.container.console.error(`Failed to add roles to ${member.user.username} in guild ${guildID} ${e}`)
+            }
         }
     }
 
@@ -183,7 +210,8 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         try {
             const channel = await guild.channels.fetch(channelId);
             return channel != null;
-        } catch {
+        } catch (error) {
+            this.container.console.error(`Channel ID ${channelId} does not exist in guild ${guild.id}: ${error}`);
             return false;
         }
     }
@@ -200,5 +228,12 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
             }
         }
         return maxBonus;
+    }
+
+    private hasPermissions(channel: TextChannel, permissions: PermissionResolvable[]): boolean {
+        const botMember = channel.guild.members.me;
+        if (!botMember) return false;
+        const channelPermissions = channel.permissionsFor(botMember);
+        return channelPermissions?.has(permissions) || false;
     }
 }

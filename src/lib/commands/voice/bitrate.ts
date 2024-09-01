@@ -2,7 +2,6 @@ import { fetchT, resolveKey } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
 import { GuildMember, InteractionResponse, Message } from "discord.js";
-import { ConvertBitrateToMillions } from "../../utils";
 import { container } from "@sapphire/pieces";
 import { Args } from "@sapphire/framework";
 import { CattoSubcommandObject } from "../../../shared/types/Commands";
@@ -17,7 +16,7 @@ export class VoiceBitrateCommand {
         try {
             if (member.voice.channel) {
                 await member.voice.channel.edit({
-                    bitrate: ConvertBitrateToMillions(bitrate ?? 64)
+                    bitrate: container.utils.ConvertBitrateToMillions(bitrate ?? 64)
                 });
             } else {
                 throw new Error('Member is not in a voice channel.');
@@ -55,7 +54,7 @@ export class VoiceBitrateCommand {
             if (member.voice.channel) {
                 const actualBitrate = bitrate ?? 64;
                 await member.voice.channel.edit({
-                    bitrate: ConvertBitrateToMillions(actualBitrate)
+                    bitrate: container.utils.ConvertBitrateToMillions(actualBitrate)
                 });
             }
             await message.reply({

@@ -1,10 +1,9 @@
 import { createCanvas, loadImage, Canvas, CanvasRenderingContext2D, Image } from 'canvas';
 import { join } from 'path';
+import { container } from '@sapphire/pieces';
 import { UserInfo } from '../../shared/interfaces/UserInfo';
-import { formatNumber } from '../utils';
-import { CanvaHelper } from '../helpers/Canva';
 
-export class RankCardBuilder extends CanvaHelper {
+export class RankCardBuilder {
     private canvas: Canvas;
     private ctx: CanvasRenderingContext2D;
     private user?: UserInfo;
@@ -17,7 +16,6 @@ export class RankCardBuilder extends CanvaHelper {
     private progressBarSecondColor: string = '#F70FFF';
 
     constructor() {
-        super();
         this.canvas = createCanvas(1000, 300);
         this.ctx = this.canvas.getContext('2d');
     }
@@ -114,8 +112,8 @@ export class RankCardBuilder extends CanvaHelper {
             throw new Error('User and guildId must be set.');
         }
 
-        const userBadges = await this.getUserBadges(user.userId);
-        const guildBadges = await this.getGuildBadges(guildId);
+        const userBadges = await container.helpers.canvas.getUserBadges(user.userId);
+        const guildBadges = await container.helpers.canvas.getGuildBadges(guildId);
 
         const allBadges = [...userBadges, ...guildBadges];
         if (allBadges.length > 0) {
@@ -178,7 +176,7 @@ export class RankCardBuilder extends CanvaHelper {
         ctx.font = '22px Poppins SemiBold';
         ctx.fillText(`Lv. ${user.level}`, LEVEL_X, LEVEL_Y);
         ctx.font = '25px Poppins SemiBold';
-        ctx.fillText(`${formatNumber(experience)} / ${formatNumber(requiredXP)}`, XP_TEXT_X, XP_TEXT_Y);
+        ctx.fillText(`${container.utils.numbers.format(experience)} / ${container.utils.numbers.format(requiredXP)}`, XP_TEXT_X, XP_TEXT_Y);
     }
 
     private drawAvatar(avatar: Image) {
@@ -202,7 +200,7 @@ export class RankCardBuilder extends CanvaHelper {
     }
 
     public async build(): Promise<Buffer> {
-        this.registerFonts();
+        container.helpers.canvas.registerFonts();
         if (!this.avatarURL) {
             throw new Error('Avatar URL must be set.');
         }

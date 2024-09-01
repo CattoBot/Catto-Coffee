@@ -3,11 +3,9 @@ import { resolveKey } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
 import { InteractionResponse, Message } from "discord.js";
-import { VoiceHelper } from "../../helpers/voice.helper";
 import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
-export class VoiceClaimCommand extends VoiceHelper {
-
+export class VoiceClaimCommand {
     public static async messageRun(message: Message) {
         await message.channel.sendTyping();
         const member = message.member;
@@ -17,7 +15,7 @@ export class VoiceClaimCommand extends VoiceHelper {
             });
         }
 
-        const channel = await this.find(member!.voice.channel.id, message.guild!.id);
+        const channel = await container.helpers.voice.find(member!.voice.channel.id, message.guild!.id);
 
         if (!channel) {
             return message.reply({
@@ -64,7 +62,7 @@ export class VoiceClaimCommand extends VoiceHelper {
             });
         }
 
-        const channel = await this.find(member!.voice.channel.id, interaction.guild!.id);
+        const channel = await container.helpers.voice.find(member!.voice.channel.id, interaction.guild!.id);
 
         if (!channel) {
             return await interaction.reply({

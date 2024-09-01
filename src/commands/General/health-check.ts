@@ -5,7 +5,7 @@ import { Colors, EmbedBuilder, Message } from 'discord.js';
 import os from 'os';
 
 export class HealthCheckCommand extends Command {
-    public constructor(context: Command.Context, options: Command.Options) {
+    public constructor(context: Command.LoaderContext, options: Command.Options) {
         super(context, {
             ...options,
             name: 'healthcheck',

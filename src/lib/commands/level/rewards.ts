@@ -5,22 +5,23 @@ import { Embed } from "../../classes/Embed";
 import { RoleReward } from "../../../shared/types/Rewards";
 import { resolveKey } from "@sapphire/plugin-i18next";
 import { LevelingHelper } from "../../helpers/leveling.helper";
+import { container } from "@sapphire/framework";
 import { CattoSubcommandObject } from "../../../shared/types/Commands";
 
 export class RewardsCommand extends LevelingHelper {
     public static async run(interaction: Subcommand.ChatInputCommandInteraction) {
         await interaction.deferReply({ ephemeral: false });
         const guildId = interaction.guildId!;
-        const voiceEnabled = await this.getVoiceXPEnabled(guildId);
-        const textEnabled = await this.getTextXPEnabled(guildId);
+        const voiceEnabled = await container.helpers.leveling.getVoiceXPEnabled(guildId);
+        const textEnabled = await container.helpers.leveling.getTextXPEnabled(guildId);
 
         if (!voiceEnabled && !textEnabled) {
             await interaction.followUp({ content: await resolveKey(interaction, `commands/replies/level:rank_not_enabled`), ephemeral: true });
             return;
         }
 
-        const textRewards = await this.getTextRewards(guildId);
-        const voiceRewards = await this.getVoiceRewards(guildId);
+        const textRewards = await container.helpers.leveling.getTextRewards(guildId);
+        const voiceRewards = await container.helpers.leveling.getVoiceRewards(guildId);
 
         if (textRewards.length === 0 && voiceRewards.length === 0) {
             await interaction.followUp({ content: await resolveKey(interaction, `commands/replies/level:not_rewards`), ephemeral: true });
