@@ -14,16 +14,12 @@ export class RewardsCommand extends LevelingHelper {
         const guildId = interaction.guildId!;
         const voiceEnabled = await container.helpers.leveling.getVoiceXPEnabled(guildId);
         const textEnabled = await container.helpers.leveling.getTextXPEnabled(guildId);
-        const voiceEnabled = await container.helpers.leveling.getVoiceXPEnabled(guildId);
-        const textEnabled = await container.helpers.leveling.getTextXPEnabled(guildId);
 
         if (!voiceEnabled && !textEnabled) {
             await interaction.followUp({ content: await resolveKey(interaction, `commands/replies/level:rank_not_enabled`), ephemeral: true });
             return;
         }
 
-        const textRewards = await container.helpers.leveling.getTextRewards(guildId);
-        const voiceRewards = await container.helpers.leveling.getVoiceRewards(guildId);
         const textRewards = await container.helpers.leveling.getTextRewards(guildId);
         const voiceRewards = await container.helpers.leveling.getVoiceRewards(guildId);
 

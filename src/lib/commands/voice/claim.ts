@@ -4,8 +4,6 @@ import { Subcommand } from "@sapphire/plugin-subcommands";
 import { Emojis } from "../../../shared/enum/Emojis";
 import { InteractionResponse, Message } from "discord.js";
 import { CattoSubcommandObject } from "../../../shared/types/Commands";
-
-export class VoiceClaimCommand {
 export class VoiceClaimCommand {
     public static async messageRun(message: Message) {
         await message.channel.sendTyping();
@@ -17,8 +15,7 @@ export class VoiceClaimCommand {
         }
 
         const channel = await container.helpers.voice.find(member!.voice.channel.id, message.guild!.id);
-        const channel = await container.helpers.voice.find(member!.voice.channel.id, message.guild!.id);
-
+        
         if (!channel) {
             return message.reply({
                 content: (await resolveKey(message, `commands/replies/commandDenied:channel_not_found`, { emoji: Emojis.ERROR })),
@@ -65,8 +62,7 @@ export class VoiceClaimCommand {
         }
 
         const channel = await container.helpers.voice.find(member!.voice.channel.id, interaction.guild!.id);
-        const channel = await container.helpers.voice.find(member!.voice.channel.id, interaction.guild!.id);
-
+        
         if (!channel) {
             return await interaction.reply({
                 content: (await resolveKey(interaction, `commands/replies/commandDenied:channel_not_found`, { emoji: Emojis.ERROR })),
