@@ -7,5 +7,5 @@
 '  '--'\ '-'  |  |  |    |  |  ' '-' ' '  '--'\' '-' '|  .-'|  .-'\   --.\   --.
  `-----'`--`--'  `--'    `--'   `---'   `-----' `---' `--'  `--'   `----' `----'
 
-Catto Coffee {{v}}
+Catto Coffee {{bot_version}}
 Powered by Discord.js {{discordjs_version}} & SapphireFramework {{saphire_version}}

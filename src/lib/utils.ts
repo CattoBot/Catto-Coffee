@@ -311,9 +311,12 @@ export class Utils {
 		 */
 		bannerLoad() {
 			setTimeout(() => {
-				const bannerPath = join(__dirname, '../../assets/banner.txt');
-				const bannerText = readFileSync(bannerPath, 'utf8');
-				container.console.watch(cyan(bannerText.replace("%version%", container.version)));
+				const bannerPath = join(__dirname, '../../assets/console/banner.format.catto');
+				const bannerText = readFileSync(bannerPath, 'utf8')
+									.replace("{{bot_version}}", container.version)
+									.replace("{{discordjs_version}}", container.package.dependencies['discord.js'])
+									.replace("{{saphire_version}}", container.package.dependencies['@sapphire/framework'])
+				container.console.watch(cyan(bannerText));
 			}, 1000);
 		},
 
