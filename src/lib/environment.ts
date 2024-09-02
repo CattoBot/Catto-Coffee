@@ -26,6 +26,29 @@ declare module '@sapphire/framework' {
 	}
 }
 
+interface npm_package_file {
+	name: string;
+	version: string;
+	main: string,
+	author?: string|{name:string, email?:string, url?:string}
+	constributors?: {name: string, email?:string, url?:string}[],
+	license: string,
+	type: string|'commonjs'|'module',
+	dependencies: {
+		[key: string]: string;
+	};
+	devDependencies: {
+		[key: string]: string;
+	};
+	scripts: {
+		[key: string]: string;
+	};
+	signale: {
+		[key: string]: boolean;
+	};
+	prettier: string
+}
+
 declare module '@sapphire/pieces' {
 	interface Container {
 		prisma: PrismaClient;
@@ -37,6 +60,7 @@ declare module '@sapphire/pieces' {
 		services: Services;
 		helpers: CoreHelper;
 		version: string;
+		package: npm_package_file;
 	}
 }
 

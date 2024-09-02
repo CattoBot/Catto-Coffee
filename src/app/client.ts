@@ -13,6 +13,7 @@ import { Utils } from "../lib/utils";
 import { CloudinaryService } from "../lib/services/cloudinary";
 import Helper from "../lib/helpers/index";
 import { Services } from "../lib/services";
+import npmpackage from "../../package.json"
 
 export class ApplicationClient extends SapphireClient {
     private rootData = getRootData();
@@ -79,7 +80,8 @@ export class ApplicationClient extends SapphireClient {
         container.commandDeniedHelper = new ChatInputDeniedCommandHelper();
         container.utils = new Utils();
         container.helpers = new Helper();
-        container.version = Config.version
+        container.version = Config.version;
+        container.package = npmpackage
         container.services = new Services();
         return super.login(token);
     }
