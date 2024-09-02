@@ -2,7 +2,15 @@
   "name": "@kohi/catto",
   "version": "2.0.1",
   "main": "dist/app.js",
-  "author": "@arestosora",
+  "contributors": [
+    {
+      "name": "@arestosora"
+    },
+    {
+      "name": "gacarbla",
+      "email": "gacarbla@gacarbla.es"
+    }
+  ],
   "license": "UNLICENSE",
   "type": "commonjs",
   "dependencies": {
