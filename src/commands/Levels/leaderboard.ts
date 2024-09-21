@@ -12,7 +12,8 @@ import { TextRankButtonRow, VoiceRankButtonRow } from '../../shared/bot/buttons/
 })
 export class RankLeaderboardCommand extends Command {
     public override async messageRun(message: Message, _args: Args) {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         const args = await _args.pick('string').catch(() => 'text');
 
         if (args === 'voice') {

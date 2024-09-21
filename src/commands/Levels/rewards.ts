@@ -22,52 +22,54 @@ export class RankLeaderboardCommand extends Command {
     }
 
     private async run(context: Message | CommandInteraction, userId: string, guildId: string) {
-        if (context instanceof Message) {
-            await context.channel.sendTyping();
-        } else {
-            await context.deferReply();
-        }
+        if (context.channel?.isSendable()) {
+            if (context instanceof Message) {
+                await context.channel.sendTyping();
+            } else {
+                await context.deferReply();
+            }
 
-        const voiceEnabled = await this.container.helpers.leveling.getVoiceXPEnabled(guildId);
-        const textEnabled = await this.container.helpers.leveling.getTextXPEnabled(guildId);
+            const voiceEnabled = await this.container.helpers.leveling.getVoiceXPEnabled(guildId);
+            const textEnabled = await this.container.helpers.leveling.getTextXPEnabled(guildId);
 
-        if (!voiceEnabled && !textEnabled) {
-            const content = await resolveKey(context, `commands/replies/level:rank_not_enabled`);
-            await this.respond(context, { content });
-            return;
-        }
+            if (!voiceEnabled && !textEnabled) {
+                const content = await resolveKey(context, `commands/replies/level:rank_not_enabled`);
+                await this.respond(context, { content });
+                return;
+            }
 
-        const textRewards = await this.container.helpers.leveling.getTextRewards(guildId);
-        const voiceRewards = await this.container.helpers.leveling.getVoiceRewards(guildId);
+            const textRewards = await this.container.helpers.leveling.getTextRewards(guildId);
+            const voiceRewards = await this.container.helpers.leveling.getVoiceRewards(guildId);
 
-        if (textRewards.length === 0 && voiceRewards.length === 0) {
-            const content = await resolveKey(context, `commands/replies/level:not_rewards`);
-            await this.respond(context, { content });
-        } else if (textRewards.length === 0 || !textEnabled) {
-            await this.voiceRewardsResponse(context, voiceRewards);
-        } else if (voiceRewards.length === 0 || !voiceEnabled) {
-            await this.textRewardsResponse(context, textRewards);
-        } else {
-            const content = await resolveKey(context, `commands/replies/level:rewards_choose`);
-            await this.respond(context, {
-                content,
-                components: [RewardButtons]
-            });
+            if (textRewards.length === 0 && voiceRewards.length === 0) {
+                const content = await resolveKey(context, `commands/replies/level:not_rewards`);
+                await this.respond(context, { content });
+            } else if (textRewards.length === 0 || !textEnabled) {
+                await this.voiceRewardsResponse(context, voiceRewards);
+            } else if (voiceRewards.length === 0 || !voiceEnabled) {
+                await this.textRewardsResponse(context, textRewards);
+            } else {
+                const content = await resolveKey(context, `commands/replies/level:rewards_choose`);
+                await this.respond(context, {
+                    content,
+                    components: [RewardButtons]
+                });
 
-            const collector = context.channel?.createMessageComponentCollector({
-                filter: (btnInteraction) => btnInteraction.user.id === userId,
-                time: 15000
-            });
+                const collector = context.channel?.createMessageComponentCollector({
+                    filter: (btnInteraction) => btnInteraction.user.id === userId,
+                    time: 15000
+                });
 
-            collector?.on('collect', async (btnInteraction: ButtonInteraction) => {
-                await btnInteraction.deferUpdate();
-                if (btnInteraction.customId === 'text_rewards') {
-                    await this.textRewardsResponse(btnInteraction, textRewards);
-                } else if (btnInteraction.customId === 'voice_rewards') {
-                    await this.voiceRewardsResponse(btnInteraction, voiceRewards);
-                }
-                collector.stop();
-            });
+                collector?.on('collect', async (btnInteraction: ButtonInteraction) => {
+                    await btnInteraction.deferUpdate();
+                    if (btnInteraction.customId === 'text_rewards') {
+                        await this.textRewardsResponse(btnInteraction, textRewards);
+                    } else if (btnInteraction.customId === 'voice_rewards') {
+                        await this.voiceRewardsResponse(btnInteraction, voiceRewards);
+                    }
+                    collector.stop();
+                });
+            }
         }
     }
 
@@ -75,7 +77,7 @@ export class RankLeaderboardCommand extends Command {
         const sortedRewards = rewards.sort((a, b) => a.level - b.level);
         const rewardStrings = sortedRewards.map(reward => `**Level: ** \`${reward.level}\`  ➜  <@&${reward.roleId}>`);
         const icon = context.guild?.iconURL();
-        const embed = new Embed(rewardStrings.join('\n')).setTitle('Text Rewards').setAuthor({name: context.guild!.name, iconURL: icon!});
+        const embed = new Embed(rewardStrings.join('\n')).setTitle('Text Rewards').setAuthor({ name: context.guild!.name, iconURL: icon! });
         await this.respond(context, { embeds: [embed], components: [], content: '' });
     }
 
@@ -83,7 +85,7 @@ export class RankLeaderboardCommand extends Command {
         const sortedRewards = rewards.sort((a, b) => a.level - b.level);
         const rewardStrings = sortedRewards.map(reward => `**Level: ** \`${reward.level}\`  ➜  <@&${reward.roleId}>`);
         const icon = context.guild?.iconURL();
-        const embed = new Embed(rewardStrings.join('\n')).setTitle('Voice Rewards').setAuthor({name: context.guild!.name, iconURL: icon!});
+        const embed = new Embed(rewardStrings.join('\n')).setTitle('Voice Rewards').setAuthor({ name: context.guild!.name, iconURL: icon! });
         await this.respond(context, { embeds: [embed], components: [], content: '' });
     }
 

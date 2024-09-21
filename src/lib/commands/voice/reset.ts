@@ -5,7 +5,8 @@ import { GuildMember, InteractionResponse, Message, PermissionFlagsBits } from "
 
 export class VoiceResetCommand {
     public static async messageRun(message: Message) {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         const member = message.member as GuildMember;
         const category = member.voice.channel!.parent;
         const channel_permissions = category!.permissionOverwrites.cache.map((overwrite) => {

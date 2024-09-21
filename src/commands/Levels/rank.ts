@@ -15,7 +15,8 @@ import { voice_experience as VoiceExperience, text_experience as TextExperience 
 })
 export class RankCommand extends Command {
     public override async messageRun(message: Message, args: Args) {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         const guildId = message.guildId!;
         const [voiceEnabled, textEnabled] = await Promise.all([
             this.container.helpers.leveling.getVoiceXPEnabled(guildId),

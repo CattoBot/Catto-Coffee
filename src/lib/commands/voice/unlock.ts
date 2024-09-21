@@ -6,25 +6,29 @@ import { container } from "@sapphire/pieces";
 
 export class VoiceUnlockCommand {
     public static async messageRun(message: Message) {
-        await message.channel.sendTyping();
-        const member = message.member;
-        const channel = member!.voice.channel;
-        const users_current_permissions = channel!.permissionOverwrites.resolve(channel!.guild.roles.everyone.id);
+        if (message.channel.isSendable()) {
+            await message.channel.sendTyping();
+            const member = message.member;
+            const channel = member!.voice.channel;
+            const users_current_permissions = channel!.permissionOverwrites.resolve(channel!.guild.roles.everyone.id);
 
-        try {
-            await channel!.permissionOverwrites.edit(channel!.guild.roles.everyone, {
-                ...users_current_permissions,
-                Connect: true
-            });
-        } catch (error) {
-            container.console.error(error)
+            try {
+                await channel!.permissionOverwrites.edit(channel!.guild.roles.everyone, {
+                    ...users_current_permissions,
+                    Connect: true
+                });
+            } catch (error) {
+                container.console.error(error)
+                return message.reply({
+                    content: (await resolveKey(message, `commands/replies/error:error`)),
+                });
+            }
             return message.reply({
-                content: (await resolveKey(message, `commands/replies/error:error`)),
+                content: (await resolveKey(message, `commands/replies/voice:unlock_success`, { emoji: Emojis.SUCCESS })),
             });
         }
-        return message.reply({
-            content: (await resolveKey(message, `commands/replies/voice:unlock_success`, { emoji: Emojis.SUCCESS })),
-        });
+
+        return;
     }
     public static async chatInputRun(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse> {
         const user = interaction.user.id;

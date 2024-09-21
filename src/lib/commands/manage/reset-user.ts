@@ -29,56 +29,59 @@ export class ResetUserCommand {
         getUserExperience: (userId: string, guildId: string) => Promise<any>,
         moduleName: string
     ) {
-        const userExperience = await getUserExperience(user.id, interaction.guildId!);
-        if (!userExperience) {
-            return interaction.reply({ content: `This user doesn't have ${moduleName} experience.`, ephemeral: true });
-        }
+        if (interaction.channel?.isSendable()) {
+            const userExperience = await getUserExperience(user.id, interaction.guildId!);
+            if (!userExperience) {
+                return interaction.reply({ content: `This user doesn't have ${moduleName} experience.`, ephemeral: true });
+            }
 
-        await interaction.reply({
-            content: await resolveKey(interaction, `commands/replies/admin:confirm_reset_user`, { user: user.displayName, module: moduleName, emoji: Emojis.WARN }),
-            ephemeral: false
-        });
-
-        const confirm = await interaction.channel?.awaitMessages({
-            filter: (msg) => msg.author.id === interaction.user.id,
-            max: 1,
-            time: 30000,
-            errors: ['time']
-        }).catch(() => null);
-
-        if (!confirm || !["confirm", "confirmar"].includes(confirm.first()?.content.toLowerCase() || "")) {
-            return interaction.followUp({ content: await resolveKey(interaction, `no_time_reset_user`), ephemeral: false });
-        }
-
-        await interaction.editReply({
-            content: await resolveKey(interaction, `commands/replies/admin:resetting_user_module`, { user: user.displayName, module: moduleName, emoji: Emojis.LOADING })
-        });
-
-        if (moduleName === 'voice') {
-            await container.prisma.voice_experience.delete({
-                where: {
-                    guildId_userId: {
-                        guildId: interaction.guildId!,
-                        userId: user.id
-                    }
-                }
+            await interaction.reply({
+                content: await resolveKey(interaction, `commands/replies/admin:confirm_reset_user`, { user: user.displayName, module: moduleName, emoji: Emojis.WARN }),
+                ephemeral: false
             });
-        } else if (moduleName === 'text') {
-            await container.prisma.text_experience.delete({
-                where: {
-                    guildId_userId: {
-                        guildId: interaction.guildId!,
-                        userId: user.id
-                    }
-                }
+
+            const confirm = await interaction.channel?.awaitMessages({
+                filter: (msg) => msg.author.id === interaction.user.id,
+                max: 1,
+                time: 30000,
+                errors: ['time']
+            }).catch(() => null);
+
+            if (!confirm || !["confirm", "confirmar"].includes(confirm.first()?.content.toLowerCase() || "")) {
+                return interaction.followUp({ content: await resolveKey(interaction, `no_time_reset_user`), ephemeral: false });
+            }
+
+            await interaction.editReply({
+                content: await resolveKey(interaction, `commands/replies/admin:resetting_user_module`, { user: user.displayName, module: moduleName, emoji: Emojis.LOADING })
             });
+
+            if (moduleName === 'voice') {
+                await container.prisma.voice_experience.delete({
+                    where: {
+                        guildId_userId: {
+                            guildId: interaction.guildId!,
+                            userId: user.id
+                        }
+                    }
+                });
+            } else if (moduleName === 'text') {
+                await container.prisma.text_experience.delete({
+                    where: {
+                        guildId_userId: {
+                            guildId: interaction.guildId!,
+                            userId: user.id
+                        }
+                    }
+                });
+            }
+
+            await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/admin:reset_user_complete_emoji`, { emoji: Emojis.SUCCESS }) });
+
+            await interaction.followUp({
+                content: await resolveKey(interaction, `commands/replies/admin:reset_user_complete`, { user: user.displayName, module: moduleName, emoji: Emojis.SUCCESS })
+            });
+            return;
         }
-
-        await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/admin:reset_user_complete_emoji`, { emoji: Emojis.SUCCESS }) });
-
-        await interaction.followUp({
-            content: await resolveKey(interaction, `commands/replies/admin:reset_user_complete`, { user: user.displayName, module: moduleName, emoji: Emojis.SUCCESS })
-        });
         return;
     }
 

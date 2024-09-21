@@ -5,7 +5,8 @@ import { Emojis } from "../../../shared/enum/Emojis";
 
 export class VoiceNameCommand {
     public static async messageRun(message: Message, args: Args): Promise<void> {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         const name = await args.rest('string').catch(() => null) as string | null;
         if (!name) {
             await message.reply({

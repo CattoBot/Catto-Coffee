@@ -7,7 +7,8 @@ import { GuildMember, InteractionResponse, Message } from "discord.js";
 export class VoiceLockCommand {
 
     public static async messageRun(message: Message) {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         const member = message.member;
         const channel = member!.voice.channel;
         const users_current_permissions = channel!.permissionOverwrites.resolve(channel!.guild.roles.everyone.id);

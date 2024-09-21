@@ -48,7 +48,8 @@ export class ProfileCommand extends Command {
     }
 
     override async messageRun(message: Message, args: Args) {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         const user = await args.pick('user').catch(() => message.author);
         if (!user) {
             return message.reply(`I couldn't find the user you're looking for. ${Emojis.ERROR}`);

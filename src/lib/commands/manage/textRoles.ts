@@ -6,102 +6,108 @@ import { MessageComponentInteraction, ActionRowBuilder, ButtonBuilder, ButtonSty
 
 export class TextRoleCommands {
     public static async add(interaction: Subcommand.ChatInputCommandInteraction) {
-        const role = interaction.options.getRole('role', true);
-        const level = interaction.options.getInteger('level', true);
-        if (!role) return interaction.reply({ content: await resolveKey(interaction, `commands/replies/error:invalid_role`), ephemeral: true });
 
-        const existingRole = await container.prisma.experience_role_rewards.findUnique({
-            where: {
-                guildId_roleId_roleType: {
-                    guildId: interaction.guild!.id,
-                    roleId: role.id,
-                    roleType: 'text'
+        if (interaction.channel?.isSendable()) {
+            const role = interaction.options.getRole('role', true);
+            const level = interaction.options.getInteger('level', true);
+            if (!role) return interaction.reply({ content: await resolveKey(interaction, `commands/replies/error:invalid_role`), ephemeral: true });
+
+            const existingRole = await container.prisma.experience_role_rewards.findUnique({
+                where: {
+                    guildId_roleId_roleType: {
+                        guildId: interaction.guild!.id,
+                        roleId: role.id,
+                        roleType: 'text'
+                    }
                 }
+            });
+
+            if (existingRole?.level === level) {
+                return interaction.reply({ content: await resolveKey(interaction, 'commands/replies/error:text_role_exists', { level: level, emoji: Emojis.ERROR }), ephemeral: true });
             }
-        });
-
-        if (existingRole?.level === level) {
-            return interaction.reply({ content: await resolveKey(interaction, 'commands/replies/error:text_role_exists', { level: level, emoji: Emojis.ERROR }), ephemeral: true });
-        }
 
 
-        if (existingRole) {
-            const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-                new ButtonBuilder()
-                    .setCustomId('confirm')
-                    .setLabel('Confirm')
-                    .setStyle(ButtonStyle.Primary),
-                new ButtonBuilder()
-                    .setCustomId('cancel')
-                    .setLabel('Cancel')
-                    .setStyle(ButtonStyle.Danger)
-            );
+            if (existingRole) {
+                const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('confirm')
+                        .setLabel('Confirm')
+                        .setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder()
+                        .setCustomId('cancel')
+                        .setLabel('Cancel')
+                        .setStyle(ButtonStyle.Danger)
+                );
 
-            await interaction.reply({
-                content: `${Emojis.WARN} This role is already assigned to level \`${existingRole.level}\`. Click **confirm** to update it to \`${level}\` or **cancel** to abort.`,
-                components: [row],
-                ephemeral: true
-            });
+                await interaction.reply({
+                    content: `${Emojis.WARN} This role is already assigned to level \`${existingRole.level}\`. Click **confirm** to update it to \`${level}\` or **cancel** to abort.`,
+                    components: [row],
+                    ephemeral: true
+                });
 
-            const filter = (i: MessageComponentInteraction) => {
-                return i.user.id === interaction.user.id && (i.customId === 'confirm' || i.customId === 'cancel');
-            };
+                const filter = (i: MessageComponentInteraction) => {
+                    return i.user.id === interaction.user.id && (i.customId === 'confirm' || i.customId === 'cancel');
+                };
 
-            const collector = interaction.channel?.createMessageComponentCollector({
-                filter,
-                time: 15000,
-                max: 1
-            });
+                const collector = interaction.channel?.createMessageComponentCollector({
+                    filter,
+                    time: 15000,
+                    max: 1
+                });
 
-            collector?.on('collect', async (i: MessageComponentInteraction) => {
-                if (i.customId === 'confirm') {
-                    await container.prisma.experience_role_rewards.update({
-                        where: {
-                            guildId_roleId_roleType: {
-                                guildId: interaction.guild!.id,
-                                roleId: role.id,
-                                roleType: 'text'
+                collector?.on('collect', async (i: MessageComponentInteraction) => {
+                    if (i.customId === 'confirm') {
+                        await container.prisma.experience_role_rewards.update({
+                            where: {
+                                guildId_roleId_roleType: {
+                                    guildId: interaction.guild!.id,
+                                    roleId: role.id,
+                                    roleType: 'text'
+                                }
+                            },
+                            data: {
+                                level: level
                             }
-                        },
-                        data: {
-                            level: level
-                        }
-                    });
-                    await i.update({
-                        content: `Successfully updated the level of ${role} to ${level} ${Emojis.SUCCESS}`,
-                        components: []
-                    });
-                } else {
-                    await i.update({
-                        content: `Operation canceled ${Emojis.INFO}`,
-                        components: []
-                    });
-                }
-            });
+                        });
+                        await i.update({
+                            content: `Successfully updated the level of ${role} to ${level} ${Emojis.SUCCESS}`,
+                            components: []
+                        });
+                    } else {
+                        await i.update({
+                            content: `Operation canceled ${Emojis.INFO}`,
+                            components: []
+                        });
+                    }
+                });
 
-            collector?.on('end', collected => {
-                if (collected.size === 0) {
-                    interaction.editReply({
-                        content: 'No response received, operation canceled.',
-                        components: []
-                    });
-                }
-            });
-        } else {
-            await container.prisma.experience_role_rewards.create({
-                data: {
-                    guildId: interaction.guild!.id,
-                    roleId: role.id,
-                    roleType: 'text',
-                    level: level
-                }
-            });
+                collector?.on('end', collected => {
+                    if (collected.size === 0) {
+                        interaction.editReply({
+                            content: 'No response received, operation canceled.',
+                            components: []
+                        });
+                    }
+                });
+            } else {
+                await container.prisma.experience_role_rewards.create({
+                    data: {
+                        guildId: interaction.guild!.id,
+                        roleId: role.id,
+                        roleType: 'text',
+                        level: level
+                    }
+                });
 
-            return await interaction.reply({
-                content: await resolveKey(interaction, `commands/replies/admin:text_role_add`, { role: role, emoji: Emojis.SUCCESS }),
-                ephemeral: true
-            });
+                return await interaction.reply({
+                    content: await resolveKey(interaction, `commands/replies/admin:text_role_add`, { role: role, emoji: Emojis.SUCCESS }),
+                    ephemeral: true
+                });
+            }
+            
+            return;
         }
+
         return;
     }
 

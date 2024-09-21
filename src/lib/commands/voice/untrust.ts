@@ -7,7 +7,8 @@ import { Args, container } from "@sapphire/framework";
 
 export class VoiceUntrustCommand extends VoiceHelper {
     public static async messageRun(message: Message, args: Args) {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         try {
             const translateKey = await fetchT(message);
             const member = message.member as GuildMember;
@@ -52,7 +53,7 @@ export class VoiceUntrustCommand extends VoiceHelper {
             return message.reply({ content: 'An unexpected error occurred. Please try again later.' });
         }
     }
-    
+
     public static async chatInputRun(interaction: Subcommand.ChatInputCommandInteraction): Promise<InteractionResponse> {
         const translateKey = await fetchT(interaction);
         const user = interaction.options.getUser(translateKey('commands/options/voice:reject_name'));

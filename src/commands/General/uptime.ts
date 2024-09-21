@@ -9,7 +9,8 @@ export class UptimeCommand extends Command {
     constructor(context: Command.LoaderContext, options: Command.Options) {
         super(context, {
             ...options,
-            description: 'Check the bot\'s uptime.'
+            description: 'Check the bot\'s uptime.',
+            preconditions: ['OwnerOnlyPrecondition']
         });
     }
 
@@ -21,7 +22,8 @@ export class UptimeCommand extends Command {
     }
 
     public override async messageRun(message: Message) {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         const uptime = this.calculateUptime(container.client.uptime);
         const dbUptime = await this.getDatabaseUptime();
         await reply(message, {

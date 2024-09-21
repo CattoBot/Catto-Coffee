@@ -6,7 +6,8 @@ import { Args, container } from "@sapphire/framework";
 
 export class VoiceTrustCommand {
     public static async messageRun(message: Message, args: Args) {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         try {
             const member = message.member as GuildMember;
             const getOwner = await container.helpers.voice.getVoiceChannelOwner(

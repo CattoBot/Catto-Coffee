@@ -6,7 +6,8 @@ import { InteractionResponse, Message } from "discord.js";
 
 export class VoiceClaimCommand {
     public static async messageRun(message: Message) {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         const member = message.member;
         if (!member!.voice.channel) {
             return await message.reply({

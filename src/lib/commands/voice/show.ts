@@ -5,7 +5,8 @@ import { resolveKey } from "@sapphire/plugin-i18next";
 
 export class VoiceShowCommand {
     public static async messageRun(message: Message): Promise<void> {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         await reply(message, { embeds: [new Embed(await resolveKey(message, `commands/replies/error:voice_default_command`)).setAuthor({ name: message.author.displayName, iconURL: message.author.displayAvatarURL() })] })
     }
 }

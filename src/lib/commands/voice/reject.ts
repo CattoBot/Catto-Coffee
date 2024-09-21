@@ -6,7 +6,8 @@ import { Args } from "@sapphire/framework";
 
 export class VoiceRejectCommand {
     public static async messageRun(message: Message, args: Args) {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         const translateKey = await fetchT(message);
 
         const user = await args.pick('user').catch(() => null) as User | null;

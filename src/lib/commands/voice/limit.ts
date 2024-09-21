@@ -7,7 +7,8 @@ import { Args } from "@sapphire/framework";
 
 export class VoiceLimitCommand {
     public static async messageRun(message: Message, args: Args) {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         try {
             const limit = await args.pick('integer');
             if (!limit) return message.reply('Please provide a valid limit for the voice channel.');

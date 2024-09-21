@@ -34,7 +34,8 @@ export class VoiceBitrateCommand {
     }
 
     public static async messageRun(message: Message, args: Args): Promise<void> {
-        await message.channel.sendTyping();
+        if (message.channel.isSendable())
+            await message.channel.sendTyping();
         const bitrate = await args.pick('integer').catch(() => null);
         if (!bitrate) {
             await message.reply({
