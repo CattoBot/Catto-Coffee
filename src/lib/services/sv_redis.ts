@@ -1,7 +1,7 @@
 import { guild_blacklisted_users } from "@prisma/client";
 import { container } from "@sapphire/framework";
 
-export class UserRedisService {
+export default class UserRedisService {
     public static async fetchUserInRedis(key: string): Promise<boolean> {
         try {
             const result = await container.redis.get(key);
