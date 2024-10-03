@@ -1,5 +1,5 @@
-import { LogType } from "../../shared/enum/LogType";
-import { ConsoleOptions } from "../../shared/types/ConsoleOptions";
+import { LogType } from "../enum/logtype";
+import { ConsoleOptions } from "../types/consoleOptions";
 
 export class ConsoleLogger {
     private options: Record<LogType, ConsoleOptions>;
