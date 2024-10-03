@@ -2,11 +2,11 @@ import EMOJIS from "./emojis";
 import LOGTYPE from "./logtype";
 import STATUS from "./status";
 
-const Enumerators = {
+const Enumerations = {
     EMOJIS: EMOJIS,
     LOGTYPE: LOGTYPE,
     STATUS: STATUS
 }
 
-export default Enumerators
+export default Enumerations
 export { EMOJIS, LOGTYPE, STATUS }

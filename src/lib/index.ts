@@ -3,11 +3,11 @@ import Utils from "./tools"
 import Services from "./services"
 import Helpers from "./helpers"
 import Constants from "./constants"
-import Enumerators from "./enum"
+import Enumerations from "./enum"
 
 const Library = {
     Services,
-    Enumerators,
+    Enumerations,
     Constants,
     Console,
     Helpers,
@@ -17,7 +17,7 @@ const Library = {
 export default Library
 
 export {
-    Enumerators,
+    Enumerations,
     Constants,
     Services,
     Helpers,
