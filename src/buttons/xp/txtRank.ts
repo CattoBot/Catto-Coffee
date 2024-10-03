@@ -16,4 +16,3 @@ const TextRankButtonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
 );
 
 export default TextRankButtonRow
-export { TextRankButtonRow }

@@ -16,4 +16,3 @@ const VoiceRankButtonRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
 );
 
 export default VoiceRankButtonRow
-export { VoiceRankButtonRow }

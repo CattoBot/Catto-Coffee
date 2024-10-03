@@ -10,4 +10,3 @@ const VoiceRankButtonOnly = new ActionRowBuilder<ButtonBuilder>().addComponents(
 );
 
 export default VoiceRankButtonOnly
-export { VoiceRankButtonOnly }

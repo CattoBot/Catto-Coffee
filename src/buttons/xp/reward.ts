@@ -13,4 +13,3 @@ const RewardButtons = new ActionRowBuilder<ButtonBuilder>()
 );
 
 export default RewardButtons
-export { RewardButtons }
