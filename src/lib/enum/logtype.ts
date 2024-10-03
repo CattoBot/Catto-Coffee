@@ -10,6 +10,3 @@ enum LOGTYPE {
 }
 
 export default LOGTYPE
-export {
-    LOGTYPE
-}

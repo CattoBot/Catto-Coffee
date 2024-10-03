@@ -10,6 +10,3 @@ enum EMOJIS {
 }
 
 export default EMOJIS
-export {
-    EMOJIS
-}

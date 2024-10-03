@@ -6,6 +6,3 @@ enum STATUS {
 }
 
 export default STATUS
-export {
-    STATUS
-}
