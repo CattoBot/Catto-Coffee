@@ -4,6 +4,7 @@ node_modules/
 .idea/
 *.iml
 .env
+old_src/
 # Yarn files
 .yarn/install-state.gz
 .yarn/build-state.yml

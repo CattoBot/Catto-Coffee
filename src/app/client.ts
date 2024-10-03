@@ -6,12 +6,9 @@ import { PrismaClient } from "@prisma/client";
 import { getRootData } from "@sapphire/pieces";
 import { join } from "path";
 import { Redis } from "ioredis";
-import { ApplicationConsole } from "../lib/console";
-import { ChatInputDeniedCommandHelper } from "../lib/events/commandDenied";
+import { Console as ApplicationConsole, Utils, Services, Helpers } from "../lib";
+import { ChatInputDeniedCommandHelper } from "../events/commandDenied";
 import { Config } from "../config";
-import { Utils } from "../lib/utils";
-import { CloudinaryService } from "../lib/services/cloudinary";
-import Helper from "../lib/helpers/index";
 
 export class ApplicationClient extends SapphireClient {
     private rootData = getRootData();
@@ -75,10 +72,10 @@ export class ApplicationClient extends SapphireClient {
         container.prisma = new PrismaClient();
         container.redis = new Redis();
         container.console = new ApplicationConsole();
-        container.cloudinary = new CloudinaryService();
+        container.cloudinary = new Services.CloudinaryService();
         container.commandDeniedHelper = new ChatInputDeniedCommandHelper();
         container.utils = new Utils();
-        container.helpers = new Helper();
+        container.helpers = new Helpers();
         container.version = Config.version
         return super.login(token);
     }
