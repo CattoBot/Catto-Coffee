@@ -3,5 +3,6 @@ interface CustomSignaleOptions {
     color: string;
     label: string;
 }
+type ConsoleOptions = CustomSignaleOptions;
 
-export type ConsoleOptions = CustomSignaleOptions;
+export default ConsoleOptions
