@@ -1,7 +1,7 @@
 import pkg from 'signale';
 import { ConsoleLogger } from '../classes/logger';
 import { LOGTYPE } from '../enum';
-import { CustomMethods } from '../types/customLogMethods';
+import CustomMethods from '../types/customLogMethods';
 
 export default class ApplicationConsole extends pkg.Signale<CustomMethods> {
     constructor() {

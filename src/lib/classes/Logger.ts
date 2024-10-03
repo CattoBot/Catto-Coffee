@@ -1,5 +1,5 @@
 import { LOGTYPE } from "../enum";
-import { ConsoleOptions } from "../types/consoleOptions";
+import ConsoleOptions from "../types/consoleOptions";
 
 export class ConsoleLogger {
     private options: Record<LOGTYPE, ConsoleOptions>;

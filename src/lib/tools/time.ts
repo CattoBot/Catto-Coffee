@@ -1,5 +1,5 @@
 import { Time } from "@sapphire/time-utilities";
-import { TimeMeassure } from '../types/timeMeassure';
+import TimeMeassure from '../types/timeMeassure';
 
 export default {
 
