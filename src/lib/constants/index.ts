@@ -13,12 +13,15 @@ const presenceStatus = {
     Watching: ActivityType.Watching
 };
 
+const cattoProfilePhotoURL = "https://cdn.discordapp.com/avatars/1000184915591168080/5f9381a2da87453f74d7b1d6e463fd76.webp?size=1024"
+
 const Constants = {
     rootDir: rootDir,
     srcDir: srcDir,
     randomLoadingMessage: randomLoadingMessage,
     activities: activities,
-    presenceStatus: presenceStatus
+    presenceStatus: presenceStatus,
+    cattoPFPurl: cattoProfilePhotoURL
 }
 
 export default Constants
@@ -28,5 +31,6 @@ export {
     srcDir,
     randomLoadingMessage,
     activities,
-    presenceStatus
+    presenceStatus,
+    cattoProfilePhotoURL
 }
