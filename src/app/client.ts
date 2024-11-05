@@ -76,7 +76,7 @@ export class ApplicationClient extends SapphireClient {
         container.commandDeniedHelper = new ChatInputDeniedCommandHelper();
         container.utils = new Utils();
         container.helpers = new Helpers();
-        container.version = Config.version
+        container.version = Config.version;
         return super.login(token);
     }
 }
