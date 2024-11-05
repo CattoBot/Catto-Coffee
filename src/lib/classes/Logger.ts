@@ -1,46 +1,46 @@
-import { LogType } from "../../shared/enum/LogType";
-import { ConsoleOptions } from "../../shared/types/ConsoleOptions";
+import { LOGTYPE } from "../enum";
+import ConsoleOptions from "../types/consoleOptions";
 
 export class ConsoleLogger {
-    private options: Record<LogType, ConsoleOptions>;
+    private options: Record<LOGTYPE, ConsoleOptions>;
     constructor() {
         this.options = {
-            [LogType.INFO]: {
+            [LOGTYPE.INFO]: {
                 badge: 'ℹ',
                 color: 'blue',
                 label: 'info',
             },
-            [LogType.WARN]: {
+            [LOGTYPE.WARN]: {
                 badge: '⚠',
                 color: 'yellow',
                 label: 'warn',
             },
-            [LogType.ERROR]: {
+            [LOGTYPE.ERROR]: {
                 badge: '✖',
                 color: 'red',
                 label: 'error',
             },
-            [LogType.DEBUG]: {
+            [LOGTYPE.DEBUG]: {
                 badge: '🐛',
                 color: 'magenta',
                 label: 'debug',
             },
-            [LogType.SUCCESS]: {
+            [LOGTYPE.SUCCESS]: {
                 badge: '✔',
                 color: 'green',
                 label: 'success',
             },
-            [LogType.LOG]: {
+            [LOGTYPE.LOG]: {
                 badge: '📝',
                 color: 'white',
                 label: 'log',
             },
-            [LogType.PAUSE]: {
+            [LOGTYPE.PAUSE]: {
                 badge: '⏸',
                 color: 'yellow',
                 label: 'pause',
             },
-            [LogType.START]: {
+            [LOGTYPE.START]: {
                 badge: '▶',
                 color: 'magenta',
                 label: 'start',
@@ -48,7 +48,7 @@ export class ConsoleLogger {
         };
     }
 
-    public getOptions(logType: LogType): ConsoleOptions {
+    public getOptions(logType: LOGTYPE): ConsoleOptions {
         return this.options[logType];
     }
 }

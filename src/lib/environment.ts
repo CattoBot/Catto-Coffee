@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { Redis } from 'ioredis';
-import { ApplicationConsole } from './console';
+import ApplicationConsole from './console';
 import { ArrayString, IntegerString } from '@skyra/env-utilities';
-import { ChatInputDeniedCommandHelper } from './events/commandDenied';
-import { CloudinaryService } from './services/cloudinary';
-import { Utils } from './utils';
+import { ChatInputDeniedCommandHelper } from '../events/commandDenied';
+import { CloudinaryService } from './services';
+import Utils from './tools';
 import CoreHelper from './helpers';
 
 declare module '@sapphire/framework' {
