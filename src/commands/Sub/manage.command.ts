@@ -28,6 +28,7 @@ import { reply } from '@sapphire/plugin-editable-commands';
 import { Embed } from '../../lib/classes/Embed';
 import { resolveKey } from '@sapphire/plugin-i18next';
 import { Emojis } from '../../shared/enum/Emojis';
+import { PermittedVoiceRoleCommand } from '../../lib/commands/manage/permitted-voice-roles';
 
 @ApplyOptions<SubcommandOptions>(AdminSubCommandOptions.Options)
 export class AdminCommands extends Subcommand {
@@ -202,5 +203,13 @@ export class AdminCommands extends Subcommand {
 
     public async ChatInputResetGuildExperience(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
         await ResetServerCommand.chatInputRun(interaction);
+    }
+
+    public async ChatInputVoiceRoleRestriction(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
+        await PermittedVoiceRoleCommand.run(interaction);
+    }
+
+    public async ChatInputVoiceRoleRestrictionRemove(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
+        await PermittedVoiceRoleCommand.delete(interaction);
     }
 }

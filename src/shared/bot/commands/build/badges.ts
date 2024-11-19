@@ -1,5 +1,6 @@
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import { applyLocalizedBuilder } from '@sapphire/plugin-i18next';
+import { Config } from '../../../../config';
 
 export class BadgesCommandRegistry {
     public static registerCommands(registry: Subcommand.Registry): void {
@@ -17,7 +18,8 @@ export class BadgesCommandRegistry {
                     .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/badges:badge', 'commands/options/badges:badges_desc').setRequired(true))
                     .addStringOption((option) => applyLocalizedBuilder(option, 'commands/options/badges:user', 'commands/options/badges:user_desc').setRequired(true))
                 ), {
-            idHints: [''], guildIds: ["1134593541172117544"]
+            idHints: [''],
+            guildIds: Config.guilds
         }
         )
     }

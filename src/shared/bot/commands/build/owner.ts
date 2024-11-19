@@ -1,5 +1,6 @@
 import { applyLocalizedBuilder } from "@sapphire/plugin-i18next";
 import { Subcommand } from "@sapphire/plugin-subcommands";
+import { Config } from "../../../../config";
 
 export class BlacklistCommandRegistry {
     public static registerCommands(registry: Subcommand.Registry): void {
@@ -21,8 +22,9 @@ export class BlacklistCommandRegistry {
                         .addStringOption((option) => applyLocalizedBuilder(option, 'commands/names/blacklist:user_remove', 'commands/descriptions/blacklist:user_remove').setRequired(true))
                     )
                 ), {
-                    idHints: [''], guildIds: ["1134593541172117544" , "998352785202479134"]
-                }
+            idHints: [''],
+            guildIds: Config.guilds
+        }
         )
     }
 }

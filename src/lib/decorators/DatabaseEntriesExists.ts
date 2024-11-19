@@ -10,7 +10,7 @@ export function DatabaseExperienceEntriesExists() {
             if (!isInitialized) {
                 await initializeDatabaseEntries();
                 isInitialized = true;
-                container.console.complete("Database initialization completed.");
+                container.console.success("Database initialization completed.");
             }
 
             return originalMethod.apply(this, args);
@@ -50,7 +50,7 @@ async function initializeDatabaseEntries() {
         }
     }
 
-    container.console.complete("Database entries initialization completed.");
+    container.console.success("Database entries initialization completed.");
 }
 
 async function Guild(guildId: string) {

@@ -26,6 +26,6 @@ export class VoiceSessionsListener extends Listener<typeof Events.ClientReady> {
             }
         }
 
-        this.container.console.complete('Finished checking for users in voice channels without session keys.');
+        this.container.console.success('Finished checking for users in voice channels without session keys.');
     }
 }

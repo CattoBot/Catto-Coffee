@@ -20,7 +20,8 @@ export class AdminSubCommandOptions {
                     },
                     {
                         name: "remove", chatInputRun: "ChatInputRemoveVoiceRole"
-                    }
+                    },
+
                 ]
             },
             {
@@ -163,7 +164,19 @@ export class AdminSubCommandOptions {
                         name: "remove", chatInputRun: "ChatInputRemoveBadge"
                     }
                 ]
-            }
+            },
+            {
+                name: "voices",
+                type: "group",
+                entries: [
+                    {
+                        name: "restrict-role", chatInputRun: "ChatInputVoiceRoleRestriction"
+                    },
+                    {
+                        name: "restrict-role-remove", chatInputRun: "ChatInputVoiceRoleRestrictionRemove"
+                    }
+                ]
+            },
         ]
     }
 }

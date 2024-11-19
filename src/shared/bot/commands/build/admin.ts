@@ -181,6 +181,47 @@ export class AdminSubCommandsRegistration {
                     .addSubcommand((command) => applyLocalizedBuilder(command, 'commands/names/admin:badge_remove', 'commands/descriptions/admin:badge_remove')
                     )
                 )
+                .addSubcommandGroup((group) =>
+                    group
+                        .setName('voices')
+                        .setDescription('Manage the voice channels behaviour.')
+                        .addSubcommand((command) =>
+                            command
+                                .setName('restrict-role')
+                                .setDescription('Restrict voice channels to be visible only to these roles.')
+                                .addRoleOption((option) =>
+                                    option
+                                        .setName('role')
+                                        .setDescription('The role you want to permit to view the voice channels.')
+                                        .setRequired(true)
+                                )
+                                .addChannelOption((channel) =>
+                                    channel
+                                        .setName('channel')
+                                        .setDescription('The VoiceChannel you use to create new temporary VoiceChannels')
+                                        .setRequired(true)
+                                )
+                        )
+
+                        .addSubcommand((command) =>
+                            command
+                                .setName('restrict-role-remove')
+                                .setDescription('Remove restriction of a role from temporary voice channels.')
+                                .addRoleOption((option) =>
+                                    option
+                                        .setName('role')
+                                        .setDescription('The role you want to remove and permit to view the voice channels.')
+                                        .setRequired(true)
+                                )
+                                .addChannelOption((channel) =>
+                                    channel
+                                        .setName('channel')
+                                        .setDescription('The VoiceChannel you use to create new temporary VoiceChannels')
+                                        .setRequired(true)
+                                )
+                        )
+                )
+
         );
     }
 }

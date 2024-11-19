@@ -221,6 +221,7 @@ model guilds {
   voice_temp_channels      voice_temp_channels[]
   webhooks                 webhooks?
   weekly_top               weekly_top?
+  PermittedVoiceRoles      PermittedVoiceRoles[]
 }
 
 model i_text_experience {
@@ -267,23 +268,6 @@ model i_voice_experience {
   @@index([guildId], map: "IDX_I_VOICE_EXPERIENCE_GUILD_ID")
 }
 
-model i_voice_temp_channels {
-  id              Int      @id @default(autoincrement())
-  guildId         String   @db.VarChar(255)
-  channelId       String   @db.VarChar(255)
-  categoryId      String   @db.VarChar(255)
-  editables       Boolean? @db.TinyInt
-  channelLimit    Int?
-  channelName     String?  @db.VarChar(255)
-  shouldEnumerate Boolean? @db.TinyInt
-  createdAt       DateTime @default(now()) @db.DateTime(6)
-  updatedAt       DateTime @default(now()) @db.DateTime(6)
-  guilds          guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_16ff10431a152f251d317d955b8")
-
-  @@unique([guildId, channelId], map: "UQ_I_VOICE_TEMP_CHANNELS_GUILD_ID_CHANNEL_ID")
-  @@index([guildId, channelId], map: "IDX_I_VOICE_TEMP_CHANNELS_GUILD_ID_CHANNEL_ID")
-}
-
 model leaderboard_channels {
   id                         Int      @id @default(autoincrement())
   guildId                    String   @unique(map: "IDX_38ec21f88f22b5a483c52c8a6d") @db.VarChar(255)
@@ -301,13 +285,13 @@ model leaderboard_channels {
 }
 
 model monthly_top {
-  id                     Int      @id @default(autoincrement())
-  guildId                String   @unique(map: "IDX_0df52067f2b19400392a22725d") @db.VarChar(255)
-  lastMonthlyMessageId   String?  @db.VarChar(255)
+  id                       Int      @id @default(autoincrement())
+  guildId                  String   @unique(map: "IDX_0df52067f2b19400392a22725d") @db.VarChar(255)
+  lastMonthlyMessageId     String?  @db.VarChar(255)
   lastMonthlyTextMessageId String?  @db.VarChar(255)
-  createdAt              DateTime @default(now()) @db.DateTime(6)
-  updatedAt              DateTime @default(now()) @db.DateTime(6)
-  guilds                 guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_0df52067f2b19400392a22725d2")
+  createdAt                DateTime @default(now()) @db.DateTime(6)
+  updatedAt                DateTime @default(now()) @db.DateTime(6)
+  guilds                   guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_0df52067f2b19400392a22725d2")
 
   @@index([guildId], map: "IDX_MONTHLY_TOP_GUILD_ID")
 }
@@ -470,13 +454,13 @@ model webhooks {
 }
 
 model weekly_top {
-  id                     Int      @id @default(autoincrement())
-  guildId                String   @unique(map: "IDX_3c15071d1f77003659f418036f") @db.VarChar(255)
-  lastWeeklyMessageId    String?  @db.VarChar(255)
+  id                      Int      @id @default(autoincrement())
+  guildId                 String   @unique(map: "IDX_3c15071d1f77003659f418036f") @db.VarChar(255)
+  lastWeeklyMessageId     String?  @db.VarChar(255)
   lastWeeklyTextMessageId String?  @db.VarChar(255)
-  createdAt              DateTime @default(now()) @db.DateTime(6)
-  updatedAt              DateTime @default(now()) @db.DateTime(6)
-  guilds                 guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_3c15071d1f77003659f418036f7")
+  createdAt               DateTime @default(now()) @db.DateTime(6)
+  updatedAt               DateTime @default(now()) @db.DateTime(6)
+  guilds                  guilds   @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_3c15071d1f77003659f418036f7")
 
   @@index([guildId], map: "IDX_WEEKLY_TOP_GUILD_ID")
 }
@@ -487,4 +471,32 @@ model bot_black_listed_guilds {
   createdAt DateTime @default(now()) @db.DateTime(6)
 
   @@index([guildId], map: "IDX_BOT_BLACKLISTED_GUILDS_GUILD_ID")
+}
+
+model PermittedVoiceRoles {
+  id        Int                   @id @default(autoincrement())
+  guildId   String                @db.VarChar(255)
+  roleId    String                @db.VarChar(255)
+  channelId String                @db.VarChar(255)
+  guild     guilds                @relation(fields: [guildId], references: [guildId])
+  channel   i_voice_temp_channels @relation(fields: [channelId], references: [channelId])
+
+  @@unique([guildId, roleId, channelId])
+}
+
+model i_voice_temp_channels {
+  id              Int                   @id @default(autoincrement())
+  guildId         String                @db.VarChar(255)
+  channelId       String                @unique @db.VarChar(255)
+  categoryId      String                @db.VarChar(255)
+  editables       Boolean?              @db.TinyInt
+  channelLimit    Int?
+  channelName     String?               @db.VarChar(255)
+  shouldEnumerate Boolean?              @db.TinyInt
+  createdAt       DateTime              @default(now()) @db.DateTime(6)
+  updatedAt       DateTime              @default(now()) @db.DateTime(6)
+  guilds          guilds                @relation(fields: [guildId], references: [guildId], onDelete: NoAction, onUpdate: NoAction, map: "FK_16ff10431a152f251d317d955b8")
+  permittedRoles  PermittedVoiceRoles[]
+
+  @@unique([guildId, channelId], map: "UQ_I_VOICE_TEMP_CHANNELS_GUILD_ID_CHANNEL_ID")
 }

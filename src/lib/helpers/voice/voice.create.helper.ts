@@ -1,4 +1,12 @@
-import { Guild, CategoryChannel, VoiceState, ChannelType, PermissionFlagsBits, OverwriteResolvable, VoiceChannel } from 'discord.js';
+import {
+    Guild,
+    CategoryChannel,
+    VoiceState,
+    ChannelType,
+    PermissionFlagsBits,
+    OverwriteResolvable,
+    VoiceChannel,
+} from 'discord.js';
 import { container } from '@sapphire/pieces';
 import { ChannelConfig } from '../../../shared/interfaces/ChannelConfig';
 import { Time } from '@sapphire/time-utilities';
@@ -17,25 +25,45 @@ export class VoiceCreateHelper extends Helper {
         }
     }
 
-    private async attemptChannelCreation(channelConfig: ChannelConfig, newState: VoiceState, oldState: VoiceState): Promise<void> {
+    private async attemptChannelCreation(
+        channelConfig: ChannelConfig,
+        newState: VoiceState,
+        oldState: VoiceState
+    ): Promise<void> {
         const { channel_id, parent_id } = channelConfig;
         const parent = newState.guild.channels.resolve(parent_id) as CategoryChannel;
-        if (!parent) {
-            return;
-        }
+        if (!parent) return;
+
         if (this.shouldCreateChannel(oldState, newState, channel_id)) {
-            await this.createChannel(newState.guild, parent, newState.member!.id, newState);
+            await this.createChannel(newState.guild, parent, newState.member!.id, newState, channel_id);
         }
     }
 
-    private async createChannel(guild: Guild, parent: CategoryChannel, user_id: string, newState: VoiceState): Promise<void> {
+    private async createChannel(
+        guild: Guild,
+        parent: CategoryChannel,
+        user_id: string,
+        newState: VoiceState,
+        channelId: string
+    ): Promise<void> {
         const user_cooldown = await this.getUserCooldown(user_id);
         if (user_cooldown && user_cooldown > Date.now()) return;
         await this.setUserCooldown(user_id);
-        const channel_details = await this.setChannelDetails(user_id, parent, newState, guild.id, newState.channelId!);
+
+        const channel_details = await this.setChannelDetails(user_id, parent, newState, guild.id, channelId);
         if (!channel_details) return;
 
-        const channel = await this.buildChannel(guild, channel_details.name, channel_details.userLimit, parent, channel_details.permissions);
+        const permittedRoles = await this.getPermittedRoles(guild.id, channelId);
+        const permissions = this.setChannelPermissions(parent, user_id, permittedRoles);
+
+        const channel = await this.buildChannel(
+            guild,
+            channel_details.name,
+            channel_details.userLimit,
+            parent,
+            permissions
+        );
+
         if (!channel) return;
 
         try {
@@ -44,15 +72,151 @@ export class VoiceCreateHelper extends Helper {
             container.console.error(`Error while creating the channel for user ${user_id}: ${error}`, { userId: user_id });
             throw new Error(`Failed to create channel: ${error}`);
         }
+
         await this.storeChannelInDatabase(guild.id, channel.id, parent.id, user_id);
     }
+
+    private async setChannelDetails(
+        user_id: string,
+        parent: CategoryChannel,
+        newState: VoiceState,
+        guildId: string,
+        channelId: string
+    ): Promise<{ name: string; userLimit: number; permissions: OverwriteResolvable[] } | null> {
+        try {
+            const shouldUseUserSettings = await this.shouldUseUserSettings(guildId, channelId);
+            let channelInfo;
+
+            if (shouldUseUserSettings) {
+                channelInfo = await this.getUserChannelInfo(user_id);
+                if (!channelInfo || !channelInfo.channelName) {
+                    channelInfo = await this.retrieveDefaultChannelSettings(guildId, channelId, newState);
+                }
+            } else {
+                channelInfo = await this.retrieveDefaultChannelSettings(guildId, channelId, newState);
+            }
+
+            return {
+                name: channelInfo?.channelName || `${newState.member?.displayName || 'User'}'s Channel`,
+                userLimit: channelInfo?.channelLimit || 0,
+                permissions: this.setChannelPermissions(parent, user_id, []),
+            };
+        } catch (error) {
+            container.console.error(`Error fetching channel info for user ${user_id}: ${error}`, { userId: user_id });
+            return null;
+        }
+    }
+
+    private async shouldUseUserSettings(guildId: string, channelId: string): Promise<boolean> {
+        try {
+            const defaultSettings = await container.prisma.i_voice_temp_channels.findUnique({
+                where: {
+                    guildId_channelId: {
+                        channelId: channelId,
+                        guildId: guildId,
+                    },
+                },
+            });
+
+            return defaultSettings?.editables ?? false;
+        } catch (error) {
+            container.console.error(`Error fetching settings for channel ${channelId} in guild ${guildId}: ${error}`);
+            return false;
+        }
+    }
+
+    private async getUserChannelInfo(userId: string): Promise<{ channelName: string; channelLimit: number } | null> {
+        try {
+            const userSettings = await container.prisma.i_users_temp_voice.findUnique({
+                where: { userId },
+            });
+
+            return userSettings
+                ? {
+                    channelName: userSettings.channelName || '',
+                    channelLimit: userSettings.channelLimit || 0,
+                }
+                : null;
+        } catch (error) {
+            container.console.error(`Error fetching user channel info for user ${userId}: ${error}`, { userId });
+            return null;
+        }
+    }
+
+    private async retrieveDefaultChannelSettings(
+        guildId: string,
+        channelId: string,
+        newState: VoiceState
+    ): Promise<{ channelName: string; channelLimit: number } | null> {
+        try {
+            const defaultSettings = await container.prisma.i_voice_temp_channels.findUnique({
+                where: {
+                    guildId_channelId: {
+                        channelId,
+                        guildId,
+                    },
+                },
+            });
+
+            const channelName = defaultSettings?.channelName?.replace('{user}', newState.member?.displayName || '') || '';
+
+            return {
+                channelName,
+                channelLimit: defaultSettings?.channelLimit || 0,
+            };
+        } catch (error) {
+            container.console.error(`Error fetching default settings for channel ${channelId}: ${error}`);
+            return null;
+        }
+    }
+
+    private async getPermittedRoles(guildId: string, channelId: string): Promise<string[]> {
+        try {
+            const roles = await container.prisma.permittedVoiceRoles.findMany({
+                where: { guildId, channelId },
+                select: { roleId: true },
+            });
+            return roles.map((role) => role.roleId);
+        } catch (error) {
+            container.console.error(`Error fetching permitted roles for guild ${guildId}: ${error}`, { guildId });
+            return [];
+        }
+    }
+
+    private setChannelPermissions(
+        parent: CategoryChannel,
+        user_id: string,
+        permittedRoles: string[]
+    ): OverwriteResolvable[] {
+        const user_permissions = this.getUserPermissions(user_id);
+        const parent_permissions = this.getParentChannelPermissions(parent);
+
+        if (permittedRoles.length > 0) {
+            const role_permissions = permittedRoles.map((roleId) => ({
+                id: roleId,
+                allow: PermissionFlagsBits.ViewChannel,
+            }));
+            parent_permissions.push(...role_permissions);
+            parent_permissions.push({
+                id: parent.guild.roles.everyone.id,
+                deny: PermissionFlagsBits.ViewChannel,
+            });
+        } else {
+            parent_permissions.push({
+                id: parent.guild.roles.everyone.id,
+                allow: PermissionFlagsBits.ViewChannel,
+            });
+        }
+
+        parent_permissions.push(user_permissions);
+        return parent_permissions;
+    }
+
 
     private async getChannel(guildId: string): Promise<ChannelConfig[]> {
         try {
             const data = await container.prisma.i_voice_temp_channels.findMany({
-                where: {
-                    guildId: guildId
-                }
+                where: { guildId },
             });
             return data.map(({ channelId, categoryId }) => ({ channel_id: channelId, parent_id: categoryId }));
         } catch (error) {
@@ -90,7 +254,7 @@ export class VoiceCreateHelper extends Helper {
     }
 
     private getParentChannelPermissions(parent: CategoryChannel): OverwriteResolvable[] {
-        return parent.permissionOverwrites.cache.map(overwrites => ({
+        return parent.permissionOverwrites.cache.map((overwrites) => ({
             id: overwrites.id,
             allow: overwrites.allow.bitfield,
             deny: overwrites.deny.bitfield,
@@ -98,136 +262,45 @@ export class VoiceCreateHelper extends Helper {
     }
 
     private shouldCreateChannel(oldState: VoiceState, newState: VoiceState, channel_id: string): boolean {
-        return (newState.channelId === channel_id && oldState.channelId !== channel_id) ||
-            (newState.channelId === channel_id && !oldState.channelId);
+        return (
+            (newState.channelId === channel_id && oldState.channelId !== channel_id) ||
+            (newState.channelId === channel_id && !oldState.channelId)
+        );
     }
 
-    private async buildChannel(guild: Guild, name: string, userLimit: number, parent: CategoryChannel, permissions: OverwriteResolvable[]): Promise<VoiceChannel | null> {
+    private async buildChannel(
+        guild: Guild,
+        name: string,
+        userLimit: number,
+        parent: CategoryChannel,
+        permissions: OverwriteResolvable[]
+    ): Promise<VoiceChannel | null> {
         try {
             return await guild.channels.create({
-                name: name,
+                name,
                 type: ChannelType.GuildVoice,
-                userLimit: userLimit,
-                parent: parent,
-                permissionOverwrites: permissions
+                userLimit,
+                parent,
+                permissionOverwrites: permissions,
             });
         } catch (error) {
-            return null;
-        }
-    }
-
-    private setChannelPermissions(parent: CategoryChannel, user_id: string): OverwriteResolvable[] {
-        const user_permissions = this.getUserPermissions(user_id);
-        const parent_permissions = this.getParentChannelPermissions(parent);
-        parent_permissions.push(user_permissions);
-        return parent_permissions;
-    }
-
-    private async setChannelDetails(user_id: string, parent: CategoryChannel, newState: VoiceState, guildId: string, channelId: string): Promise<{ name: string, userLimit: number, permissions: OverwriteResolvable[] } | null> {
-        try {
-            const shouldUseUserSettings = await this.shouldUseUserSettings(guildId, channelId);
-            let channelInfo;
-
-            if (shouldUseUserSettings) {
-                channelInfo = await this.getUserChannelInfo(user_id);
-                if (!channelInfo || !channelInfo.channelName) {
-                    channelInfo = await this.retrieveDefaultChannelSettings(guildId, channelId, newState);
-                }
-            } else {
-                channelInfo = await this.retrieveDefaultChannelSettings(guildId, channelId, newState);
-            }
-
-            return {
-                name: channelInfo?.channelName!,
-                userLimit: channelInfo?.channelLimit || 0,
-                permissions: this.setChannelPermissions(parent, user_id),
-            };
-
-        } catch (error) {
-            container.console.error(`Error fetching channel info for user ${user_id}: ${error}`, { userId: user_id });
-            return null;
-        }
-    }
-
-
-    private async getUserChannelInfo(userId: string): Promise<{ channelName: string, channelLimit: number } | null> {
-        try {
-            const user = await container.prisma.i_users_temp_voice.findUnique({
-                where: {
-                    userId: userId
-                }
-            });
-            return {
-                channelName: user?.channelName || '',
-                channelLimit: user?.channelLimit || 0
-            }
-        } catch (error) {
-            container.console.error(`Error fetching user channel info for user ${userId}: ${error}`, { userId: userId });
+            container.console.error(`Error creating channel: ${error}`);
             return null;
         }
     }
 
     private async storeChannelInDatabase(guildId: string, channelId: string, categoryId: string, userId: string): Promise<void> {
         try {
-            setTimeout(async () => {
-                await container.prisma.voice_temp_channels.create({
-                    data: {
-                        guildId: guildId,
-                        channelId: channelId,
-                        channelCategoryId: categoryId,
-                        channelOwnerId: userId
-                    }
-                })
-            }, 500);
-
-        } catch (error) {
-            container.console.error(`Error storing channel in database: ${error}`, { guildId: guildId, channelId: channelId, userId: userId });
-        }
-    }
-
-    private async retrieveDefaultChannelSettings(guildId: string, channelId: string, newState: VoiceState): Promise<{ channelName: string, channelLimit: number } | null> {
-        try {
-            const defaultSettings = await container.prisma.i_voice_temp_channels.findUnique({
-                where: {
-                    guildId_channelId: {
-                        channelId: channelId,
-                        guildId: guildId
-                    }
-                }
+            await container.prisma.voice_temp_channels.create({
+                data: {
+                    guildId,
+                    channelId,
+                    channelCategoryId: categoryId,
+                    channelOwnerId: userId,
+                },
             });
-
-            const channelName = defaultSettings?.channelName?.replace('{user}', newState.member?.displayName || '') || '';
-
-            return {
-                channelName,
-                channelLimit: defaultSettings?.channelLimit || 0
-            };
         } catch (error) {
-            container.console.error(`Error fetching default channel settings for guild ${guildId}: ${error}`, { guildId });
-            return null;
-        }
-    }
-
-    private async shouldUseUserSettings(guildId: string, channelId: string): Promise<boolean> {
-        try {
-            const defaultSettings = await container.prisma.i_voice_temp_channels.findUnique({
-                where: {
-                    guildId_channelId: {
-                        channelId: channelId,
-                        guildId: guildId
-                    }
-                }
-            });
-
-            if (defaultSettings) {
-                const useUserSettings = defaultSettings.editables;
-                return useUserSettings!;
-            } else {
-                return false;
-            }
-        } catch (error) {
-            container.console.error(`Error fetching default channel settings for guild ${guildId}: ${error}`, { guildId });
-            return false;
+            container.console.error(`Error storing channel in database: ${error}`, { guildId, channelId, userId });
         }
     }
 }

@@ -44,9 +44,9 @@ declare module '@skyra/env-utilities' {
 		OWNERS: ArrayString;
 		GUILD_ID: ArrayString;
 		REDIS_HOST: string;
-		REDIS_PASSWORD: string;
 		REDIS_PORT: IntegerString;
 		REDIS_TASK_DB: IntegerString;
+		REDIS_PASSWORD: string;
 		CLOUDINARY_CLOUD_NAME: string;
 		CLOUDINARY_API_KEY: string;
 		CLOUDINARY_API_SECRET: string;

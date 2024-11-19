@@ -42,7 +42,6 @@ declare module '@sapphire/pieces' {
 declare module '@skyra/env-utilities' {
 	interface Env {
 		OWNERS: ArrayString;
-		GUILD_ID: ArrayString;
 		REDIS_HOST: string;
 		REDIS_PASSWORD: string;
 		REDIS_PORT: IntegerString;
