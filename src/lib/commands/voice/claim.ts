@@ -6,38 +6,46 @@ import { InteractionResponse, Message } from "discord.js";
 
 export class VoiceClaimCommand {
     public static async messageRun(message: Message) {
-        if (message.channel.isSendable())
-            await message.channel.sendTyping();
+        if (message.channel.isSendable()) await message.channel.sendTyping();
         const member = message.member;
         if (!member!.voice.channel) {
             return await message.reply({
-                content: (await resolveKey(message, `commands/replies/commandDenied:voice_channel_not_found`, { emoji: Emojis.ERROR })),
+                content: await resolveKey(message, `commands/replies/commandDenied:voice_channel_not_found`, {
+                    emoji: Emojis.ERROR,
+                }),
             });
         }
 
-        const channel = await container.helpers.voice.find(member!.voice.channel.id, message.guild!.id);
+        const voiceChannel = member!.voice.channel;
+        const channel = await container.helpers.voice.find(voiceChannel.id, message.guild!.id);
 
         if (!channel) {
             return message.reply({
-                content: (await resolveKey(message, `commands/replies/commandDenied:channel_not_found`, { emoji: Emojis.ERROR })),
+                content: await resolveKey(message, `commands/replies/commandDenied:channel_not_found`, {
+                    emoji: Emojis.ERROR,
+                }),
             });
         }
 
         if (channel!.channelOwnerId === member!.id) {
             return message.reply({
-                content: (await resolveKey(message, `commands/replies/commandDenied:already_owner`, { emoji: Emojis.ERROR })),
+                content: await resolveKey(message, `commands/replies/commandDenied:already_owner`, {
+                    emoji: Emojis.ERROR,
+                }),
             });
         }
 
-        if (member!.voice.channel.members.has(channel!.channelOwnerId)) {
+        if (voiceChannel.members.has(channel!.channelOwnerId)) {
             return message.reply({
-                content: (await resolveKey(message, `commands/replies/voice:claim_error`, { emoji: Emojis.ERROR })),
+                content: await resolveKey(message, `commands/replies/voice:claim_error`, {
+                    emoji: Emojis.ERROR,
+                }),
             });
         } else {
             await container.prisma.voice_temp_channels.update({
                 where: {
                     guildId_channelId: {
-                        channelId: member!.voice.channel.id,
+                        channelId: voiceChannel.id,
                         guildId: message.guild!.id,
                     },
                 },
@@ -46,8 +54,16 @@ export class VoiceClaimCommand {
                 },
             });
 
+            await voiceChannel.permissionOverwrites.edit(member!.id, {
+                ViewChannel: true,
+                Connect: true,
+                Speak: true,
+            });
+
             return message.reply({
-                content: (await resolveKey(message, `commands/replies/voice:claim_success`, { emoji: Emojis.SUCCESS })),
+                content: await resolveKey(message, `commands/replies/voice:claim_success`, {
+                    emoji: Emojis.SUCCESS,
+                }),
             });
         }
     }
@@ -57,37 +73,47 @@ export class VoiceClaimCommand {
         const member = interaction.guild!.members.resolve(user);
         if (!member!.voice.channel) {
             return interaction.reply({
-                content: (await resolveKey(interaction, `commands/replies/commandDenied:voice_channel_not_found`, { emoji: Emojis.ERROR })),
+                content: await resolveKey(interaction, `commands/replies/commandDenied:voice_channel_not_found`, {
+                    emoji: Emojis.ERROR,
+                }),
                 ephemeral: true,
             });
         }
 
-        const channel = await container.helpers.voice.find(member!.voice.channel.id, interaction.guild!.id);
+        const voiceChannel = member!.voice.channel;
+        const channel = await container.helpers.voice.find(voiceChannel.id, interaction.guild!.id);
 
         if (!channel) {
             return await interaction.reply({
-                content: (await resolveKey(interaction, `commands/replies/commandDenied:channel_not_found`, { emoji: Emojis.ERROR })),
+                content: await resolveKey(interaction, `commands/replies/commandDenied:channel_not_found`, {
+                    emoji: Emojis.ERROR,
+                }),
                 ephemeral: true,
             });
         }
 
         if (channel!.channelOwnerId === member!.id) {
             return interaction.reply({
-                content: (await resolveKey(interaction, `commands/replies/commandDenied:already_owner`, { emoji: Emojis.ERROR })),
+                content: await resolveKey(interaction, `commands/replies/commandDenied:already_owner`, {
+                    emoji: Emojis.ERROR,
+                }),
                 ephemeral: true,
             });
         }
 
-        if (member!.voice.channel!.members.has(channel!.channelOwnerId)) {
+        if (voiceChannel.members.has(channel!.channelOwnerId)) {
             return interaction.reply({
-                content: (await resolveKey(interaction, `commands/replies/voice:claim_error`, { emoji: Emojis.ERROR })),
+                content: await resolveKey(interaction, `commands/replies/voice:claim_error`, {
+                    emoji: Emojis.ERROR,
+                }),
                 ephemeral: true,
             });
         } else {
+            // Update the database to set the current user as the channel owner
             await container.prisma.voice_temp_channels.update({
                 where: {
                     guildId_channelId: {
-                        channelId: member!.voice.channel!.id,
+                        channelId: voiceChannel.id,
                         guildId: interaction.guild!.id,
                     },
                 },
@@ -96,9 +122,18 @@ export class VoiceClaimCommand {
                 },
             });
 
+            // Grant the claiming user specific permissions
+            await voiceChannel.permissionOverwrites.edit(member!.id, {
+                ViewChannel: true,
+                Connect: true,
+                Speak: true,
+            });
+
             return interaction.reply({
-                content: (await resolveKey(interaction, `commands/replies/voice:claim_success`, { emoji: Emojis.SUCCESS })),
-                ephemeral: false
+                content: await resolveKey(interaction, `commands/replies/voice:claim_success`, {
+                    emoji: Emojis.SUCCESS,
+                }),
+                ephemeral: false,
             });
         }
     }

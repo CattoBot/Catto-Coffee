@@ -1,241 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Badges` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `BonusTXTChannels` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `BonusTextRoles` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `BonusVoiceChannels` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `BonusVoiceRoles` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `BotBlackListedGuilds` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `BotBlackListedUsers` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `DailyTop` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `DisabledCommands` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `DisabledModules` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `EditableChannels` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `ExperienceRoleRewards` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `GuildBadges` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `GuildBlacklistedUsers` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Guilds` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `LeaderboardChannels` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `MonthlyTop` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `PremiumServers` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `RestrictedCommandRoles` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `RoleLeaderboardRewards` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `TextExperience` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `TrustedVoiceUsers` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `UserBadges` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Users` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `UsersRankCardConfig` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `VoiceExperience` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `VoiceTempChannels` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Webhooks` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `WeeklyTop` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `filteredTextChannels` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `filteredVoiceChannels` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `iTextExperience` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `iUsersTempVoice` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `iVoiceExperience` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `iVoiceTempChannels` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE `BonusTXTChannels` DROP FOREIGN KEY `BonusTXTChannels_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `BonusTextRoles` DROP FOREIGN KEY `BonusTextRoles_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `BonusVoiceChannels` DROP FOREIGN KEY `BonusVoiceChannels_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `BonusVoiceRoles` DROP FOREIGN KEY `BonusVoiceRoles_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `DailyTop` DROP FOREIGN KEY `DailyTop_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `DisabledCommands` DROP FOREIGN KEY `DisabledCommands_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `DisabledModules` DROP FOREIGN KEY `DisabledModules_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `EditableChannels` DROP FOREIGN KEY `EditableChannels_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `ExperienceRoleRewards` DROP FOREIGN KEY `ExperienceRoleRewards_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `GuildBadges` DROP FOREIGN KEY `GuildBadges_badgeId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `GuildBadges` DROP FOREIGN KEY `GuildBadges_guildId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `GuildBlacklistedUsers` DROP FOREIGN KEY `GuildBlacklistedUsers_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `LeaderboardChannels` DROP FOREIGN KEY `LeaderboardChannels_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `MonthlyTop` DROP FOREIGN KEY `MonthlyTop_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `PremiumServers` DROP FOREIGN KEY `PremiumServers_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `RestrictedCommandRoles` DROP FOREIGN KEY `RestrictedCommandRoles_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `RoleLeaderboardRewards` DROP FOREIGN KEY `RoleLeaderboardRewards_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `TextExperience` DROP FOREIGN KEY `TextExperience_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `TrustedVoiceUsers` DROP FOREIGN KEY `TrustedVoiceUsers_guild_id_channel_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `UserBadges` DROP FOREIGN KEY `UserBadges_badgeId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `UserBadges` DROP FOREIGN KEY `UserBadges_userId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `UsersRankCardConfig` DROP FOREIGN KEY `UsersRankCardConfig_user_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `VoiceExperience` DROP FOREIGN KEY `VoiceExperience_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `VoiceTempChannels` DROP FOREIGN KEY `VoiceTempChannels_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `Webhooks` DROP FOREIGN KEY `Webhooks_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `WeeklyTop` DROP FOREIGN KEY `WeeklyTop_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `filteredTextChannels` DROP FOREIGN KEY `filteredTextChannels_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `filteredVoiceChannels` DROP FOREIGN KEY `filteredVoiceChannels_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `iTextExperience` DROP FOREIGN KEY `iTextExperience_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `iVoiceExperience` DROP FOREIGN KEY `iVoiceExperience_guild_id_fkey`;
-
--- DropForeignKey
-ALTER TABLE `iVoiceTempChannels` DROP FOREIGN KEY `iVoiceTempChannels_guild_id_fkey`;
-
--- DropTable
-DROP TABLE `Badges`;
-
--- DropTable
-DROP TABLE `BonusTXTChannels`;
-
--- DropTable
-DROP TABLE `BonusTextRoles`;
-
--- DropTable
-DROP TABLE `BonusVoiceChannels`;
-
--- DropTable
-DROP TABLE `BonusVoiceRoles`;
-
--- DropTable
-DROP TABLE `BotBlackListedGuilds`;
-
--- DropTable
-DROP TABLE `BotBlackListedUsers`;
-
--- DropTable
-DROP TABLE `DailyTop`;
-
--- DropTable
-DROP TABLE `DisabledCommands`;
-
--- DropTable
-DROP TABLE `DisabledModules`;
-
--- DropTable
-DROP TABLE `EditableChannels`;
-
--- DropTable
-DROP TABLE `ExperienceRoleRewards`;
-
--- DropTable
-DROP TABLE `GuildBadges`;
-
--- DropTable
-DROP TABLE `GuildBlacklistedUsers`;
-
--- DropTable
-DROP TABLE `Guilds`;
-
--- DropTable
-DROP TABLE `LeaderboardChannels`;
-
--- DropTable
-DROP TABLE `MonthlyTop`;
-
--- DropTable
-DROP TABLE `PremiumServers`;
-
--- DropTable
-DROP TABLE `RestrictedCommandRoles`;
-
--- DropTable
-DROP TABLE `RoleLeaderboardRewards`;
-
--- DropTable
-DROP TABLE `TextExperience`;
-
--- DropTable
-DROP TABLE `TrustedVoiceUsers`;
-
--- DropTable
-DROP TABLE `UserBadges`;
-
--- DropTable
-DROP TABLE `Users`;
-
--- DropTable
-DROP TABLE `UsersRankCardConfig`;
-
--- DropTable
-DROP TABLE `VoiceExperience`;
-
--- DropTable
-DROP TABLE `VoiceTempChannels`;
-
--- DropTable
-DROP TABLE `Webhooks`;
-
--- DropTable
-DROP TABLE `WeeklyTop`;
-
--- DropTable
-DROP TABLE `filteredTextChannels`;
-
--- DropTable
-DROP TABLE `filteredVoiceChannels`;
-
--- DropTable
-DROP TABLE `iTextExperience`;
-
--- DropTable
-DROP TABLE `iUsersTempVoice`;
-
--- DropTable
-DROP TABLE `iVoiceExperience`;
-
--- DropTable
-DROP TABLE `iVoiceTempChannels`;
-
 -- CreateTable
 CREATE TABLE `badges` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
@@ -253,6 +15,7 @@ CREATE TABLE `bonus_text_roles` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `guildId` VARCHAR(255) NOT NULL,
     `roleId` VARCHAR(255) NOT NULL,
+    `bonus` INTEGER NOT NULL DEFAULT 15,
     `createdAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     `updatedAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
 
@@ -266,6 +29,7 @@ CREATE TABLE `bonus_txt_channels` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `guildId` VARCHAR(255) NOT NULL,
     `channelId` VARCHAR(255) NOT NULL,
+    `bonus` INTEGER NOT NULL DEFAULT 15,
     `createdAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     `updatedAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
 
@@ -279,6 +43,7 @@ CREATE TABLE `bonus_voice_channels` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `guildId` VARCHAR(255) NOT NULL,
     `channelId` VARCHAR(255) NOT NULL,
+    `bonus` INTEGER NOT NULL DEFAULT 15,
     `createdAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     `updatedAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
 
@@ -317,6 +82,7 @@ CREATE TABLE `daily_top` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `guildId` VARCHAR(255) NOT NULL,
     `lastDailyMessageId` VARCHAR(255) NULL,
+    `lastDailyTextMessageId` VARCHAR(255) NULL,
     `created_at` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     `updated_at` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
 
@@ -495,30 +261,15 @@ CREATE TABLE `i_voice_experience` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `i_voice_temp_channels` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `guildId` VARCHAR(255) NOT NULL,
-    `channelId` VARCHAR(255) NOT NULL,
-    `categoryId` VARCHAR(255) NOT NULL,
-    `editables` BOOLEAN NULL,
-    `channelLimit` INTEGER NULL,
-    `channelName` VARCHAR(255) NULL,
-    `shouldEnumerate` BOOLEAN NULL,
-    `createdAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    `updatedAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-
-    INDEX `IDX_I_VOICE_TEMP_CHANNELS_GUILD_ID_CHANNEL_ID`(`guildId`, `channelId`),
-    UNIQUE INDEX `UQ_I_VOICE_TEMP_CHANNELS_GUILD_ID_CHANNEL_ID`(`guildId`, `channelId`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `leaderboard_channels` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `guildId` VARCHAR(255) NOT NULL,
     `weeklyVoiceTop10channelId` VARCHAR(255) NULL,
     `monthlyVoiceTop10channelId` VARCHAR(255) NULL,
     `dailyVoiceTop10channelId` VARCHAR(255) NULL,
+    `dailyTextTop10channelId` VARCHAR(255) NULL,
+    `weeklyTextTop10channelId` VARCHAR(255) NULL,
+    `monthlyTextTop10channelId` VARCHAR(255) NULL,
     `createdAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     `updatedAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
 
@@ -532,6 +283,7 @@ CREATE TABLE `monthly_top` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `guildId` VARCHAR(255) NOT NULL,
     `lastMonthlyMessageId` VARCHAR(255) NULL,
+    `lastMonthlyTextMessageId` VARCHAR(255) NULL,
     `createdAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     `updatedAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
 
@@ -576,25 +328,6 @@ CREATE TABLE `role_leaderboard_rewards` (
 
     INDEX `IDX_ROLE_LEADERBOARD_REWARDS_GUILD_ID_ROLE_ID_ROLE_TYPE`(`guildId`, `roleId`, `roleType`),
     UNIQUE INDEX `UQ_ROLE_LEADERBOARD_REWARDS_GUILD_ID_ROLE_ID_ROLE_TYPE`(`guildId`, `roleId`, `roleType`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `text_experience` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `guildId` VARCHAR(255) NOT NULL,
-    `userId` VARCHAR(255) NOT NULL,
-    `textExperience` INTEGER NOT NULL DEFAULT 0,
-    `textLevel` INTEGER NOT NULL DEFAULT 1,
-    `totalTextExperience` INTEGER NOT NULL DEFAULT 0,
-    `totalMessagesDaily` INTEGER NOT NULL DEFAULT 0,
-    `totalMessagesWeekly` INTEGER NOT NULL DEFAULT 0,
-    `totalMessagesMonthly` INTEGER NOT NULL DEFAULT 0,
-    `createdAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    `updatedAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-
-    INDEX `IDX_TEXT_EXPERIENCE_GUILD_ID_USER_ID`(`guildId`, `userId`),
-    UNIQUE INDEX `UQ_TEXT_EXPERIENCE_GUILD_ID_USER_ID`(`guildId`, `userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -659,6 +392,26 @@ CREATE TABLE `users_rank_card_config` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `text_experience` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `guildId` VARCHAR(255) NOT NULL,
+    `userId` VARCHAR(255) NOT NULL,
+    `textExperience` INTEGER NOT NULL DEFAULT 0,
+    `textLevel` INTEGER NOT NULL DEFAULT 1,
+    `totalTextExperience` INTEGER NOT NULL DEFAULT 0,
+    `totalMessagesDaily` INTEGER NOT NULL DEFAULT 0,
+    `totalMessagesWeekly` INTEGER NOT NULL DEFAULT 0,
+    `totalMessagesMonthly` INTEGER NOT NULL DEFAULT 0,
+    `totalMessages` INTEGER NOT NULL DEFAULT 0,
+    `createdAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    `updatedAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+
+    INDEX `IDX_TEXT_EXPERIENCE_GUILD_ID_USER_ID`(`guildId`, `userId`),
+    UNIQUE INDEX `UQ_TEXT_EXPERIENCE_GUILD_ID_USER_ID`(`guildId`, `userId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `voice_experience` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `guildId` VARCHAR(255) NOT NULL,
@@ -714,6 +467,7 @@ CREATE TABLE `weekly_top` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `guildId` VARCHAR(255) NOT NULL,
     `lastWeeklyMessageId` VARCHAR(255) NULL,
+    `lastWeeklyTextMessageId` VARCHAR(255) NULL,
     `createdAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     `updatedAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
 
@@ -730,6 +484,35 @@ CREATE TABLE `bot_black_listed_guilds` (
 
     UNIQUE INDEX `IDX_aff80b4580b3ae75b76898e974`(`guildId`),
     INDEX `IDX_BOT_BLACKLISTED_GUILDS_GUILD_ID`(`guildId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `PermittedVoiceRoles` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `guildId` VARCHAR(255) NOT NULL,
+    `roleId` VARCHAR(255) NOT NULL,
+    `channelId` VARCHAR(255) NOT NULL,
+
+    UNIQUE INDEX `PermittedVoiceRoles_guildId_roleId_channelId_key`(`guildId`, `roleId`, `channelId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `i_voice_temp_channels` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `guildId` VARCHAR(255) NOT NULL,
+    `channelId` VARCHAR(255) NOT NULL,
+    `categoryId` VARCHAR(255) NOT NULL,
+    `editables` BOOLEAN NULL,
+    `channelLimit` INTEGER NULL,
+    `channelName` VARCHAR(255) NULL,
+    `shouldEnumerate` BOOLEAN NULL,
+    `createdAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    `updatedAt` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+
+    UNIQUE INDEX `i_voice_temp_channels_channelId_key`(`channelId`),
+    UNIQUE INDEX `UQ_I_VOICE_TEMP_CHANNELS_GUILD_ID_CHANNEL_ID`(`guildId`, `channelId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -782,9 +565,6 @@ ALTER TABLE `i_text_experience` ADD CONSTRAINT `FK_2d9f5eff627d519fbab6ef46b37` 
 ALTER TABLE `i_voice_experience` ADD CONSTRAINT `FK_56eb586296e143b6967aa8d19d2` FOREIGN KEY (`guildId`) REFERENCES `guilds`(`guildId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE `i_voice_temp_channels` ADD CONSTRAINT `FK_16ff10431a152f251d317d955b8` FOREIGN KEY (`guildId`) REFERENCES `guilds`(`guildId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
 ALTER TABLE `leaderboard_channels` ADD CONSTRAINT `FK_38ec21f88f22b5a483c52c8a6df` FOREIGN KEY (`guildId`) REFERENCES `guilds`(`guildId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
@@ -800,9 +580,6 @@ ALTER TABLE `restricted_command_roles` ADD CONSTRAINT `FK_c1871e1a216a2431eb5ac2
 ALTER TABLE `role_leaderboard_rewards` ADD CONSTRAINT `FK_35ab550d6594edebfa8d361ac5c` FOREIGN KEY (`guildId`) REFERENCES `guilds`(`guildId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE `text_experience` ADD CONSTRAINT `FK_04abffedff742a06c2e0adc266c` FOREIGN KEY (`guildId`) REFERENCES `guilds`(`guildId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
 ALTER TABLE `trusted_voice_users` ADD CONSTRAINT `FK_8f3787e1edb92f9815d8191413c` FOREIGN KEY (`guildId`, `channelId`) REFERENCES `voice_temp_channels`(`guildId`, `channelId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
@@ -815,6 +592,9 @@ ALTER TABLE `user_badges` ADD CONSTRAINT `FK_bd34ef334baea6f589a53438a1e` FOREIG
 ALTER TABLE `users_rank_card_config` ADD CONSTRAINT `FK_173a1c5567e4fded286417dbc82` FOREIGN KEY (`userId`) REFERENCES `users`(`userId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
+ALTER TABLE `text_experience` ADD CONSTRAINT `FK_04abffedff742a06c2e0adc266c` FOREIGN KEY (`guildId`) REFERENCES `guilds`(`guildId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
 ALTER TABLE `voice_experience` ADD CONSTRAINT `FK_7a259b73a1a6c41f01d7803331a` FOREIGN KEY (`guildId`) REFERENCES `guilds`(`guildId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
@@ -825,3 +605,12 @@ ALTER TABLE `webhooks` ADD CONSTRAINT `FK_4c839321cea8a9d667bb7fe73b0` FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE `weekly_top` ADD CONSTRAINT `FK_3c15071d1f77003659f418036f7` FOREIGN KEY (`guildId`) REFERENCES `guilds`(`guildId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `PermittedVoiceRoles` ADD CONSTRAINT `PermittedVoiceRoles_guildId_fkey` FOREIGN KEY (`guildId`) REFERENCES `guilds`(`guildId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PermittedVoiceRoles` ADD CONSTRAINT `PermittedVoiceRoles_channelId_fkey` FOREIGN KEY (`channelId`) REFERENCES `i_voice_temp_channels`(`channelId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `i_voice_temp_channels` ADD CONSTRAINT `FK_16ff10431a152f251d317d955b8` FOREIGN KEY (`guildId`) REFERENCES `guilds`(`guildId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
