@@ -199,32 +199,50 @@ export class VoiceCreateHelper extends Helper {
         user_id: string,
         permittedRoles: string[]
     ): OverwriteResolvable[] {
-
+    
         const user_permissions = this.getUserPermissions(user_id);
+
         const parent_permissions = this.getParentChannelPermissions(parent);
+
         const everyonePerms = this.getParentChannelEveryonePermissions(parent);
 
-        if (permittedRoles.length > 0) {
-            const role_permissions = permittedRoles.map((roleId) => ({
-                id: roleId,
-                allow: [
-                    PermissionFlagsBits.ViewChannel,
-                    PermissionFlagsBits.Connect,
-                    PermissionFlagsBits.Speak,
-                ],
-            }));
-            parent_permissions.push(...everyonePerms)
-            parent_permissions.push(...role_permissions);
+        const role_permissions = permittedRoles.map((roleId) => ({
+            id: roleId,
+            allow: [
+                PermissionFlagsBits.ViewChannel,
+                PermissionFlagsBits.Connect,
+                PermissionFlagsBits.Speak,
+            ],
+            deny: 0n,
+        }));
 
-            parent_permissions.push({
+        let combined_permissions: OverwriteResolvable[] = [
+            ...parent_permissions,
+            ...everyonePerms,
+            ...role_permissions,
+            {
                 id: parent.guild.roles.everyone.id,
-                deny: [PermissionFlagsBits.ViewChannel],
-            });
-        }
-        parent_permissions.push(...everyonePerms)
-        parent_permissions.push(user_permissions);
+                deny: [PermissionFlagsBits.ViewChannel], 
+            },
+            user_permissions,
+        ];
 
-        return parent_permissions;
+        combined_permissions = combined_permissions.reduce<OverwriteResolvable[]>((acc, current) => {
+            if (!acc.some((perm) => perm.id === current.id)) {
+                acc.push(current);
+            }
+            return acc;
+        }, []);
+
+
+        if (combined_permissions.length > 100) {
+            console.warn(
+                `Warning: Permissions list truncated to 100 entries to comply with Discord API limits.`
+            );
+            combined_permissions = combined_permissions.slice(0, 100);
+        }
+
+        return combined_permissions;
     }
 
 
