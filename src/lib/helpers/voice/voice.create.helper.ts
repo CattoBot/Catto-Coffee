@@ -183,6 +183,17 @@ export class VoiceCreateHelper extends Helper {
         }
     }
 
+    private getParentChannelEveryonePermissions(parent: CategoryChannel): OverwriteResolvable[] {
+        const perms = parent.permissionOverwrites.cache.map((overwrites) => ({
+            id: overwrites.id,
+            allow: overwrites.allow.bitfield,
+            deny: overwrites.deny.bitfield,
+        }));
+
+        console.log(perms)
+        return perms;
+    }
+
     private setChannelPermissions(
         parent: CategoryChannel,
         user_id: string,
@@ -191,7 +202,8 @@ export class VoiceCreateHelper extends Helper {
 
         const user_permissions = this.getUserPermissions(user_id);
         const parent_permissions = this.getParentChannelPermissions(parent);
-        
+        const everyonePerms = this.getParentChannelEveryonePermissions(parent);
+
         if (permittedRoles.length > 0) {
             const role_permissions = permittedRoles.map((roleId) => ({
                 id: roleId,
@@ -201,25 +213,19 @@ export class VoiceCreateHelper extends Helper {
                     PermissionFlagsBits.Speak,
                 ],
             }));
+            parent_permissions.push(...everyonePerms)
             parent_permissions.push(...role_permissions);
 
             parent_permissions.push({
                 id: parent.guild.roles.everyone.id,
                 deny: [PermissionFlagsBits.ViewChannel],
             });
-        } else {
-            parent_permissions.push({
-                id: parent.guild.roles.everyone.id,
-                allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect, PermissionFlagsBits.Speak],
-            });
         }
-
+        parent_permissions.push(...everyonePerms)
         parent_permissions.push(user_permissions);
 
         return parent_permissions;
     }
-
-
 
 
     private async getChannel(guildId: string): Promise<ChannelConfig[]> {
