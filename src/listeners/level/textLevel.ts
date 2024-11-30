@@ -46,6 +46,8 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
 
         await this.updateUserExperience(message.guild.id, message.author.id, updatedExp, currentLevel, randomXP, userExp);
         await this.updateGlobalExperience(message.author.id);
+
+        await this.updateTextLeaderboard(message.guild.id, message.author.id, userExp?.totalTextExperience! + randomXP || randomXP);
     }
 
     private async setCooldown(cooldownKey: string, cooldown: number) {
@@ -235,5 +237,10 @@ export class TextLevelingCoreModule extends Listener<typeof Events.MessageCreate
         if (!botMember) return false;
         const channelPermissions = channel.permissionsFor(botMember);
         return channelPermissions?.has(permissions) || false;
+    }
+
+    private async updateTextLeaderboard(guildId: string, userId: string, totalTextExperience: number): Promise<void> {
+        const leaderboardKey = `textLeaderboard:${guildId}`;
+        await this.container.redis.zadd(leaderboardKey, totalTextExperience, userId);
     }
 }
