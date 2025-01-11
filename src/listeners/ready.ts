@@ -4,6 +4,7 @@ import type { StoreRegistryValue } from '@sapphire/pieces';
 import { blue, cyan, gray, green, magenta, magentaBright, white, yellow } from 'colorette';
 import { ActivityType, PresenceData } from 'discord.js';
 import { DatabaseExperienceEntriesExists } from '../lib/decorators/DatabaseEntriesExists';
+import { SyncRankings } from '../lib/decorators/redis';
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -12,14 +13,15 @@ export class ReadyEvent extends Listener {
 	private readonly style = dev ? yellow : blue;
 
 	@DatabaseExperienceEntriesExists()
+	@SyncRankings()
 	public override run() {
 		this.printBanner();
 		this.printStoreDebugInformation();
 		this.setBotPresence();
 		setTimeout(() => {
-			return this.container.console.start(cyan(`${this.container.client.user?.username} is online.`)) 
+			return this.container.console.start(cyan(`${this.container.client.user?.username} is online.`))
 		}, 2000);
-		
+
 	}
 
 	private printBanner() {

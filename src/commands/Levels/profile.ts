@@ -22,7 +22,7 @@ export class ProfileCommand extends Command {
                 .addUserOption(option =>
                     applyLocalizedBuilder(option, 'commands/names/level:user', 'commands/descriptions/level:user_description').setRequired(false)
                 )
-        )
+        );
     }
 
     override async chatInputRun(command: Command.ChatInputCommandInteraction) {
@@ -32,6 +32,7 @@ export class ProfileCommand extends Command {
         if (!user) {
             return await command.reply(`I couldn't find the user you're looking for. ${Emojis.ERROR}`);
         }
+
         const userInfo = await this.fetchUserInfo(user, command);
 
         if (!userInfo) {
@@ -51,9 +52,11 @@ export class ProfileCommand extends Command {
         if (message.channel.isSendable())
             await message.channel.sendTyping();
         const user = await args.pick('user').catch(() => message.author);
+
         if (!user) {
             return message.reply(`I couldn't find the user you're looking for. ${Emojis.ERROR}`);
         }
+
         const userInfo = await this.fetchUserInfo(user, message);
 
         if (!userInfo) {
@@ -98,19 +101,22 @@ export class ProfileCommand extends Command {
         return userInfo;
     }
 
-    private async getRank(userId: string) {
-        const allUsers = await this.container.prisma.users.findMany({
-            orderBy: [
-                {
-                    globalLevel: 'desc'
-                },
-                {
-                    totalGlobalExperience: 'desc'
-                }
-            ]
-        });
+    private async getRank(userId: string): Promise<number | undefined> {
+        const leaderboardKey = 'generalLeaderboard';
+        const leaderboardExists = await this.container.redis.exists(leaderboardKey);
+        if (!leaderboardExists) {
+            const allUsers = await this.container.prisma.users.findMany({
+                select: { userId: true, totalGlobalExperience: true }
+            });
 
-        const userIndex = allUsers.findIndex(user => user.userId === userId);
-        return userIndex !== -1 ? userIndex + 1 : undefined;
+            const pipeline = this.container.redis.pipeline();
+            for (const user of allUsers) {
+                pipeline.zadd(leaderboardKey, user.totalGlobalExperience, user.userId);
+            }
+            await pipeline.exec();
+        }
+
+        const rank = await this.container.redis.zrevrank(leaderboardKey, userId);
+        return rank !== null ? rank + 1 : undefined;
     }
 }

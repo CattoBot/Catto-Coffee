@@ -14,36 +14,17 @@ export class LevelingHelper extends Helper {
     }
 
     public async getTextLeaderboard(guildId: string) {
-        const lb = await container.prisma.text_experience.findMany({
-            where: {
-                guildId: guildId
-            }, take: 999,
-            orderBy: [
-                {
-                    textLevel: 'desc'
-                },
-                {
-                    textExperience: 'desc'
-                }
-            ]
-        });
-        return lb;
+        const key = `textLeaderboard:${guildId}`;
+        const leaderboard = await container.redis.zrevrange(key, 0, -1, "WITHSCORES");
+        const parsedLeaderboard = this.parseLeaderboard(leaderboard);
+        return this.populateLeaderboardDetails(parsedLeaderboard, 'text');
     }
 
     public async getVoiceLeaderboard(guildId: string) {
-        const lb = await container.prisma.voice_experience.findMany({
-            where: {
-                guildId: guildId
-            }, orderBy: [
-                {
-                    voiceLevel: 'desc'
-                },
-                {
-                    voiceExperience: 'desc'
-                }
-            ], take: 999
-        });
-        return lb;
+        const key = `voiceLeaderboard:${guildId}`;
+        const leaderboard = await container.redis.zrevrange(key, 0, -1, "WITHSCORES");
+        const parsedLeaderboard = this.parseLeaderboard(leaderboard);
+        return this.populateLeaderboardDetails(parsedLeaderboard, 'voice');
     }
 
     public async getTextRewards(guildId: string): Promise<RoleReward[]> {
@@ -61,35 +42,15 @@ export class LevelingHelper extends Helper {
     }
 
     public async getVoiceRank(userId: string, guildId: string) {
-        const users = await container.prisma.voice_experience.findMany({
-            where: { guildId },
-            orderBy: [
-                {
-                    voiceLevel: 'desc'
-                },
-                {
-                    voiceExperience: 'desc'
-                }
-            ]
-        });
-        const userIndex = users.findIndex(user => user.userId === userId);
-        return userIndex !== -1 ? userIndex + 1 : undefined;
+        const key = `voiceLeaderboard:${guildId}`;
+        const rank = await container.redis.zrevrank(key, userId);
+        return rank !== null ? rank + 1 : undefined;
     }
 
     public async getTextRank(userId: string, guildId: string) {
-        const users = await container.prisma.text_experience.findMany({
-            where: { guildId },
-            orderBy: [
-                {
-                    textLevel: 'desc'
-                },
-                {
-                    textExperience: 'desc'
-                }
-            ]
-        });
-        const userIndex = users.findIndex(user => user.userId === userId);
-        return userIndex !== -1 ? userIndex + 1 : undefined;
+        const key = `textLeaderboard:${guildId}`;
+        const rank = await container.redis.zrevrank(key, userId);
+        return rank !== null ? rank + 1 : undefined;
     }
 
     public async getVoiceUserInfo(userId: string, guildId: string) {
@@ -111,6 +72,73 @@ export class LevelingHelper extends Helper {
                     guildId,
                 }
             }
+        });
+    }
+
+    public async updateVoiceLeaderboard(guildId: string, userId: string, experience: number) {
+        const key = `voiceLeaderboard:${guildId}`;
+        await container.redis.zadd(key, experience, userId);
+    }
+
+    public async updateTextLeaderboard(guildId: string, userId: string, experience: number) {
+        const key = `textLeaderboard:${guildId}`;
+        await container.redis.zadd(key, experience, userId);
+    }
+
+    private parseLeaderboard(data: string[]) {
+        const result = [];
+        for (let i = 0; i < data.length; i += 2) {
+            result.push({ userId: data[i], score: parseInt(data[i + 1], 10) });
+        }
+        return result;
+    }
+
+    private async populateLeaderboardDetails(
+        leaderboard: { userId: string; score: number }[],
+        type: 'text' | 'voice'
+    ) {
+        const userIds = leaderboard.map(entry => entry.userId);
+
+        type UserDetail = {
+            userId: string;
+            textLevel?: number;
+            textExperience?: number;
+            totalMessages?: number;
+            voiceLevel?: number;
+            voiceExperience?: number;
+            totalTimeInVoiceChannel?: number;
+        };
+
+        const userDetails: UserDetail[] = type === 'text'
+            ? await container.prisma.text_experience.findMany({
+                where: { userId: { in: userIds } },
+                select: { userId: true, textLevel: true, textExperience: true, totalMessages: true },
+            })
+            : await container.prisma.voice_experience.findMany({
+                where: { userId: { in: userIds } },
+                select: { userId: true, voiceLevel: true, voiceExperience: true, totalTimeInVoiceChannel: true },
+            });
+
+        return leaderboard.map(entry => {
+            const userDetail: UserDetail = userDetails.find(user => user.userId === entry.userId) ?? {
+                userId: entry.userId,
+            };
+
+            return {
+                userId: entry.userId,
+                score: entry.score,
+                ...(type === 'text'
+                    ? {
+                        textLevel: userDetail.textLevel ?? 0,
+                        textExperience: userDetail.textExperience ?? 0,
+                        totalMessages: userDetail.totalMessages ?? 0,
+                    }
+                    : {
+                        voiceLevel: userDetail.voiceLevel ?? 0,
+                        voiceExperience: userDetail.voiceExperience ?? 0,
+                        totalTimeInVoiceChannel: userDetail.totalTimeInVoiceChannel ?? 0,
+                    }),
+            };
         });
     }
 }
