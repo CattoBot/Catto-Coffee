@@ -70,7 +70,7 @@ export class ApplicationClient extends SapphireClient {
 
 	public override async login(token?: string): Promise<string> {
 		container.prisma = new PrismaClient();
-		container.redis = new Redis();
+		container.redis = new Redis(envParseString('REDIS_URL'));
 		container.console = new ApplicationConsole();
 		container.cloudinary = new CloudinaryService();
 		container.commandDeniedHelper = new ChatInputDeniedCommandHelper();
