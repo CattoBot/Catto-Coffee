@@ -17,9 +17,8 @@ export class ReadyEvent extends Listener {
 		this.printStoreDebugInformation();
 		this.setBotPresence();
 		setTimeout(() => {
-			return this.container.console.start(cyan(`${this.container.client.user?.username} is online.`)) 
+			return this.container.console.start(cyan(`${this.container.client.user?.username} is online.`));
 		}, 2000);
-		
 	}
 
 	private printBanner() {
@@ -59,11 +58,12 @@ ${dev ? ` ${pad}${blc('<')}${llc('/')}${blc('>')} ${llc('DEVELOPMENT MODE')}` : 
 			activities: [
 				{
 					name: `${guildCount} Guilds | ${memberCount} Members`,
-					type: ActivityType.Watching,
-				}],
-			status: 'idle',
+					type: ActivityType.Watching
+				}
+			],
+			status: 'idle'
 		};
 
-		this.container.client.user?.setPresence(presenceData)
+		this.container.client.user?.setPresence(presenceData);
 	}
 }

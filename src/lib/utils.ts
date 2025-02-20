@@ -4,30 +4,29 @@ import { send } from '@sapphire/plugin-editable-commands';
 import { cyan } from 'colorette';
 import { ActivityType, EmbedBuilder, type APIUser, type Guild, type Message, type User } from 'discord.js';
 import { RandomLoadingMessage } from './constants';
-import { join } from "path";
-import { readFileSync } from "fs";
+import { join } from 'path';
+import { readFileSync } from 'fs';
 import { Status } from '../shared/enum/Status';
 import { Activities, PresenceStatus } from './constants';
-import { Time } from "@sapphire/time-utilities"
+import { Time } from '@sapphire/time-utilities';
 import { Config } from '../config';
 import { TimeMeassure } from '../shared/types/timeMeassure';
 
 export class Utils {
-
 	/**
 	 * Número del contador actual
 	 */
-	private x = 0
+	private x = 0;
 
 	/**
 	 * Cada vez que es llamado incrementa su valor en 1
 	 */
 	get counter() {
-		return this.x++
+		return this.x++;
 	}
 
 	set counter(x) {
-		this.x = x
+		this.x = x;
 	}
 
 	/**
@@ -52,9 +51,10 @@ export class Utils {
 		try {
 			return await asyncFn(); // Attempt to execute the function`
 		} catch (error) {
-			if (retries > 0) { // Check if there are retries left
+			if (retries > 0) {
+				// Check if there are retries left
 				if (delay) {
-					await new Promise(resolve => setTimeout(resolve, delay)); // Wait for the specified delay
+					await new Promise((resolve) => setTimeout(resolve, delay)); // Wait for the specified delay
 				}
 				return this.retryAsync(asyncFn, retries - 1, delay); // Recursively retry the function
 			} else {
@@ -68,13 +68,13 @@ export class Utils {
 	}
 
 	/**
-	 *   _______ _                
-	 *  |__   __(_)               
-	 *     | |   _ _ __ ___   ___ 
+	 *   _______ _
+	 *  |__   __(_)
+	 *     | |   _ _ __ ___   ___
 	 *     | |  | | '_ ` _ \ / _ \
 	 *     | |  | | | | | | |  __/
 	 *     |_|  |_|_| |_| |_|\___|
-	 * 
+	 *
 	 * Made by @gacarbla
 	 */
 
@@ -175,20 +175,20 @@ export class Utils {
 		 * @example
 		 * let timeInMinutes = 2
 		 * let timeInSeconds = convert(timeInMinutes, 'minutes', 'seconds')
-		 * 
+		 *
 		 * console.log(timeInSeconds) // 120
 		 */
 		convert(num: number, from: TimeMeassure, to: TimeMeassure): number {
-			return this[`to${to}`](this[from](num))
+			return this[`to${to}`](this[from](num));
 		},
 
 		/**
 		 * Convierte cualquier unidad de tiempo a un formato más claro y legible.
-		 * 
+		 *
 		 * ! No se recomienda utilizar unidades de medida superiores al minuto.
 		 */
 		format(num: number, meassure: TimeMeassure): string {
-			const seconds = this.convert(num, meassure, 'seconds')
+			const seconds = this.convert(num, meassure, 'seconds');
 			if (seconds < 60) return `${seconds} second${seconds === 1 ? '' : 's'}`;
 			const minutes = Math.floor(seconds / 60);
 			if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'}`;
@@ -197,19 +197,19 @@ export class Utils {
 			const days = Math.floor(hours / 24);
 			return `${days} day${days === 1 ? '' : 's'}`;
 		}
-	}
+	};
 
 	/**
-	 *   _   _                 _                   
-     *  | \ | |               | |                  
-     *  |  \| |_   _ _ __ ___ | |__   ___ _ __ ___ 
+	 *   _   _                 _
+	 *  | \ | |               | |
+	 *  |  \| |_   _ _ __ ___ | |__   ___ _ __ ___
 	 *  | . ` | | | | '_ ` _ \| '_ \ / _ \ '__/ __|
 	 *  | |\  | |_| | | | | | | |_) |  __/ |  \__ \
 	 *  |_| \_|\__,_|_| |_| |_|_.__/ \___|_|  |___/
 	 */
 
 	/**
-	 * 
+	 *
 	 */
 	numbers = {
 		/**
@@ -223,25 +223,25 @@ export class Utils {
 		 */
 		format(num: number): string {
 			if (num >= 1000000) {
-				return (num / 1000000).toFixed(1) + "M";
+				return (num / 1000000).toFixed(1) + 'M';
 			} else if (num >= 1000) {
-				return (num / 1000).toFixed(1) + "K";
+				return (num / 1000).toFixed(1) + 'K';
 			} else {
 				return num.toString();
 			}
 		}
-	}
+	};
 
 	/**
-	 *   _____          _ _        _                  
-	 *  |  __ \        | (_)      | |                 
-	 *  | |__) |___  __| |_ ___   | | _____ _   _ ___ 
+	 *   _____          _ _        _
+	 *  |  __ \        | (_)      | |
+	 *  | |__) |___  __| |_ ___   | | _____ _   _ ___
 	 *  |  _  // _ \/ _` | / __|  | |/ / _ \ | | / __|
 	 *  | | \ \  __/ (_| | \__ \  |   <  __/ |_| \__ \
 	 *  |_|  \_\___|\__,_|_|___/  |_|\_\___|\__, |___/
-	 *                                       __/ |    
-	 *                                      |___/     
-	 * 
+	 *                                       __/ |
+	 *                                      |___/
+	 *
 	 * Made by @gacarbla
 	 */
 
@@ -249,27 +249,25 @@ export class Utils {
 	 * Obtén la key de redis para determinadas acciones frecuentes
 	 */
 	getRedisKey = {
-
 		/**
 		 * En caso de tratarse de configuraciones o estados del servidor
 		 */
 		guild: {
-
 			/**
 			 * Key del prefijo de comandos del servidor
 			 */
 			prefix: (guildId: string) => `guild:config:${guildId}:prefix`
 		}
-	}
+	};
 
 	/**
-	 *   ____        _   
-	 *  |  _ \      | |  
-	 *  | |_) | ___ | |_ 
+	 *   ____        _
+	 *  |  _ \      | |
+	 *  | |_) | ___ | |_
 	 *  |  _ < / _ \| __|
-	 *  | |_) | (_) | |_ 
+	 *  | |_) | (_) | |_
 	 *  |____/ \___/ \__|
-	 * 
+	 *
 	 * Made by @gacarbla and @arestosora
 	 */
 
@@ -287,7 +285,7 @@ export class Utils {
 
 			return {
 				name: randomActivity,
-				type: randomActivityType,
+				type: randomActivityType
 			};
 		},
 
@@ -301,7 +299,7 @@ export class Utils {
 				const { name, type } = this.getRandomPresence();
 				container.client.user?.setPresence({
 					status: Status.Busy,
-					activities: [{ name, type }],
+					activities: [{ name, type }]
 				});
 			}, 10000);
 		},
@@ -313,64 +311,60 @@ export class Utils {
 			setTimeout(() => {
 				const bannerPath = join(__dirname, '../../assets/banner.txt');
 				const bannerText = readFileSync(bannerPath, 'utf8');
-				container.console.watch(cyan(bannerText.replace("%version%", container.version)));
+				container.console.watch(cyan(bannerText.replace('%version%', container.version)));
 			}, 1000);
 		},
 
 		/**
 		 * Envía un mensaje de carga como respuesta a un mensaje
 		 * @param message Mensaje al que contestar
-		 * @returns 
+		 * @returns
 		 */
 		sendLoadingMessage: (message: Message): Promise<typeof message> => {
 			return send(message, { embeds: [new EmbedBuilder().setDescription(this.pickRandom(RandomLoadingMessage)).setColor('#FF0000')] });
 		}
-	}
+	};
 
 	/**
-	 *    _____ _                   _     
-	 *   / ____| |                 | |    
-	 *  | (___ | |__   __ _ _ __ __| |___ 
+	 *    _____ _                   _
+	 *   / ____| |                 | |
+	 *  | (___ | |__   __ _ _ __ __| |___
 	 *   \___ \| '_ \ / _` | '__/ _` / __|
 	 *   ____) | | | | (_| | | | (_| \__ \
 	 *  |_____/|_| |_|\__,_|_|  \__,_|___/
-	 * 
+	 *
 	 * Made by @gacarbla and @arestosora
 	 */
 
 	/**
 	 * Herramientas para el monitoreo y gestión de los shards del bot
 	 */
-	shards = {
-
-	}
+	shards = {};
 
 	/**
-	 *    _____                                          _     
-	 *   / ____|                                        | |    
-	 *  | |     ___  _ __ ___  _ __ ___   __ _ _ __   __| |___ 
+	 *    _____                                          _
+	 *   / ____|                                        | |
+	 *  | |     ___  _ __ ___  _ __ ___   __ _ _ __   __| |___
 	 *  | |    / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` / __|
 	 *  | |___| (_) | | | | | | | | | | | (_| | | | | (_| \__ \
 	 *   \_____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|___/
-	 * 
+	 *
 	 * Made by @gacarbla and @arestosora
 	 */
 
 	/**
 	 * Herramientas de comandos del bot
 	 */
-	commands = {
-
-	}
+	commands = {};
 
 	/**
-	 *    _____       _ _     _     
-	 *   / ____|     (_) |   | |    
-	 *  | |  __ _   _ _| | __| |___ 
+	 *    _____       _ _     _
+	 *   / ____|     (_) |   | |
+	 *  | |  __ _   _ _| | __| |___
 	 *  | | |_ | | | | | |/ _` / __|
 	 *  | |__| | |_| | | | (_| \__ \
 	 *   \_____|\__,_|_|_|\__,_|___/
-	 * 
+	 *
 	 * Made by @gacarbla and @arestosora
 	 */
 
@@ -378,7 +372,6 @@ export class Utils {
 	 * Herramientas relacionadas con los servidores
 	 */
 	guilds = {
-
 		/**
 		 * Obtiene el prefijo del servidor. Lo intenta primero
 		 * a través de redis pero en caso de no ser localizado,
@@ -386,7 +379,7 @@ export class Utils {
 		 * @param guildId ID del servidor en cuestión
 		 */
 		async getPrefix(guildId: string): Promise<string> {
-			let prefix = await this.getPrefixFromRedis(guildId) ?? await this.getPrefixFromDatabase(guildId) ?? Config.prefix;
+			let prefix = (await this.getPrefixFromRedis(guildId)) ?? (await this.getPrefixFromDatabase(guildId)) ?? Config.prefix;
 			if (prefix !== Config.prefix) {
 				await this.setPrefixInRedis(guildId, prefix);
 			}
@@ -407,38 +400,36 @@ export class Utils {
 		 * Obtiene el prefijo almacenado en Redis para un servidor.
 		 * En ausencia de su declaración, devuelve `null`
 		 * @param guildId ID del servidor en cuestión
-		 * @returns 
+		 * @returns
 		 */
-		getPrefixFromRedis: (guildId: string): Promise<string | null> =>
-			container.redis.get(this.getRedisKey.guild.prefix(guildId)),
+		getPrefixFromRedis: (guildId: string): Promise<string | null> => container.redis.get(this.getRedisKey.guild.prefix(guildId)),
 
 		/**
 		 * Obtiene el prefijo de servidor según la base de datos.
 		 * En ausencia de su declaración, revuelve `null`
 		 * @param guildId ID del servidor en cuestión
-		 * @returns 
+		 * @returns
 		 */
 		getPrefixFromDatabase: async (guildId: string): Promise<string | null> => {
 			const guild = await container.prisma.guilds.findUnique({ where: { guildId } });
 			return guild?.prefix ?? null;
 		}
-	}
+	};
 
 	/**
-	 *   _                                 
-	 *  | |                                
-	 *  | |     ___   __ _  __ _  ___ _ __ 
+	 *   _
+	 *  | |
+	 *  | |     ___   __ _  __ _  ___ _ __
 	 *  | |    / _ \ / _` |/ _` |/ _ \ '__|
-	 *  | |___| (_) | (_| | (_| |  __/ |   
-	 *  |______\___/ \__, |\__, |\___|_|   
-	 *                __/ | __/ |          
-	 *               |___/ |___/           
-	 * 
+	 *  | |___| (_) | (_| | (_| |  __/ |
+	 *  |______\___/ \__, |\__, |\___|_|
+	 *                __/ | __/ |
+	 *               |___/ |___/
+	 *
 	 * Made by @gacarbla and @arestosora
 	 */
 
 	logger = {
-
 		logSuccessCommand(payload: ContextMenuCommandSuccessPayload | ChatInputCommandSuccessPayload | MessageCommandSuccessPayload): void {
 			let successLoggerData: ReturnType<typeof this.getSuccessLoggerData>;
 			if ('interaction' in payload) {
@@ -446,7 +437,9 @@ export class Utils {
 			} else {
 				successLoggerData = this.getSuccessLoggerData(payload.message.guild, payload.message.author, payload.command);
 			}
-			container.logger.debug(`${successLoggerData.shard} - ${successLoggerData.commandName} ${successLoggerData.author} ${successLoggerData.sentAt}`);
+			container.logger.debug(
+				`${successLoggerData.shard} - ${successLoggerData.commandName} ${successLoggerData.author} ${successLoggerData.sentAt}`
+			);
 		},
 
 		getSuccessLoggerData(guild: Guild | null, user: User, command: Command) {
@@ -460,6 +453,6 @@ export class Utils {
 		authorInfo: (author: User | APIUser) => `${author.username}[${cyan(author.id)}]`,
 		shardsInfo: (id: number) => `[${cyan(id.toString())}]`,
 		commandsInfo: (command: Command) => cyan(command.name),
-		guildsInfo: (guild: Guild | null) => (guild === null) ? `[${cyan('DM')}]` : `${guild.name}[${cyan(guild.id)}]`,
-	}
+		guildsInfo: (guild: Guild | null) => (guild === null ? `[${cyan('DM')}]` : `${guild.name}[${cyan(guild.id)}]`)
+	};
 }

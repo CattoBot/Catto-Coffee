@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { Redis } from 'ioredis';
 import { ApplicationConsole } from './console';
-import { ArrayString, IntegerString } from '@skyra/env-utilities';
+import { ArrayString } from '@skyra/env-utilities';
 import { ChatInputDeniedCommandHelper } from './events/commandDenied';
 import { CloudinaryService } from './services/cloudinary';
 import { Utils } from './utils';
@@ -30,7 +30,7 @@ declare module '@sapphire/pieces' {
 		prisma: PrismaClient;
 		redis: Redis;
 		console: ApplicationConsole;
-		commandDeniedHelper: ChatInputDeniedCommandHelper
+		commandDeniedHelper: ChatInputDeniedCommandHelper;
 		cloudinary: CloudinaryService;
 		utils: Utils;
 		helpers: CoreHelper;
@@ -38,14 +38,11 @@ declare module '@sapphire/pieces' {
 	}
 }
 
-
 declare module '@skyra/env-utilities' {
 	interface Env {
 		OWNERS: ArrayString;
 		REDIS_HOST: string;
-		REDIS_PASSWORD: string;
-		REDIS_PORT: IntegerString;
-		REDIS_TASK_DB: IntegerString;
+		REDIS_URL: string;
 		CLOUDINARY_CLOUD_NAME: string;
 		CLOUDINARY_API_KEY: string;
 		CLOUDINARY_API_SECRET: string;

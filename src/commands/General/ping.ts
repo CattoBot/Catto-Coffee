@@ -20,14 +20,17 @@ export class UserCommand extends Command {
 	public override async messageRun(message: Message) {
 		const msg = await send(message, 'Ping?');
 
-		const content = `Pong! Bot Latency ${Math.round(this.container.client.ws.ping)}ms. API Latency ${(msg.editedTimestamp || msg.createdTimestamp) - (message.editedTimestamp || message.createdTimestamp)
-			}ms.`;
+		const content = `Pong! Bot Latency ${Math.round(this.container.client.ws.ping)}ms. API Latency ${
+			(msg.editedTimestamp || msg.createdTimestamp) - (message.editedTimestamp || message.createdTimestamp)
+		}ms.`;
 
 		return send(message, content);
 	}
 
 	// slash command
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		return interaction.reply({ content: await resolveKey(interaction, 'commands/replies/ping:success_with_args', { latency: this.container.client.ws.ping }) });
+		return interaction.reply({
+			content: await resolveKey(interaction, 'commands/replies/ping:success_with_args', { latency: this.container.client.ws.ping })
+		});
 	}
 }

@@ -5,12 +5,12 @@ import { ScheduledTask, ScheduledTaskEvents } from '@sapphire/plugin-scheduled-t
 
 @ApplyOptions<Listener.Options>({ event: ScheduledTaskEvents.ScheduledTaskError })
 export class UserListener extends Listener<typeof ScheduledTaskEvents.ScheduledTaskError> {
-  public override async run(error: Error, task: ScheduledTask) {
-    this.container.logger.error(`[Scheduled-Task Plugin]: task: ${task.name} threw an error`, error);
-  }
+	public override async run(error: Error, task: ScheduledTask) {
+		this.container.logger.error(`[Scheduled-Task Plugin]: task: ${task.name} threw an error`, error);
+	}
 
-  public override onLoad() {
-    this.enabled = (this.container.logger as Logger).level <= LogLevel.Debug;
-    return super.onLoad();
-  }
+	public override onLoad() {
+		this.enabled = (this.container.logger as Logger).level <= LogLevel.Debug;
+		return super.onLoad();
+	}
 }

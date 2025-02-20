@@ -7,363 +7,385 @@ import { chunk } from 'lodash';
 
 @ApplyOptions<ScheduledTaskOptions>({ interval: Time.Minute * 20, name: 'VoiceExperienceTask' })
 export class VoiceExperienceTask extends ScheduledTask {
-    public constructor(context: ScheduledTask.LoaderContext, options: ScheduledTask.Options) {
-        super(context, {
-            ...options,
-        });
-    }
+	public constructor(context: ScheduledTask.LoaderContext, options: ScheduledTask.Options) {
+		super(context, {
+			...options
+		});
+	}
 
-    public async run(): Promise<void> {
-        const failedKeys: string[] = [];
+	public async run(): Promise<void> {
+		const failedKeys: string[] = [];
 
-        try {
-            const keys = await container.redis.keys('voiceSession:*');
-            this.container.console.info(`Found ${keys.length} active voice sessions to process.`);
+		try {
+			const keys = await container.redis.keys('voiceSession:*');
+			this.container.console.info(`Found ${keys.length} active voice sessions to process.`);
 
-            const guilds: { [key: string]: string[] } = {};
+			const guilds: { [key: string]: string[] } = {};
 
-            for (const key of keys) {
-                const [, userId, guildId] = key.split(':');
-                if (!guilds[guildId]) {
-                    guilds[guildId] = [];
-                }
-                guilds[guildId].push(userId);
-            }
-            
-            this.container.console.info(`Dividing ${Object.keys(guilds).length} guilds into chunks for processing.`);
-            const guildChunks = chunk(Object.keys(guilds), 1000);
+			for (const key of keys) {
+				const [, userId, guildId] = key.split(':');
+				if (!guilds[guildId]) {
+					guilds[guildId] = [];
+				}
+				guilds[guildId].push(userId);
+			}
 
-            for (const guildChunk of guildChunks) {
-                this.container.console.info(`Processing a chunk of ${guildChunk.length} guilds.`);
-                const guildPromises = guildChunk.map(guildId => this.processGuildSessions(guildId, guilds[guildId], failedKeys));
-                await Promise.all(guildPromises);
-            }
+			this.container.console.info(`Dividing ${Object.keys(guilds).length} guilds into chunks for processing.`);
+			const guildChunks = chunk(Object.keys(guilds), 1000);
 
-            await this.addNewVoiceSessions();
-        } catch (error) {
-            this.container.console.error(`Error processing scheduled task for voice experience: ${error}`);
-        }
+			for (const guildChunk of guildChunks) {
+				this.container.console.info(`Processing a chunk of ${guildChunk.length} guilds.`);
+				const guildPromises = guildChunk.map((guildId) => this.processGuildSessions(guildId, guilds[guildId], failedKeys));
+				await Promise.all(guildPromises);
+			}
 
-        if (failedKeys.length > 0) {
-            try {
-                this.container.console.warn(`Attempting to clean up ${failedKeys.length} failed keys from Redis.`);
-                await container.redis.del(...failedKeys);
-                this.container.console.info(`Cleaned up ${failedKeys.length} failed keys from Redis.`);
-            } catch (error) {
-                this.container.console.error(`Error cleaning up failed keys from Redis: ${error}`);
-            }
-        } else {
-            this.container.console.info(`No failed keys were found.`);
-        }
-    }
+			await this.addNewVoiceSessions();
+		} catch (error) {
+			this.container.console.error(`Error processing scheduled task for voice experience: ${error}`);
+		}
 
-    private async processGuildSessions(guildId: string, userIds: string[], failedKeys: string[]): Promise<void> {
-        try {
-            this.container.console.info(`Fetching guild with ID: ${guildId}.`);
-            const guild = await this.container.client.guilds.fetch(guildId);
-            this.container.console.info(`Processing sessions for guild: ${guild.name} (${guild.id}) with ${userIds.length} active sessions.`);
-            const memberFetchPromises = userIds.map(userId => this.processUserSession(userId, guild, failedKeys));
-            await Promise.all(memberFetchPromises);
-        } catch (error) {
-            this.container.console.error(`Error processing guild sessions for guild ID: ${guildId}: ${error}`);
-            userIds.forEach(userId => failedKeys.push(`voiceSession:${userId}:${guildId}`));
-        }
-    }
+		if (failedKeys.length > 0) {
+			try {
+				this.container.console.warn(`Attempting to clean up ${failedKeys.length} failed keys from Redis.`);
+				await container.redis.del(...failedKeys);
+				this.container.console.info(`Cleaned up ${failedKeys.length} failed keys from Redis.`);
+			} catch (error) {
+				this.container.console.error(`Error cleaning up failed keys from Redis: ${error}`);
+			}
+		} else {
+			this.container.console.info(`No failed keys were found.`);
+		}
+	}
 
-    private async processUserSession(userId: string, guild: Guild, failedKeys: string[]): Promise<void> {
-        const key = `voiceSession:${userId}:${guild.id}`;
-        try {
-            this.container.console.info(`Fetching session data for user ID: ${userId}.`);
-            const sessionDataStr = await container.redis.get(key);
-            if (sessionDataStr) {
-                this.container.console.info(`Session data found for user ID: ${userId}, processing.`);
-                const sessionData = JSON.parse(sessionDataStr);
-                const joinTime = sessionData.startTime;
-                const now = Date.now();
-                const durationInSeconds = (now - joinTime) / 1000;
-                const member = await guild.members.fetch(userId).catch(() => null);
+	private async processGuildSessions(guildId: string, userIds: string[], failedKeys: string[]): Promise<void> {
+		try {
+			this.container.console.info(`Fetching guild with ID: ${guildId}.`);
+			const guild = await this.container.client.guilds.fetch(guildId);
+			this.container.console.info(`Processing sessions for guild: ${guild.name} (${guild.id}) with ${userIds.length} active sessions.`);
+			const memberFetchPromises = userIds.map((userId) => this.processUserSession(userId, guild, failedKeys));
+			await Promise.all(memberFetchPromises);
+		} catch (error) {
+			this.container.console.error(`Error processing guild sessions for guild ID: ${guildId}: ${error}`);
+			userIds.forEach((userId) => failedKeys.push(`voiceSession:${userId}:${guildId}`));
+		}
+	}
 
-                if (member) {
-                    this.container.console.info(`Member found: ${member.displayName}, processing voice session.`);
-                    await this.processVoiceSession(member, guild, key, durationInSeconds);
-                } else {
-                    this.container.console.warn(`No member found for user ID: ${userId} in guild ID: ${guild.id}`);
-                    failedKeys.push(key);
-                }
-            } else {
-                this.container.console.warn(`No session data found for user ID: ${userId}`);
-                failedKeys.push(key);
-            }
-        } catch (error) {
-            this.container.console.error(`Error processing user session for user ID: ${userId} in guild ID: ${guild.id}: ${error}`);
-            failedKeys.push(key);
-        }
-    }
+	private async processUserSession(userId: string, guild: Guild, failedKeys: string[]): Promise<void> {
+		const key = `voiceSession:${userId}:${guild.id}`;
+		try {
+			this.container.console.info(`Fetching session data for user ID: ${userId}.`);
+			const sessionDataStr = await container.redis.get(key);
+			if (sessionDataStr) {
+				this.container.console.info(`Session data found for user ID: ${userId}, processing.`);
+				const sessionData = JSON.parse(sessionDataStr);
+				const joinTime = sessionData.startTime;
+				const now = Date.now();
+				const durationInSeconds = (now - joinTime) / 1000;
+				const member = await guild.members.fetch(userId).catch(() => null);
 
-    private async addNewVoiceSessions(): Promise<void> {
-        this.container.console.info('Adding new voice sessions for all guilds.');
-        const addSessionPromises = this.container.client.guilds.cache.map(async (guild) => {
-            const voiceStates = guild.voiceStates.cache.filter((voiceState: VoiceState) => voiceState.channelId);
-            const addSessionPromises = voiceStates.map(async (voiceState) => {
-                if (voiceState.member?.user.bot) return; // Skip bots
-                const userId = voiceState.id;
-                const guildId = voiceState.guild.id;
-                const key = `voiceSession:${userId}:${guildId}`;
-                this.container.console.info(`Adding new voice session for user ID: ${userId} in guild ID: ${guildId}.`);
-                await container.redis.set(key, JSON.stringify({ startTime: Date.now() }));
-            });
-            await Promise.all(addSessionPromises);
-        });
-        await Promise.all(addSessionPromises);
-        this.container.console.info('Finished adding new voice sessions.');
-    }
+				if (member) {
+					this.container.console.info(`Member found: ${member.displayName}, processing voice session.`);
+					await this.processVoiceSession(member, guild, key, durationInSeconds);
+				} else {
+					this.container.console.warn(`No member found for user ID: ${userId} in guild ID: ${guild.id}`);
+					failedKeys.push(key);
+				}
+			} else {
+				this.container.console.warn(`No session data found for user ID: ${userId}`);
+				failedKeys.push(key);
+			}
+		} catch (error) {
+			this.container.console.error(`Error processing user session for user ID: ${userId} in guild ID: ${guild.id}: ${error}`);
+			failedKeys.push(key);
+		}
+	}
 
-    private async processVoiceSession(member: GuildMember, guild: Guild, sessionId: string, durationInSeconds: number): Promise<void> {
-        try {
-            this.container.console.info(`Calculating experience for member ${member.displayName}, duration: ${durationInSeconds}s.`);
-            let experience = await this.calculateExperience(durationInSeconds, guild);
-            const bonusPercentage = await this.getUserBonusPercentage(member);
-            if (bonusPercentage > 0) {
-                this.container.console.info(`Applying bonus percentage: ${bonusPercentage}% for user ${member.displayName}.`);
-                experience += experience * (bonusPercentage / 100);
-            }
-            const updatedUser = await this.updateVoiceExperience(member, guild.id, experience, durationInSeconds);
-            if (updatedUser.levelUp) {
-                this.container.console.info(`User ${member.displayName} leveled up to level ${updatedUser.voiceLevel}.`);
-                await this.handleLevelUp(member, guild.id, updatedUser.voiceLevel);
-            }
+	private async addNewVoiceSessions(): Promise<void> {
+		this.container.console.info('Adding new voice sessions for all guilds.');
+		const addSessionPromises = this.container.client.guilds.cache.map(async (guild) => {
+			const voiceStates = guild.voiceStates.cache.filter((voiceState: VoiceState) => voiceState.channelId);
+			const addSessionPromises = voiceStates.map(async (voiceState) => {
+				if (voiceState.member?.user.bot) return; // Skip bots
+				const userId = voiceState.id;
+				const guildId = voiceState.guild.id;
+				const key = `voiceSession:${userId}:${guildId}`;
+				this.container.console.info(`Adding new voice session for user ID: ${userId} in guild ID: ${guildId}.`);
+				await container.redis.set(key, JSON.stringify({ startTime: Date.now() }));
+			});
+			await Promise.all(addSessionPromises);
+		});
+		await Promise.all(addSessionPromises);
+		this.container.console.info('Finished adding new voice sessions.');
+	}
 
-            this.container.console.info(`Voice session processed for user ${member.displayName}, deleting session key.`);
-            await container.redis.del(sessionId);
-        } catch (error) {
-            this.container.console.error(`Error processing voice session for member ${member.displayName}: ${error}`);
-            await container.redis.del(sessionId);
-        }
-    }
+	private async processVoiceSession(member: GuildMember, guild: Guild, sessionId: string, durationInSeconds: number): Promise<void> {
+		try {
+			this.container.console.info(`Calculating experience for member ${member.displayName}, duration: ${durationInSeconds}s.`);
+			let experience = await this.calculateExperience(durationInSeconds, guild);
+			const bonusPercentage = await this.getUserBonusPercentage(member);
+			if (bonusPercentage > 0) {
+				this.container.console.info(`Applying bonus percentage: ${bonusPercentage}% for user ${member.displayName}.`);
+				experience += experience * (bonusPercentage / 100);
+			}
+			const updatedUser = await this.updateVoiceExperience(member, guild.id, experience, durationInSeconds);
+			if (updatedUser.levelUp) {
+				this.container.console.info(`User ${member.displayName} leveled up to level ${updatedUser.voiceLevel}.`);
+				await this.handleLevelUp(member, guild.id, updatedUser.voiceLevel);
+			}
 
-    private async calculateExperience(durationInSeconds: number, guild: Guild): Promise<number> {
-        this.container.console.info(`Calculating experience for duration: ${durationInSeconds}s in guild: ${guild.name}.`);
-        const { min, max, cooldown } = await this.getMinMaxEXP(guild);
-        const intervals = Math.floor(durationInSeconds / cooldown);
-        return this.getRandomXP(min, max) * intervals;
-    }
+			this.container.console.info(`Voice session processed for user ${member.displayName}, deleting session key.`);
+			await container.redis.del(sessionId);
+		} catch (error) {
+			this.container.console.error(`Error processing voice session for member ${member.displayName}: ${error}`);
+			await container.redis.del(sessionId);
+		}
+	}
 
-    private async getMinMaxEXP(guild: Guild): Promise<{ min: number; max: number; cooldown: number }> {
-        const cacheKey = `voiceExpSettings:${guild.id}`;
-        this.container.console.info(`Fetching EXP settings for guild: ${guild.name}.`);
-        const cachedData = await this.container.redis.get(cacheKey);
-        if (cachedData) {
-            this.container.console.info(`EXP settings found in cache for guild: ${guild.name}.`);
-            return JSON.parse(cachedData);
-        }
-        const voiceData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guild.id } });
-        const expData = {
-            cooldown: voiceData?.cooldown ?? Time.Minute,
-            min: voiceData?.min ?? 5,
-            max: voiceData?.max ?? 20
-        };
-        this.container.console.info(`Caching EXP settings for guild: ${guild.name}.`);
-        await this.container.redis.set(cacheKey, JSON.stringify(expData), 'EX', 3600);
-        return expData;
-    }
+	private async calculateExperience(durationInSeconds: number, guild: Guild): Promise<number> {
+		this.container.console.info(`Calculating experience for duration: ${durationInSeconds}s in guild: ${guild.name}.`);
+		const { min, max, cooldown } = await this.getMinMaxEXP(guild);
+		const intervals = Math.floor(durationInSeconds / cooldown);
+		return this.getRandomXP(min, max) * intervals;
+	}
 
-    private async updateVoiceExperience(member: GuildMember, guildID: string, experience: number, durationInSeconds: number): Promise<any> {
-        try {
-            this.container.console.info(`Updating voice experience for user: ${member.displayName}.`);
-            const updatedUser = await this.updateUserExperience(member, guildID, experience, durationInSeconds);
-            const { voiceLevel: currentLevel, voiceExperience: currentExperience } = updatedUser;
-            this.container.console.info(`Calculating level up for user: ${member.displayName}, current level: ${currentLevel}, current experience: ${currentExperience}.`);
-            const { levelUp, newLevel, newExperience } = await this.calculateLevelUp(member.user.id, guildID, currentExperience, currentLevel);
+	private async getMinMaxEXP(guild: Guild): Promise<{ min: number; max: number; cooldown: number }> {
+		const cacheKey = `voiceExpSettings:${guild.id}`;
+		this.container.console.info(`Fetching EXP settings for guild: ${guild.name}.`);
+		const cachedData = await this.container.redis.get(cacheKey);
+		if (cachedData) {
+			this.container.console.info(`EXP settings found in cache for guild: ${guild.name}.`);
+			return JSON.parse(cachedData);
+		}
+		const voiceData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guild.id } });
+		const expData = {
+			cooldown: voiceData?.cooldown ?? Time.Minute,
+			min: voiceData?.min ?? 5,
+			max: voiceData?.max ?? 20
+		};
+		this.container.console.info(`Caching EXP settings for guild: ${guild.name}.`);
+		await this.container.redis.set(cacheKey, JSON.stringify(expData), 'EX', 3600);
+		return expData;
+	}
 
-            return { ...updatedUser, voiceLevel: newLevel, voiceExperience: newExperience, levelUp: levelUp };
-        } catch (error) {
-            this.container.console.error(`Failed to update experience for user ${member.displayName}: ${error}`);
-            throw error;
-        }
-    }
+	private async updateVoiceExperience(member: GuildMember, guildID: string, experience: number, durationInSeconds: number): Promise<any> {
+		try {
+			this.container.console.info(`Updating voice experience for user: ${member.displayName}.`);
+			const updatedUser = await this.updateUserExperience(member, guildID, experience, durationInSeconds);
+			const { voiceLevel: currentLevel, voiceExperience: currentExperience } = updatedUser;
+			this.container.console.info(
+				`Calculating level up for user: ${member.displayName}, current level: ${currentLevel}, current experience: ${currentExperience}.`
+			);
+			const { levelUp, newLevel, newExperience } = await this.calculateLevelUp(member.user.id, guildID, currentExperience, currentLevel);
 
-    private async updateUserExperience(member: GuildMember, guildID: string, experience: number, durationInSeconds: number): Promise<any> {
-        const upsertUserExperience = async () =>
-            await this.container.prisma.voice_experience.upsert({
-                where: {
-                    guildId_userId: {
-                        guildId: guildID,
-                        userId: member.user.id
-                    }
-                },
-                create: {
-                    userId: member.user.id,
-                    guildId: guildID,
-                    voiceExperience: experience,
-                    totalVoiceExperience: experience,
-                    totalTimeInVoiceChannel: durationInSeconds,
-                    weeklyTimeInVoiceChannel: durationInSeconds,
-                    dailyTimeInVoiceChannel: durationInSeconds,
-                    monthlyTimeInVoiceChannel: durationInSeconds,
-                },
-                update: {
-                    voiceExperience: { increment: experience },
-                    totalVoiceExperience: { increment: experience },
-                    totalTimeInVoiceChannel: { increment: durationInSeconds },
-                    weeklyTimeInVoiceChannel: { increment: durationInSeconds },
-                    dailyTimeInVoiceChannel: { increment: durationInSeconds },
-                    monthlyTimeInVoiceChannel: { increment: durationInSeconds }
-                }
-            });
+			return { ...updatedUser, voiceLevel: newLevel, voiceExperience: newExperience, levelUp: levelUp };
+		} catch (error) {
+			this.container.console.error(`Failed to update experience for user ${member.displayName}: ${error}`);
+			throw error;
+		}
+	}
 
-        this.container.console.info(`Upserting experience for user: ${member.displayName}.`);
-        await container.utils.retryAsync(upsertUserExperience, 3, 500);
-        await this.updateGlobalExperience(member.user.id, durationInSeconds);
-        const updatedUser = await this.container.prisma.voice_experience.findUnique({
-            where: {
-                guildId_userId: {
-                    guildId: guildID,
-                    userId: member.user.id
-                }
-            }
-        });
+	private async updateUserExperience(member: GuildMember, guildID: string, experience: number, durationInSeconds: number): Promise<any> {
+		const upsertUserExperience = async () =>
+			await this.container.prisma.voice_experience.upsert({
+				where: {
+					guildId_userId: {
+						guildId: guildID,
+						userId: member.user.id
+					}
+				},
+				create: {
+					userId: member.user.id,
+					guildId: guildID,
+					voiceExperience: experience,
+					totalVoiceExperience: experience,
+					totalTimeInVoiceChannel: durationInSeconds,
+					weeklyTimeInVoiceChannel: durationInSeconds,
+					dailyTimeInVoiceChannel: durationInSeconds,
+					monthlyTimeInVoiceChannel: durationInSeconds
+				},
+				update: {
+					voiceExperience: { increment: experience },
+					totalVoiceExperience: { increment: experience },
+					totalTimeInVoiceChannel: { increment: durationInSeconds },
+					weeklyTimeInVoiceChannel: { increment: durationInSeconds },
+					dailyTimeInVoiceChannel: { increment: durationInSeconds },
+					monthlyTimeInVoiceChannel: { increment: durationInSeconds }
+				}
+			});
 
-        if (!updatedUser) {
-            throw new Error('Failed to fetch updated user data.');
-        }
-        return updatedUser;
-    }
+		this.container.console.info(`Upserting experience for user: ${member.displayName}.`);
+		await container.utils.retryAsync(upsertUserExperience, 3, 500);
+		await this.updateGlobalExperience(member.user.id, durationInSeconds);
+		const updatedUser = await this.container.prisma.voice_experience.findUnique({
+			where: {
+				guildId_userId: {
+					guildId: guildID,
+					userId: member.user.id
+				}
+			}
+		});
 
-    private async updateGlobalExperience(userId: string, duration: number) {
-        this.container.console.info(`Updating global experience for user ID: ${userId}.`);
-        const user = await this.container.prisma.users.findUnique({
-            where: { userId },
-            select: { globalExperience: true, globalLevel: true }
-        });
-        const experience = Math.random() * 350;
-        let currentExperience = user?.globalExperience || 0;
-        let currentLevel = user?.globalLevel || 1;
-        let newExperience = currentExperience + experience;
-        let nextLevelExperience = container.helpers.leveling.xp.globalExperienceFormula(currentLevel + 1);
-        while (newExperience >= nextLevelExperience) {
-            newExperience -= nextLevelExperience;
-            currentLevel++;
-            nextLevelExperience = container.helpers.leveling.xp.globalExperienceFormula(currentLevel + 1);
-        }
+		if (!updatedUser) {
+			throw new Error('Failed to fetch updated user data.');
+		}
+		return updatedUser;
+	}
 
-        await this.container.prisma.users.upsert({
-            where: { userId },
-            update: { globalExperience: newExperience, globalLevel: currentLevel, totalGlobalExperience: { increment: experience }, totalTimeInVoiceChannel: { increment: duration } },
-            create: { userId, globalExperience: newExperience, globalLevel: currentLevel, totalGlobalExperience: experience, totalTimeInVoiceChannel: duration }
-        });
-    }
+	private async updateGlobalExperience(userId: string, duration: number) {
+		this.container.console.info(`Updating global experience for user ID: ${userId}.`);
+		const user = await this.container.prisma.users.findUnique({
+			where: { userId },
+			select: { globalExperience: true, globalLevel: true }
+		});
+		const experience = Math.random() * 350;
+		let currentExperience = user?.globalExperience || 0;
+		let currentLevel = user?.globalLevel || 1;
+		let newExperience = currentExperience + experience;
+		let nextLevelExperience = container.helpers.leveling.xp.globalExperienceFormula(currentLevel + 1);
+		while (newExperience >= nextLevelExperience) {
+			newExperience -= nextLevelExperience;
+			currentLevel++;
+			nextLevelExperience = container.helpers.leveling.xp.globalExperienceFormula(currentLevel + 1);
+		}
 
-    private async calculateLevelUp(userID: string, guildID: string, currentExperience: number, currentLevel: number): Promise<{ levelUp: boolean, newLevel: number, newExperience: number }> {
-        let levelUp = false;
-        let xpNeeded = container.helpers.leveling.xp.experienceFormula(currentLevel);
-        this.container.console.info(`Calculating level up for user ID: ${userID}, current level: ${currentLevel}, current XP: ${currentExperience}, XP needed: ${xpNeeded}.`);
+		await this.container.prisma.users.upsert({
+			where: { userId },
+			update: {
+				globalExperience: newExperience,
+				globalLevel: currentLevel,
+				totalGlobalExperience: { increment: experience },
+				totalTimeInVoiceChannel: { increment: duration }
+			},
+			create: {
+				userId,
+				globalExperience: newExperience,
+				globalLevel: currentLevel,
+				totalGlobalExperience: experience,
+				totalTimeInVoiceChannel: duration
+			}
+		});
+	}
 
-        while (currentExperience >= xpNeeded) {
-            currentLevel++;
-            currentExperience -= xpNeeded;
-            xpNeeded = container.helpers.leveling.xp.experienceFormula(currentLevel);
-            levelUp = true;
-        }
+	private async calculateLevelUp(
+		userID: string,
+		guildID: string,
+		currentExperience: number,
+		currentLevel: number
+	): Promise<{ levelUp: boolean; newLevel: number; newExperience: number }> {
+		let levelUp = false;
+		let xpNeeded = container.helpers.leveling.xp.experienceFormula(currentLevel);
+		this.container.console.info(
+			`Calculating level up for user ID: ${userID}, current level: ${currentLevel}, current XP: ${currentExperience}, XP needed: ${xpNeeded}.`
+		);
 
-        if (levelUp) {
-            this.container.console.info(`User ID: ${userID} leveled up to level ${currentLevel}, updating database.`);
-            await this.container.prisma.voice_experience.update({
-                where: {
-                    guildId_userId: {
-                        guildId: guildID,
-                        userId: userID
-                    }
-                },
-                data: {
-                    voiceLevel: currentLevel,
-                    voiceExperience: currentExperience
-                }
-            });
-        }
+		while (currentExperience >= xpNeeded) {
+			currentLevel++;
+			currentExperience -= xpNeeded;
+			xpNeeded = container.helpers.leveling.xp.experienceFormula(currentLevel);
+			levelUp = true;
+		}
 
-        return { levelUp, newLevel: currentLevel, newExperience: currentExperience };
-    }
+		if (levelUp) {
+			this.container.console.info(`User ID: ${userID} leveled up to level ${currentLevel}, updating database.`);
+			await this.container.prisma.voice_experience.update({
+				where: {
+					guildId_userId: {
+						guildId: guildID,
+						userId: userID
+					}
+				},
+				data: {
+					voiceLevel: currentLevel,
+					voiceExperience: currentExperience
+				}
+			});
+		}
 
-    private async handleLevelUp(member: GuildMember, guildID: string, voiceLevel: number): Promise<void> {
-        try {
-            this.container.console.info(`Handling level up for user ${member.displayName} at level ${voiceLevel}.`);
-            const message = await this.getNotificationMessage(guildID);
-            const userMention = `<@${member.id}>`;
-            const messageWithUserAndLevel = message.replace(/\{user}/g, userMention).replace(/\{level}/g, voiceLevel.toString());
-            const channelID = await this.getNotificationChannelID(guildID);
-            const notificationChannel = this.container.client.channels.resolve(channelID) as TextChannel;
-            if (notificationChannel) {
-                this.container.console.info(`Sending level up notification to channel ID: ${channelID}.`);
-                await notificationChannel.send(messageWithUserAndLevel);
-            }
+		return { levelUp, newLevel: currentLevel, newExperience: currentExperience };
+	}
 
-            await this.assignRoles(member, guildID, voiceLevel);
-        } catch (error) {
-            this.container.console.error(`Failed to handle level up for user ${member.displayName}: ${error}`);
-        }
-    }
+	private async handleLevelUp(member: GuildMember, guildID: string, voiceLevel: number): Promise<void> {
+		try {
+			this.container.console.info(`Handling level up for user ${member.displayName} at level ${voiceLevel}.`);
+			const message = await this.getNotificationMessage(guildID);
+			const userMention = `<@${member.id}>`;
+			const messageWithUserAndLevel = message.replace(/\{user}/g, userMention).replace(/\{level}/g, voiceLevel.toString());
+			const channelID = await this.getNotificationChannelID(guildID);
+			const notificationChannel = this.container.client.channels.resolve(channelID) as TextChannel;
+			if (notificationChannel) {
+				this.container.console.info(`Sending level up notification to channel ID: ${channelID}.`);
+				await notificationChannel.send(messageWithUserAndLevel);
+			}
 
-    private async assignRoles(member: GuildMember, guildID: string, voiceLevel: number): Promise<void> {
-        this.container.console.info(`Assigning roles for user ${member.displayName} at level ${voiceLevel}.`);
-        const rolesForLevel = await this.container.prisma.experience_role_rewards.findMany({
-            where: {
-                guildId: guildID,
-                level: { lte: voiceLevel },
-                roleType: "voice"
-            }
-        });
+			await this.assignRoles(member, guildID, voiceLevel);
+		} catch (error) {
+			this.container.console.error(`Failed to handle level up for user ${member.displayName}: ${error}`);
+		}
+	}
 
-        const roleIdsForLevel = new Set(rolesForLevel.map(role => role.roleId));
-        const currentRoleIds = new Set(member.roles.cache.keys());
-        const rolesToAssign = Array.from(member.guild.roles.cache.values()).filter(role => roleIdsForLevel.has(role.id) && !currentRoleIds.has(role.id));
-        if (rolesToAssign.length > 0) {
-            this.container.console.info(`Assigning ${rolesToAssign.length} new roles to user ${member.displayName}.`);
-            await member.roles.add(rolesToAssign).catch(() => null);
-        }
-    }
+	private async assignRoles(member: GuildMember, guildID: string, voiceLevel: number): Promise<void> {
+		this.container.console.info(`Assigning roles for user ${member.displayName} at level ${voiceLevel}.`);
+		const rolesForLevel = await this.container.prisma.experience_role_rewards.findMany({
+			where: {
+				guildId: guildID,
+				level: { lte: voiceLevel },
+				roleType: 'voice'
+			}
+		});
 
-    private async getNotificationMessage(guildID: string): Promise<string> {
-        try {
-            this.container.console.info(`Fetching level up message for guild ID: ${guildID}.`);
-            const guildData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guildID } });
-            return guildData?.lvlUpMsg ?? "Congratulations, {user}! You've just reached level {level} in voice channels!";
-        } catch (error) {
-            this.container.console.error(`Error fetching level up message for guild ${guildID}: ${error}`);
-            return "Congratulations, {user}! You've just reached level {level} in voice channels! uwu";
-        }
-    }
+		const roleIdsForLevel = new Set(rolesForLevel.map((role) => role.roleId));
+		const currentRoleIds = new Set(member.roles.cache.keys());
+		const rolesToAssign = Array.from(member.guild.roles.cache.values()).filter(
+			(role) => roleIdsForLevel.has(role.id) && !currentRoleIds.has(role.id)
+		);
+		if (rolesToAssign.length > 0) {
+			this.container.console.info(`Assigning ${rolesToAssign.length} new roles to user ${member.displayName}.`);
+			await member.roles.add(rolesToAssign).catch(() => null);
+		}
+	}
 
-    private async getNotificationChannelID(guildID: string): Promise<string> {
-        try {
-            this.container.console.info(`Fetching notification channel ID for guild ID: ${guildID}.`);
-            const guildData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guildID } });
-            return guildData?.msgChannelId ?? "";
-        } catch (error) {
-            this.container.console.error(`Error fetching notification channel ID for guild ${guildID}: ${error}`);
-            return "";
-        }
-    }
+	private async getNotificationMessage(guildID: string): Promise<string> {
+		try {
+			this.container.console.info(`Fetching level up message for guild ID: ${guildID}.`);
+			const guildData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guildID } });
+			return guildData?.lvlUpMsg ?? "Congratulations, {user}! You've just reached level {level} in voice channels!";
+		} catch (error) {
+			this.container.console.error(`Error fetching level up message for guild ${guildID}: ${error}`);
+			return "Congratulations, {user}! You've just reached level {level} in voice channels! uwu";
+		}
+	}
 
-    private getRandomXP(min: number, max: number): number {
-        const randomXP = Math.floor(Math.random() * (max - min + 1)) + min;
-        this.container.console.info(`Generated random XP: ${randomXP} between ${min} and ${max}.`);
-        return randomXP;
-    }
+	private async getNotificationChannelID(guildID: string): Promise<string> {
+		try {
+			this.container.console.info(`Fetching notification channel ID for guild ID: ${guildID}.`);
+			const guildData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guildID } });
+			return guildData?.msgChannelId ?? '';
+		} catch (error) {
+			this.container.console.error(`Error fetching notification channel ID for guild ${guildID}: ${error}`);
+			return '';
+		}
+	}
 
-    private async getUserBonusPercentage(member: GuildMember): Promise<number> {
-        this.container.console.info(`Checking bonus percentage for user ${member.displayName}.`);
-        const bonusRoles = await this.container.prisma.bonus_voice_roles.findMany({ where: { guildId: member.guild.id } });
-        const userRoles = member.roles.cache;
-        let maxBonus = 0;
-        for (const role of bonusRoles) {
-            if (userRoles.has(role.roleId)) {
-                if (role.bonus! > maxBonus) {
-                    this.container.console.info(`Applying bonus for role ID: ${role.roleId} with bonus: ${role.bonus}%.`);
-                    maxBonus = role.bonus!;
-                }
-            }
-        }
+	private getRandomXP(min: number, max: number): number {
+		const randomXP = Math.floor(Math.random() * (max - min + 1)) + min;
+		this.container.console.info(`Generated random XP: ${randomXP} between ${min} and ${max}.`);
+		return randomXP;
+	}
 
-        return maxBonus;
-    }
+	private async getUserBonusPercentage(member: GuildMember): Promise<number> {
+		this.container.console.info(`Checking bonus percentage for user ${member.displayName}.`);
+		const bonusRoles = await this.container.prisma.bonus_voice_roles.findMany({ where: { guildId: member.guild.id } });
+		const userRoles = member.roles.cache;
+		let maxBonus = 0;
+		for (const role of bonusRoles) {
+			if (userRoles.has(role.roleId)) {
+				if (role.bonus! > maxBonus) {
+					this.container.console.info(`Applying bonus for role ID: ${role.roleId} with bonus: ${role.bonus}%.`);
+					maxBonus = role.bonus!;
+				}
+			}
+		}
+
+		return maxBonus;
+	}
 }

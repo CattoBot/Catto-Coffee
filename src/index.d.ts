@@ -1,11 +1,11 @@
-import { PrismaClient } from "@prisma/client";
-import { ArrayString, IntegerString } from "@skyra/env-utilities";
-import Redis from "ioredis";
-import { ApplicationConsole } from "./lib/console";
-import { ChatInputDeniedCommandHelper } from "./lib/events/commandDenied";
-import CoreHelper from "./lib/helpers";
-import { CloudinaryService } from "./lib/services/cloudinary";
-import { Utils } from "./lib/utils";
+import { PrismaClient } from '@prisma/client';
+import { ArrayString, IntegerString } from '@skyra/env-utilities';
+import Redis from 'ioredis';
+import { ApplicationConsole } from './lib/console';
+import { ChatInputDeniedCommandHelper } from './lib/events/commandDenied';
+import CoreHelper from './lib/helpers';
+import { CloudinaryService } from './lib/services/cloudinary';
+import { Utils } from './lib/utils';
 
 declare module '@sapphire/framework' {
 	interface Preconditions {
@@ -30,14 +30,13 @@ declare module '@sapphire/pieces' {
 		prisma: PrismaClient;
 		redis: Redis;
 		console: ApplicationConsole;
-		commandDeniedHelper: ChatInputDeniedCommandHelper
+		commandDeniedHelper: ChatInputDeniedCommandHelper;
 		cloudinary: CloudinaryService;
 		utils: Utils;
 		helpers: CoreHelper;
 		version: string;
 	}
 }
-
 
 declare module '@skyra/env-utilities' {
 	interface Env {

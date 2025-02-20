@@ -7,47 +7,47 @@ import { LeaderboardImageBuilder } from '../../lib/classes/LeaderboardCard';
 import { container } from '@sapphire/framework';
 
 export class ButtonTextLeaderboardHandler extends InteractionHandler {
-    public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
-        super(ctx, {
-            ...options,
-            interactionHandlerType: InteractionHandlerTypes.Button
-        });
-    }
+	public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
+		super(ctx, {
+			...options,
+			interactionHandlerType: InteractionHandlerTypes.Button
+		});
+	}
 
-    public override parse(interaction: ButtonInteraction) {
-        if (interaction.customId !== 'text-lb') return this.none();
-        return this.some();
-    }
+	public override parse(interaction: ButtonInteraction) {
+		if (interaction.customId !== 'text-lb') return this.none();
+		return this.some();
+	}
 
-    @CheckTextExperienceEnabled
-    public async run(interaction: ButtonInteraction) {
-        try {
-            await interaction.deferReply();
+	@CheckTextExperienceEnabled
+	public async run(interaction: ButtonInteraction) {
+		try {
+			await interaction.deferReply();
 
-            const guild_leaderboard = await this.container.helpers.leveling.getTextLeaderboard(interaction.guildId!);
-            if (guild_leaderboard.length === 0) {
-                await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:lb_not_data`) });
-                return;
-            }
+			const guild_leaderboard = await this.container.helpers.leveling.getTextLeaderboard(interaction.guildId!);
+			if (guild_leaderboard.length === 0) {
+				await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:lb_not_data`) });
+				return;
+			}
 
-            const userId = interaction.user.id;
-            const builder = new LeaderboardImageBuilder()
-                .setGuildLeaderboard(guild_leaderboard)
-                .setUserId(userId)
-                .setBackground('../../../assets/img/Leader_TXT.png')
-                .setExperienceFormula(container.helpers.leveling.xp.textExperienceFormula)
-                .setShowMessages(true)
-                .setType('text');
+			const userId = interaction.user.id;
+			const builder = new LeaderboardImageBuilder()
+				.setGuildLeaderboard(guild_leaderboard)
+				.setUserId(userId)
+				.setBackground('../../../assets/img/Leader_TXT.png')
+				.setExperienceFormula(container.helpers.leveling.xp.textExperienceFormula)
+				.setShowMessages(true)
+				.setType('text');
 
-            const buffer = await builder.build();
-            if (buffer) {
-                await interaction.editReply({ files: [{ attachment: buffer, name: 'leaderboard.png' }], components: [TextRankButtonRow] });
-            } else {
-                await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:lb_voice_user_not_data`) });
-            }
-        } catch (error) {
-            container.logger.error(`Error in ButtonTextLeaderboardHandler: ${error}`);
-            await interaction.editReply({ content: 'An error occurred while processing your request. Please try again later.' });
-        }
-    }
+			const buffer = await builder.build();
+			if (buffer) {
+				await interaction.editReply({ files: [{ attachment: buffer, name: 'leaderboard.png' }], components: [TextRankButtonRow] });
+			} else {
+				await interaction.editReply({ content: await resolveKey(interaction, `commands/replies/level:lb_voice_user_not_data`) });
+			}
+		} catch (error) {
+			container.logger.error(`Error in ButtonTextLeaderboardHandler: ${error}`);
+			await interaction.editReply({ content: 'An error occurred while processing your request. Please try again later.' });
+		}
+	}
 }

@@ -1,23 +1,19 @@
 type RoleReward = {
-    id: number;
-    guildId: string;
-    roleId: string;
-    level: number;
-    roleType: 'text' | 'voice';
+	id: number;
+	guildId: string;
+	roleId: string;
+	level: number;
+	roleType: 'text' | 'voice';
 };
 
 type VoiceXP = {
-    guildId: string;
-    isEnabled: boolean;
+	guildId: string;
+	isEnabled: boolean;
 };
 
 type TextXP = {
-    guildId: string;
-    isEnabled: boolean;
+	guildId: string;
+	isEnabled: boolean;
 };
 
-export {
-    RoleReward,
-    VoiceXP,
-    TextXP
-}
+export { RoleReward, VoiceXP, TextXP };

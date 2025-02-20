@@ -7,8 +7,8 @@ export const RandomLoadingMessage = ['Computing...', 'Thinking...', 'Cooking som
 export const Activities = ['catto.gatitosworld.com', 'catto.docs.com', 'Made with 💕'];
 
 export const PresenceStatus = {
-    Playing: ActivityType.Playing,
-    Streaming: ActivityType.Streaming,
-    Listening: ActivityType.Listening,
-    Watching: ActivityType.Watching
+	Playing: ActivityType.Playing,
+	Streaming: ActivityType.Streaming,
+	Listening: ActivityType.Listening,
+	Watching: ActivityType.Watching
 };

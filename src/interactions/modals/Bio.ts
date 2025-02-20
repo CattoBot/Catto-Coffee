@@ -4,26 +4,28 @@ import { Emojis } from '../../shared/enum/Emojis';
 import { resolveKey } from '@sapphire/plugin-i18next';
 
 export class BiographyModalHandler extends InteractionHandler {
-    public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
-        super(ctx, {
-            ...options,
-            interactionHandlerType: InteractionHandlerTypes.ModalSubmit
-        });
-    }
+	public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
+		super(ctx, {
+			...options,
+			interactionHandlerType: InteractionHandlerTypes.ModalSubmit
+		});
+	}
 
-    public override parse(interaction: ModalSubmitInteraction) {
-        if (interaction.customId !== 'modal-bio') return this.none();
-        return this.some();
-    }
+	public override parse(interaction: ModalSubmitInteraction) {
+		if (interaction.customId !== 'modal-bio') return this.none();
+		return this.some();
+	}
 
-    public async run(interaction: ModalSubmitInteraction): Promise<InteractionResponse> {
-        const bio = interaction.fields.getTextInputValue('text-bio');
-        await this.container.prisma.users.upsert({
-            where: { userId: interaction.user.id }, create: { userId: interaction.user.id, aboutme: bio }, update: { aboutme: bio }
-        })
+	public async run(interaction: ModalSubmitInteraction): Promise<InteractionResponse> {
+		const bio = interaction.fields.getTextInputValue('text-bio');
+		await this.container.prisma.users.upsert({
+			where: { userId: interaction.user.id },
+			create: { userId: interaction.user.id, aboutme: bio },
+			update: { aboutme: bio }
+		});
 
-        return await interaction.reply({
-            content: (await resolveKey(interaction, 'commands/replies/set:bio_success', { emoji: Emojis.SUCCESS })),
-        });
-    }
+		return await interaction.reply({
+			content: await resolveKey(interaction, 'commands/replies/set:bio_success', { emoji: Emojis.SUCCESS })
+		});
+	}
 }

@@ -1,1 +1,1 @@
-export type LeaderboardType = 'voice' | 'text' 
+export type LeaderboardType = 'voice' | 'text';

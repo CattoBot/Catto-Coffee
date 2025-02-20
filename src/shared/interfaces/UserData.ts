@@ -1,8 +1,8 @@
-import { Image } from "canvas";
+import { Image } from 'canvas';
 
 interface UserData {
-    userInfo: string;
-    avatar: Image;
+	userInfo: string;
+	avatar: Image;
 }
 
 export type FetchUserData = UserData;

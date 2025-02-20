@@ -8,29 +8,28 @@ import { RemoveUserBlacklistCommand } from '../../lib/commands/owners/remove-bl-
 import { BlacklistCommandRegistry } from '../../shared/bot/commands/build/owner';
 import { OwnerOnlyCommandsOptions } from '../../shared/bot/commands/options/SubCommands/owner';
 
-
 @ApplyOptions<SubcommandOptions>(OwnerOnlyCommandsOptions.Options)
 export class BlacklistCommands extends Subcommand {
-    public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
-        super(context, {
-            ...options,
-        });
-    }
+	public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
+		super(context, {
+			...options
+		});
+	}
 
-    override registerApplicationCommands(registry: Subcommand.Registry) {
-        BlacklistCommandRegistry.registerCommands(registry);
-    }
+	override registerApplicationCommands(registry: Subcommand.Registry) {
+		BlacklistCommandRegistry.registerCommands(registry);
+	}
 
-    public async ChatInputServer(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
-        await AddServerBlacklistCommand.run(interaction);
-    }
-    public async ChatInputUser(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
-        await AddUserBlacklistCommand.run(interaction);
-    }
-    public async ChatInputRemoveUser(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
-        await RemoveUserBlacklistCommand.run(interaction)
-    }
-    public async ChatInputRemoveServer(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
-        await RemoveServerBlacklistCommand.run(interaction)
-    }
+	public async ChatInputServer(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
+		await AddServerBlacklistCommand.run(interaction);
+	}
+	public async ChatInputUser(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
+		await AddUserBlacklistCommand.run(interaction);
+	}
+	public async ChatInputRemoveUser(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
+		await RemoveUserBlacklistCommand.run(interaction);
+	}
+	public async ChatInputRemoveServer(interaction: Subcommand.ChatInputCommandInteraction<CacheType>): Promise<void> {
+		await RemoveServerBlacklistCommand.run(interaction);
+	}
 }

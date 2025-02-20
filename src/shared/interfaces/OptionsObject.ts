@@ -1,6 +1,6 @@
 interface optionsObject {
-    disabled: boolean | undefined,
-    author: string | undefined
+	disabled: boolean | undefined;
+	author: string | undefined;
 }
 
 export type OptionsObject = optionsObject;
