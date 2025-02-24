@@ -165,8 +165,6 @@ export class VoiceCreateHelper extends Helper {
 			allow: overwrites.allow.bitfield,
 			deny: overwrites.deny.bitfield
 		}));
-
-		console.log(perms);
 		return perms;
 	}
 
