@@ -17,19 +17,15 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
 
 	public async run(): Promise<void> {
 		const dailyTop = await this.container.prisma.daily_top.findMany();
-		this.container.console.info('Starting to process daily tops...', dailyTop);
-
 		for (const top of dailyTop) {
 			const guildId = top.guildId;
 			let nextPublishDate = await this.getNextPublishDate(guildId);
 			const now = new Date();
 			if (now >= nextPublishDate) {
-				this.container.console.info(`Processing guild with ID: ${guildId}`);
 				const guildTop10 = await this.getTop10VoiceUsers(guildId);
 				const channel = await this.getChannelId(guildId);
 
 				if (guildTop10.length && channel) {
-					this.container.console.info('Found top 10 voice users and channel...');
 					const buffer = await this.generateDailyVoiceLeaderboard(guildTop10);
 
 					const textChannel = (await this.container.client.channels.fetch(channel)) as TextChannel;
@@ -58,7 +54,6 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
 						.setImage('attachment://leaderboard.png')
 						.setColor(Colors.White);
 					const newMessage = await textChannel.send({ embeds: [embed], files: [{ attachment: buffer, name: 'leaderboard.png' }] });
-					this.container.console.info('Sent new daily top message.');
 					await this.updatedailyTopMessageId(guildId, newMessage.id);
 					await this.deletedailyVoiceExperience(guildId);
 				}
@@ -68,17 +63,14 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
 			}
 		}
 
-		this.container.console.info('Finished run() method.');
 	}
 
 	private async getTop10VoiceUsers(guildId: string) {
-		this.container.console.info('Fetching top 10 voice users...');
 		const top = await this.container.prisma.voice_experience.findMany({
 			where: { guildId },
 			take: 10,
 			orderBy: { dailyTimeInVoiceChannel: 'desc' }
 		});
-		this.container.console.info('Fetched top 10 voice users.', top);
 		return top;
 	}
 
@@ -87,21 +79,17 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
 			where: { guildId },
 			data: { dailyTimeInVoiceChannel: 0 }
 		});
-		this.container.console.info('Deleted daily voice experience.');
 	}
 
 	private async getChannelId(guildId: string) {
 		const channel = await this.container.prisma.leaderboard_channels.findUnique({
 			where: { guildId }
 		});
-		this.container.console.info('Fetched channel ID:', channel?.dailyVoiceTop10channelId);
 		return channel?.dailyVoiceTop10channelId;
 	}
 
 	private async getNextPublishDate(guildId: string): Promise<Date> {
 		let nextDateString = await this.container.redis.get(`daily:publish:${guildId}`);
-		this.container.console.info('Fetched next publish date from Redis:', nextDateString);
-
 		if (!nextDateString) {
 			const dailyTop = await this.container.prisma.daily_top.findUnique({
 				where: { guildId }
@@ -112,10 +100,7 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
 			}
 
 			const baseDate = dailyTop.updated_at!;
-			this.container.console.info(`Fetched base date from database (updatedAt): ${baseDate}`);
-
-			const nextDate = addDays(baseDate, 1); // 24 hours
-			this.container.console.info(`Calculated next publish date from base date: ${nextDate}`);
+			const nextDate = addDays(baseDate, 1);
 
 			await this.updateNextPublishDate(guildId, nextDate);
 
@@ -127,7 +112,6 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
 
 	private async updateNextPublishDate(guildId: string, nextDate: Date): Promise<void> {
 		await this.container.redis.set(`daily:publish:${guildId}`, formatISO(nextDate));
-		this.container.console.info('Updated next publish date:', nextDate);
 	}
 
 	private async updatedailyTopMessageId(guildId: string, messageId: string): Promise<void> {
@@ -135,7 +119,6 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
 			where: { guildId },
 			data: { lastDailyMessageId: messageId }
 		});
-		this.container.console.info('Updated daily top message ID:', messageId);
 	}
 
 	private async generateDailyVoiceLeaderboard(guildTop10: LeaderboardUserData[]) {

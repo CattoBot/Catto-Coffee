@@ -17,7 +17,6 @@ export class VoiceSessionsListener extends Listener<typeof Events.ClientReady> {
 							const sessionId = `voiceSession:${memberId}:${guild.id}`;
 							const sessionData = await this.container.redis.get(sessionId);
 							if (!sessionData) {
-								this.container.console.info(`Adding session key for user ${member.displayName} in guild ${guild.name}`);
 								await this.container.redis.set(sessionId, JSON.stringify({ startTime: Date.now() }));
 							}
 						}

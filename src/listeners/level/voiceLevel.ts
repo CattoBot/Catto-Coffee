@@ -20,7 +20,6 @@ export class VoiceLevelingCoreModule extends Listener<typeof Events.VoiceStateUp
 	@VoiceUserEntry()
 	public async run(oldState: VoiceState, newState: VoiceState): Promise<void> {
 		if (!newState.member || newState.member.user.bot) {
-			this.container.console.warn('No se encontró miembro en el nuevo estado de voz o es un bot.');
 			return;
 		}
 

@@ -28,7 +28,6 @@ export function VoiceUserEntry() {
 					await container.prisma.users.create({
 						data: { userId }
 					});
-					container.logger.info(`Usuario con ID ${userId} creado en la base de datos.`);
 				}
 				return originalMethod.apply(this, args);
 			} catch (error) {

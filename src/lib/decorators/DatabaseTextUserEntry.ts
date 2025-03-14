@@ -21,7 +21,7 @@ export function TextUserEntry() {
 				await container.prisma.users.create({
 					data: { userId }
 				});
-				container.logger.info(`User with ID ${userId} created in the database.`);
+
 			}
 			return originalMethod.apply(this, args);
 		};
