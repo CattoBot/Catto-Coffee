@@ -5,7 +5,6 @@ import { ScheduledTask, ScheduledTaskEvents } from '@sapphire/plugin-scheduled-t
 @ApplyOptions<Listener.Options>({ event: ScheduledTaskEvents.ScheduledTaskSuccess })
 export class UserListener extends Listener<typeof ScheduledTaskEvents.ScheduledTaskSuccess> {
 	public override run(task: ScheduledTask, _payload: unknown, _taskRunResult: unknown, duration: number) {
-		this.container.logger.debug(`[Scheduled-Task Plugin]: successfully ran task: ${task.name} in ${this.formatDuration(duration)}`);
 	}
 
 	public override onLoad() {

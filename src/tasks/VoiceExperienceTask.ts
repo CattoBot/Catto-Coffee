@@ -47,8 +47,6 @@ export class VoiceExperienceTask extends ScheduledTask {
 			} catch (error) {
 				this.container.console.error(`Error cleaning up failed keys from Redis: ${error}`);
 			}
-		} else {
-			this.container.console.info(`No failed keys were found.`);
 		}
 	}
 
@@ -327,7 +325,6 @@ export class VoiceExperienceTask extends ScheduledTask {
 
 	private getRandomXP(min: number, max: number): number {
 		const randomXP = Math.floor(Math.random() * (max - min + 1)) + min;
-		this.container.console.info(`Generated random XP: ${randomXP} between ${min} and ${max}.`);
 		return randomXP;
 	}
 
@@ -338,7 +335,6 @@ export class VoiceExperienceTask extends ScheduledTask {
 		for (const role of bonusRoles) {
 			if (userRoles.has(role.roleId)) {
 				if (role.bonus! > maxBonus) {
-					this.container.console.info(`Applying bonus for role ID: ${role.roleId} with bonus: ${role.bonus}%.`);
 					maxBonus = role.bonus!;
 				}
 			}

@@ -53,11 +53,13 @@ export class DailyVoiceLeaderboardTask extends ScheduledTask {
 						})
 						.setImage('attachment://leaderboard.png')
 						.setColor(Colors.White);
-					const newMessage = await textChannel.send({ embeds: [embed], files: [{ attachment: buffer, name: 'leaderboard.png' }] });
-					await this.updatedailyTopMessageId(guildId, newMessage.id);
-					await this.deletedailyVoiceExperience(guildId);
+					try {
+						const newMessage = await textChannel.send({ embeds: [embed], files: [{ attachment: buffer, name: 'leaderboard.png' }] });
+						await this.updatedailyTopMessageId(guildId, newMessage.id);
+						await this.deletedailyVoiceExperience(guildId);
+					} catch (error) {
+					}
 				}
-
 				const newNextDate = addDays(now, 1);
 				await this.updateNextPublishDate(guildId, newNextDate);
 			}
