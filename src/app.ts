@@ -1,17 +1,16 @@
 import './lib/setup';
-import { ApplicationClient } from './app/client';
+import app from './lib/client';
 
-async function main(): Promise<void> {
-	const client = new ApplicationClient();
+const main = async () => {
 	try {
-		client.logger.info('Logging in');
-		await client.login();
-		client.logger.info('Logged in');
+		app.logger.info('Logging in');
+		await app.login();
+		app.logger.info('logged in');
 	} catch (error) {
-		client.logger.fatal(error);
-		await client.destroy();
+		app.logger.fatal(error);
+		await app.destroy();
 		process.exit(1);
 	}
-}
+};
 
 void main();

@@ -3,7 +3,7 @@ node_modules/
 .vs/
 .idea/
 *.iml
-.env
+
 # Yarn files
 .yarn/install-state.gz
 .yarn/build-state.yml
@@ -13,6 +13,8 @@ node_modules/
 
 dist/
 
+# Ignore the config file (contains sensitive information such as tokens)
+config.ts
 
 # Ignore heapsnapshot and log files
 *.heapsnapshot
@@ -26,4 +28,3 @@ package-lock.json
 .env.development.local
 .env.test.local
 .env.production.local
-src/.env
