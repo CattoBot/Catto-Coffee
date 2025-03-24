@@ -1,8 +1,10 @@
 import { LogLevel, SapphireClient } from '@sapphire/framework';
 import { GatewayIntentBits, Partials } from 'discord.js';
-import { getRootData } from '@sapphire/pieces';
+import { container, getRootData } from '@sapphire/pieces';
 import { join } from 'path';
 import { envParseString } from '@skyra/env-utilities';
+import { PrismaClient } from '@prisma/client';
+import Redis from 'ioredis';
 
 export class Client extends SapphireClient {
     private rootData = getRootData();
@@ -27,7 +29,7 @@ export class Client extends SapphireClient {
                 GatewayIntentBits.GuildVoiceStates,
                 GatewayIntentBits.MessageContent
             ],
-            partials: [Partials.Channel],
+            partials: [Partials.Channel, Partials.User, Partials.GuildMember, Partials.Message],
             loadMessageCommandListeners: true,
             presence: {
                 status: 'idle'
@@ -35,7 +37,8 @@ export class Client extends SapphireClient {
             tasks: {
                 bull: {
                     connection: {
-                        url: envParseString('REDIS_URL')
+                        url: envParseString('REDIS_URL'),
+                        db: 1
                     }
                 }
             },
@@ -49,6 +52,8 @@ export class Client extends SapphireClient {
 
 
     public override async login(token?: string): Promise<string> {
+        container.prisma = new PrismaClient();
+        container.redis = new Redis(envParseString('REDIS_URL'))
         return super.login(token)
     }
 }
