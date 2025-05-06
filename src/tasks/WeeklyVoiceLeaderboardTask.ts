@@ -16,20 +16,16 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
 
 	public async run(): Promise<void> {
 		const weeklyTop = await this.container.prisma.weekly_top.findMany();
-		this.container.console.info('Starting to process weekly tops...', weeklyTop);
-
 		for (const top of weeklyTop) {
 			const guildId = top.guildId;
 			let nextPublishDate = await this.getNextPublishDate(guildId);
 			const now = new Date();
 
 			if (now >= nextPublishDate) {
-				this.container.console.info(`Processing guild with ID: ${guildId}`);
 				const guildTop10 = await this.getTop10VoiceUsers(guildId);
 				const channel = await this.getChannelId(guildId);
 
 				if (guildTop10.length && channel) {
-					this.container.console.info('Found top 10 voice users and channel...');
 					const buffer = await this.generateWeeklyVoiceLeaderboard(guildTop10);
 
 					const textChannel = (await this.container.client.channels.fetch(channel)) as TextChannel;
@@ -38,7 +34,7 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
 							const previousMessage = await textChannel.messages.fetch(top.lastWeeklyMessageId);
 							await previousMessage.delete();
 						} catch (error) {
-							this.container.console.error('Error deleting previous message:', error);
+
 						}
 					}
 
@@ -57,7 +53,6 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
 						})
 						.setImage('attachment://leaderboard.png');
 					const newMessage = await textChannel.send({ embeds: [embed], files: [{ attachment: buffer, name: 'leaderboard.png' }] });
-					this.container.console.info('Sent new weekly top message.');
 					await this.updateWeeklyTopMessageId(guildId, newMessage.id);
 					await this.deleteWeeklyVoiceExperience(guildId);
 				}
@@ -67,17 +62,14 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
 			}
 		}
 
-		this.container.console.info('Finished run() method.');
 	}
 
 	private async getTop10VoiceUsers(guildId: string) {
-		this.container.console.info('Fetching top 10 voice users...');
 		const top = await this.container.prisma.voice_experience.findMany({
 			where: { guildId },
 			take: 10,
 			orderBy: { weeklyTimeInVoiceChannel: 'desc' }
 		});
-		this.container.console.info('Fetched top 10 voice users.', top);
 		return top;
 	}
 
@@ -86,21 +78,17 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
 			where: { guildId },
 			data: { weeklyTimeInVoiceChannel: 0 }
 		});
-		this.container.console.info('Deleted weekly voice experience.');
 	}
 
 	private async getChannelId(guildId: string) {
 		const channel = await this.container.prisma.leaderboard_channels.findUnique({
 			where: { guildId }
 		});
-		this.container.console.info('Fetched channel ID:', channel?.weeklyVoiceTop10channelId);
 		return channel?.weeklyVoiceTop10channelId;
 	}
 
 	private async getNextPublishDate(guildId: string): Promise<Date> {
 		let nextDateString = await this.container.redis.get(`weekly:publish:${guildId}`);
-		this.container.console.info('Fetched next publish date from Redis:', nextDateString);
-
 		if (!nextDateString) {
 			const weeklyTop = await this.container.prisma.weekly_top.findUnique({
 				where: { guildId }
@@ -111,10 +99,7 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
 			}
 
 			const baseDate = weeklyTop.updatedAt!;
-			this.container.console.info(`Fetched base date from database (updatedAt): ${baseDate}`);
-
 			const nextDate = addDays(baseDate, 7);
-			this.container.console.info(`Calculated next publish date from base date: ${nextDate}`);
 
 			await this.updateNextPublishDate(guildId, nextDate);
 
@@ -126,7 +111,6 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
 
 	private async updateNextPublishDate(guildId: string, nextDate: Date): Promise<void> {
 		await this.container.redis.set(`weekly:publish:${guildId}`, formatISO(nextDate));
-		this.container.console.info('Updated next publish date:', nextDate);
 	}
 
 	private async updateWeeklyTopMessageId(guildId: string, messageId: string): Promise<void> {
@@ -134,7 +118,6 @@ export class WeeklyVoiceLeaderboardTask extends ScheduledTask {
 			where: { guildId },
 			data: { lastWeeklyMessageId: messageId }
 		});
-		this.container.console.info('Updated weekly top message ID:', messageId);
 	}
 
 	private async generateWeeklyVoiceLeaderboard(guildTop10: any[]) {

@@ -7,8 +7,6 @@ import { FilteredVoiceChannels } from '../../lib/decorators/FilteredVoiceChannel
 export class VoiceSessionsListener extends Listener<typeof Events.ClientReady> {
 	@FilteredVoiceChannels()
 	public async run() {
-		this.container.console.await('Bot is ready. Checking for users in voice channels without session keys.');
-
 		for (const guild of this.container.client.guilds.cache.values()) {
 			for (const channel of guild.channels.cache.values()) {
 				if (channel instanceof VoiceChannel) {
@@ -24,7 +22,5 @@ export class VoiceSessionsListener extends Listener<typeof Events.ClientReady> {
 				}
 			}
 		}
-
-		this.container.console.success('Finished checking for users in voice channels without session keys.');
 	}
 }

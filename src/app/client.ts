@@ -2,7 +2,6 @@ import { LogLevel, SapphireClient, container } from '@sapphire/framework';
 import { envParseString } from '@skyra/env-utilities';
 import { InternationalizationContext } from '@sapphire/plugin-i18next';
 import { GatewayIntentBits, Partials } from 'discord.js';
-import { PrismaClient } from '@prisma/client';
 import { getRootData } from '@sapphire/pieces';
 import { join } from 'path';
 import { Redis } from 'ioredis';
@@ -12,6 +11,7 @@ import { Config } from '../config';
 import { Utils } from '../lib/utils';
 import { CloudinaryService } from '../lib/services/cloudinary';
 import Helper from '../lib/helpers/index';
+import { PrismaClient } from '@prisma/client';
 
 export class ApplicationClient extends SapphireClient {
 	private rootData = getRootData();

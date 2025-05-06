@@ -17,20 +17,16 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
 
 	public async run(): Promise<void> {
 		const monthlyTop = await this.container.prisma.monthly_top.findMany();
-		this.container.console.info('Starting to process monthly tops...', monthlyTop);
-
 		for (const top of monthlyTop) {
 			const guildId = top.guildId;
 			let nextPublishDate = await this.getNextPublishDate(guildId);
 			const now = new Date();
 
 			if (now >= nextPublishDate) {
-				this.container.console.info(`Processing guild with ID: ${guildId}`);
 				const guildTop10 = await this.getTop10VoiceUsers(guildId);
 				const channel = await this.getChannelId(guildId);
 
 				if (guildTop10.length && channel) {
-					this.container.console.info('Found top 10 voice users and channel...');
 					const buffer = await this.generateMonthlyVoiceLeaderboard(guildTop10);
 
 					const textChannel = (await this.container.client.channels.fetch(channel)) as TextChannel;
@@ -57,7 +53,6 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
 						})
 						.setImage('attachment://leaderboard.png');
 					const newMessage = await textChannel.send({ embeds: [embed], files: [{ attachment: buffer, name: 'leaderboard.png' }] });
-					this.container.console.info('Sent new monthly top message.');
 					await this.updatemonthlyTopMessageId(guildId, newMessage.id);
 					await this.deletemonthlyVoiceExperience(guildId);
 				}
@@ -66,18 +61,14 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
 				await this.updateNextPublishDate(guildId, newNextDate);
 			}
 		}
-
-		this.container.console.info('Finished run() method.');
 	}
 
 	private async getTop10VoiceUsers(guildId: string) {
-		this.container.console.info('Fetching top 10 voice users...');
 		const top = await this.container.prisma.voice_experience.findMany({
 			where: { guildId },
 			take: 10,
 			orderBy: { monthlyTimeInVoiceChannel: 'desc' }
 		});
-		this.container.console.info('Fetched top 10 voice users.', top);
 		return top;
 	}
 
@@ -86,21 +77,17 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
 			where: { guildId },
 			data: { dailyTimeInVoiceChannel: 0 }
 		});
-		this.container.console.info('Deleted monthly voice experience.');
 	}
 
 	private async getChannelId(guildId: string) {
 		const channel = await this.container.prisma.leaderboard_channels.findUnique({
 			where: { guildId }
 		});
-		this.container.console.info('Fetched channel ID:', channel?.monthlyVoiceTop10channelId);
 		return channel?.monthlyVoiceTop10channelId;
 	}
 
 	private async getNextPublishDate(guildId: string): Promise<Date> {
 		let nextDateString = await this.container.redis.get(`monthly:publish:${guildId}`);
-		this.container.console.info('Fetched next publish date from Redis:', nextDateString);
-
 		if (!nextDateString) {
 			const monthlyTop = await this.container.prisma.monthly_top.findUnique({
 				where: { guildId }
@@ -111,10 +98,7 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
 			}
 
 			const baseDate = monthlyTop.updatedAt!;
-			this.container.console.info(`Fetched base date from database (updatedAt): ${baseDate}`);
-
 			const nextDate = addDays(baseDate, 30);
-			this.container.console.info(`Calculated next publish date from base date: ${nextDate}`);
 
 			await this.updateNextPublishDate(guildId, nextDate);
 
@@ -126,7 +110,6 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
 
 	private async updateNextPublishDate(guildId: string, nextDate: Date): Promise<void> {
 		await this.container.redis.set(`monthly:publish:${guildId}`, formatISO(nextDate));
-		this.container.console.info('Updated next publish date:', nextDate);
 	}
 
 	private async updatemonthlyTopMessageId(guildId: string, messageId: string): Promise<void> {
@@ -134,7 +117,6 @@ export class MonthlyVoiceLeaderboardTask extends ScheduledTask {
 			where: { guildId },
 			data: { lastMonthlyMessageId: messageId }
 		});
-		this.container.console.info('Updated monthly top message ID:', messageId);
 	}
 
 	private async generateMonthlyVoiceLeaderboard(guildTop10: LeaderboardUserData[]) {

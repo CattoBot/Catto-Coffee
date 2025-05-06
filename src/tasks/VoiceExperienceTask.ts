@@ -280,7 +280,6 @@ export class VoiceExperienceTask extends ScheduledTask {
 
 			await this.assignRoles(member, guildID, voiceLevel);
 		} catch (error) {
-			this.container.console.error(`Failed to handle level up for user ${member.displayName}: ${error}`);
 		}
 	}
 
@@ -308,7 +307,6 @@ export class VoiceExperienceTask extends ScheduledTask {
 			const guildData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guildID } });
 			return guildData?.lvlUpMsg ?? "Congratulations, {user}! You've just reached level {level} in voice channels!";
 		} catch (error) {
-			this.container.console.error(`Error fetching level up message for guild ${guildID}: ${error}`);
 			return "Congratulations, {user}! You've just reached level {level} in voice channels!";
 		}
 	}
@@ -318,7 +316,6 @@ export class VoiceExperienceTask extends ScheduledTask {
 			const guildData = await this.container.prisma.i_voice_experience.findUnique({ where: { guildId: guildID } });
 			return guildData?.msgChannelId ?? '';
 		} catch (error) {
-			this.container.console.error(`Error fetching notification channel ID for guild ${guildID}: ${error}`);
 			return '';
 		}
 	}
