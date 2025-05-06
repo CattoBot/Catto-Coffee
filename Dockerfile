@@ -13,8 +13,9 @@ RUN set -ex; \
     py3-pip
 ENV PYTHON=/usr/bin/python3
 WORKDIR /app
-COPY package*.json ./
-RUN npm cache clean --force && npm install
+COPY node_modules ./
+COPY package.json ./
+RUN npm install
 COPY . .
 RUN npx prisma generate
 RUN npm run build
