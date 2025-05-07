@@ -12,7 +12,7 @@
 
 dist/
 
-
+node_modules
 # Ignore heapsnapshot and log files
 *.heapsnapshot
 *.log
