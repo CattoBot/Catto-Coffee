@@ -8,8 +8,8 @@
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "@sapphire/decorators": "^6.1.1",
-    "@sapphire/discord-utilities": "^3.4.4",
-    "@sapphire/discord.js-utilities": "^7.3.2",
+    "@sapphire/discord-utilities": "^3.5.0",
+    "@sapphire/discord.js-utilities": "^7.3.3",
     "@sapphire/fetch": "^3.0.5",
     "@sapphire/framework": "^5.3.4",
     "@sapphire/pieces": "^4.3.2",
@@ -30,6 +30,7 @@
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.2.0",
     "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0",
     "ioredis": "^5.6.1",
     "lodash": "^4.17.21",
     "os": "^0.1.2",
@@ -41,7 +42,7 @@
     "@sapphire/prettier-config": "^2.0.0",
     "@sapphire/ts-config": "^5.0.1",
     "@types/lodash": "^4.17.16",
-    "@types/node": "^22.15.11",
+    "@types/node": "^22.15.15",
     "@types/signale": "^1.4.7",
     "@types/ws": "^8.18.1",
     "npm-run-all2": "^6.2.6",
@@ -68,5 +69,6 @@
     "displayTimestamp": true,
     "underlineLabel": true
   },
-  "prettier": "@sapphire/prettier-config"
+  "prettier": "@sapphire/prettier-config",
+  "packageManager": "pnpm@10.7.0+sha512.6b865ad4b62a1d9842b61d674a393903b871d9244954f652b8842c2b553c72176b278f64c463e52d40fff8aba385c235c8c9ecf5cc7de4fd78b8bb6d49633ab6"
 }
