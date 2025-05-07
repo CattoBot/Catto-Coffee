@@ -13,7 +13,6 @@ RUN set -ex; \
     py3-pip
 ENV PYTHON=/usr/bin/python3
 WORKDIR /app
-COPY node_modules ./
 COPY package.json ./
 RUN npm install
 COPY . .
